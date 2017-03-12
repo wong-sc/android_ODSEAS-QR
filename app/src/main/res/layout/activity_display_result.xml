@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.example.pethoalpar.zxingexample.DisplayResult">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="View Attendance"
+            android:id="@+id/viewattendance" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="10dp"
+            card_view:cardElevation="10dp"
+            android:layout_marginTop="18dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="383dp">
+
+                <TextView
+                    android:id="@+id/coursenametag"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:paddingLeft="5dp"
+                    android:text="Course Name:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:text="TMP 4935 Final Year Project 2"
+                    android:id="@+id/coursename"
+                    android:layout_below="@+id/coursenametag"/>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    card_view:cardCornerRadius="10dp"
+                    card_view:cardBackgroundColor="#eeeeee"
+                    android:layout_margin="15dp"
+                    android:layout_below="@+id/coursename">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="276dp">
+
+                        <TextView
+                            android:id="@+id/total"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="3dp"
+                            android:layout_marginBottom="15dp"
+                            android:text="Total: "
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/attendee"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/total"
+                            android:paddingTop="5dp"
+                            android:text="0"
+                            android:textAlignment="center"
+                            android:textSize="40sp" />
+
+                        <TextView
+                            android:id="@+id/noattendees"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/attendee"
+                            android:paddingLeft="15dp"
+                            android:text="Number of Attendees"
+                            android:textAlignment="center"
+                            android:textSize="20sp" />
+
+                        <ImageView
+                            android:id="@+id/underline"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_below="@+id/noattendees"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:layout_marginTop="15dp"
+                            android:background="#000000" />
+
+                        <TextView
+                            android:id="@+id/bookletnum"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_below="@+id/underline"
+                            android:paddingTop="15dp"
+                            android:text="0"
+                            android:textAlignment="center"
+                            android:textSize="40sp" />
+
+                        <TextView
+                            android:id="@+id/answerbooklet"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Answer Booklets"
+                            android:textAlignment="center"
+                            android:textSize="20sp"
+                            android:layout_below="@+id/bookletnum"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true" />
+
+
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <Button
+            android:id="@+id/viewlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="View Name List"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/stopscan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Stop Scan"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</ScrollView>

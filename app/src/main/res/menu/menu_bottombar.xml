@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottombarpin"
+        android:icon="@drawable/ic_menu_keypad"
+        android:title="Insert Pin">
+    </item>
+
+    <item
+        android:id="@+id/bottombarscanner"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="QR Scanner">
+    </item>
+
+    <item
+        android:id="@+id/bottombarviewattendance"
+        android:icon="@drawable/ic_menu_view"
+        android:title="Attendance">
+    </item>
+</menu>
