@@ -31,8 +31,7 @@ import java.util.Map;
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
     //public static final String LOGIN_URL = "http://simplifiedcoding.16mb.com/UserRegistration/volleyLogin.php";
-    private static final String LOGIN_URL = Config.BASE_URL+"seas/staff/login.php";
-           // "http://10.64.117.203/seas/staff/login.php";
+    private static final String LOGIN_URL = Config.BASE_URL+"ODSEAS-QR/staff/login.php";
 
     public static final String KEY_STAFF_ID="staff_id";
     public static final String KEY_PASSWORD="staff_password";

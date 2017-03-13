@@ -89,7 +89,7 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
 
     private void getData(){
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"seas/student/getSubjectData.php",
+        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getSubjectData.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -125,7 +125,7 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
 
     private void getDetails(String subjectID){
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"seas/student/getDetailsData.php?subject_code="+subjectID,
+        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getDetailsData.php?subject_code="+subjectID,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

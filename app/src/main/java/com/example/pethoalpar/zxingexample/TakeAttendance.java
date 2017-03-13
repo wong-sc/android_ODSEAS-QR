@@ -22,7 +22,6 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 
 public class TakeAttendance extends AppCompatActivity {
 
-    BottomBar mBottomBar;
     FragmentAdapter adapterViewPager;
 
 
@@ -79,35 +78,6 @@ public class TakeAttendance extends AppCompatActivity {
             }
         });
     }
-    //        mBottomBar = BottomBar.attach(this, savedInstanceState);
-//        mBottomBar.setItemsFromMenu(R.menu.menu_bottombar, new OnMenuTabClickListener() {
-//            @Override
-//            public void onMenuTabSelected(@IdRes int i) {
-//                if (i == R.id.bottombarscanner) {
-//                    Scan f = new Scan();
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
-//                } else if (i == R.id.bottombarpin) {
-//                    EnterStudentID f = new EnterStudentID();
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
-//                } else if (i == R.id.bottombarviewattendance) {
-//                    DisplayResult f = new DisplayResult();
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, f).commit();
-//                }
-//            }
-//
-//            @Override
-//            public void onMenuTabReSelected(@IdRes int i) {
-//
-//            }
-//        });
-//        mBottomBar.mapColorForTab(0,"#E1BEE7");
-//        mBottomBar.mapColorForTab(1,"#B3E5FC");
-//        mBottomBar.mapColorForTab(2,"#FFECB3");
-//
-////        BottomBarBadge unread;
-////        unread = mBottomBar.makeBadgeForTabAt(1,"#BDBDBD",13);
-////        unread.show();
-//    }
 
     public boolean onCreateOptionalMenu (Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bottombar,menu);

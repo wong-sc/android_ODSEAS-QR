@@ -12,6 +12,8 @@
         <item>All</item>
         <item>Attendees</item>
         <item>Absentees</item>
+        <item>Attendees - Submitted</item>
+        <item>Attendees - In Examination</item>
     </string-array>
 
 </resources>

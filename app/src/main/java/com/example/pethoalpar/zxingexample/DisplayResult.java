@@ -76,7 +76,7 @@ public class DisplayResult extends Fragment {
 
     public void getAttendedData() {
             requestQueue = Volley.newRequestQueue(getActivity());
-            JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"seas/student/getAttendedData.php?subject_code="+subjectCode+"&isScanned=1",
+            JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"ODSEAS-QR/student/getAttendedData.php?subject_code="+subjectCode+"&isScanned=1",
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject jsonObject) {
@@ -114,7 +114,7 @@ public class DisplayResult extends Fragment {
 
     public void getAnswerBooklet() {
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"seas/student/getAnswerBooklet.php?subject_code="+subjectCode+"&isScanned=1",
+        JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"ODSEAS-QR/student/getAnswerBooklet.php?subject_code="+subjectCode+"&isScanned=1",
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {

@@ -26,8 +26,6 @@ public class ParseJSON {
         try {
             jsonObject = new JSONObject(json);
             users = jsonObject.getJSONArray(JSON_ARRAY);
-
-
             ids = new String[users.length()];
             names = new String[users.length()];
 

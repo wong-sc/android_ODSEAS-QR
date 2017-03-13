@@ -108,7 +108,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
     public void checkAlreadyScan() {
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "seas/student/checkAlreadyScan.php?stud_id=" + dataStringStudentID + "&subject_code=" + dataStringSubjectCode,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/checkAlreadyScan.php?stud_id=" + dataStringStudentID + "&subject_code=" + dataStringSubjectCode,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -162,7 +162,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
     public void checkStudent() {
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "seas/student/getStudentSubject.php?stud_id=" + dataStringStudentID,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/getStudentSubject.php?stud_id=" + dataStringStudentID,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -213,7 +213,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
         requestQueue = Volley.newRequestQueue(getActivity());
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "seas/student/getStudentData.php?stud_id=" + dataStringStudentID,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/getStudentData.php?stud_id=" + dataStringStudentID,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -247,7 +247,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     }
 
     public void getData() {
-        String getUrl = Config.BASE_URL + "seas/gcm_test/v1/updateAttendanceRecord";
+        String getUrl = Config.BASE_URL + "ODSEAS-QR/gcm_test/v1/updateAttendanceRecord";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -320,284 +320,3 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         }
     }
 }
-//public class EnterStudentID extends AppCompatActivity{
-//
-//    public String dataStringStudentID;
-//    public String dataStringSubjectCode;
-//
-//    RequestQueue requestQueue;
-//
-//    private Button buttonEnter;
-//    private EditText studentid;
-//    private TextView studentname;
-//    private boolean foundStudent = false;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_enter_student_id);
-//
-//        Intent i = getIntent();
-//        dataStringSubjectCode = i.getStringExtra("passDataSubjectCode");
-//        Log.d("hye datastring subject", dataStringSubjectCode);
-//
-//        requestQueue = Volley.newRequestQueue(getApplicationContext());
-//
-//    }
-//
-//    public void buttonEnter (View v) {
-//        editEnterStudID = (EditText) findViewById(R.id.EnterStudID);
-//
-//        dataStringStudentID = editEnterStudID.getText().toString();
-//        Log.d("hye datastring subject", dataStringStudentID);
-//        checkStudent();
-//        //getStudentName();
-//        //textStudName.setText(editEnterStudID.getText());
-//
-//    }
-//
-//    public void buttonConfirm (View v) {
-//
-//        //Toast.makeText(this,"Successfully added "+dataStringStudentID,Toast.LENGTH_LONG).show();
-//
-//        checkAlreadyScan();
-//        getData();
-//    }
-//
-//    public void checkAlreadyScan(){
-//        requestQueue = Volley.newRequestQueue(this);
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"seas/student/checkAlreadyScan.php?stud_id="+dataStringStudentID+"&subject_code="+dataStringSubjectCode,
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject jsonObject) {
-//
-//                        try {
-//                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-//
-//                            Log.d("testing", ""+jsonArray.length());
-//
-//                            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                                JSONObject result = jsonArray.getJSONObject(i);
-//                                String Scanned = "1";
-//                                String isScanned = result.getString("isScanned");
-//                                Log.d ("hye subject codess",isScanned);
-//                                if(Scanned.equals(isScanned)) {
-//
-//                                    //Toast.makeText(EnterStudentID.this,dataStringStudentID+" already scanned!",Toast.LENGTH_LONG).show();
-//                                    AlertDialog.Builder Adialog = new AlertDialog.Builder(EnterStudentID.this);
-//                                    Adialog.setMessage(dataStringStudentID+" has already scanned!").setCancelable(false)
-//                                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    dialog.cancel();
-//                                                }
-//                                            });
-//
-//                                    AlertDialog alert = Adialog.create();
-//                                    alert.setTitle("Alert");
-//                                    alert.show();
-//
-//                                }
-//                                else{
-//                                    Toast.makeText(EnterStudentID.this,"Successfully added "+dataStringStudentID,Toast.LENGTH_LONG).show();
-//                                }
-//
-//                            }
-//
-//                            if (jsonArray.length()==0){
-//                                AlertDialog.Builder Adialog = new AlertDialog.Builder(EnterStudentID.this);
-//                                Adialog.setMessage(dataStringStudentID+" has already scanned!").setCancelable(false)
-//                                        .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which) {
-//                                                dialog.cancel();
-//                                            }
-//                                        });
-//
-//                                AlertDialog alert = Adialog.create();
-//                                alert.setTitle("Alert");
-//                                alert.show();
-//
-//                            }
-//
-//
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError volleyError) {
-//                        Log.e("Volley",volleyError.toString());
-//
-//                    }
-//                }
-//
-//
-//        );
-//        requestQueue.add(jsonObjectRequest);
-//    }
-//
-//    public void checkStudent(){
-//        requestQueue = Volley.newRequestQueue(this);
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"seas/student/getStudentSubject.php?stud_id="+dataStringStudentID,
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject jsonObject) {
-//
-//                        try {
-//                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-//
-//                            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                                JSONObject result = jsonArray.getJSONObject(i);
-//
-//                                String subject_code = result.getString("subject_code");
-//                                Log.d ("hye subject codess",subject_code);
-//                                if(dataStringSubjectCode.equals(subject_code)) {
-//                                    //Toast.makeText(EnterStudentID.this,"student exists",Toast.LENGTH_LONG).show();
-//                                    foundStudent = true;
-//                                    getStudentName();
-//                                }
-//
-//                            }
-//                            if (!foundStudent){
-//                                //Toast.makeText(EnterStudentID.this,"student does not exists",Toast.LENGTH_LONG).show();
-//                                AlertDialog.Builder Adialog = new AlertDialog.Builder(EnterStudentID.this);
-//                                Adialog.setMessage("Student does not register for this subject.").setCancelable(false)
-//                                        .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which) {
-//                                                dialog.cancel();
-//                                            }
-//                                        });
-//
-//                                AlertDialog alert = Adialog.create();
-//                                alert.setTitle("Alert");
-//                                alert.show();
-//                            }
-//
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError volleyError) {
-//                        Log.e("Volley",volleyError.toString());
-//
-//                    }
-//                }
-//
-//
-//        );
-//        requestQueue.add(jsonObjectRequest);
-//    }
-//
-//    public void getStudentName(){
-//        textStudName = (TextView) findViewById(R.id.textViewName);
-//        requestQueue = Volley.newRequestQueue(this);
-//
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"seas/student/getStudentData.php?stud_id="+dataStringStudentID,
-//                new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject jsonObject) {
-//
-//                        try {
-//                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-//
-//                            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                                JSONObject result = jsonArray.getJSONObject(i);
-//
-//                                String stud_name = result.getString("stud_name");
-//                                textStudName.append(stud_name);
-//                            }
-//
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError volleyError) {
-//                        Log.e("Volley","Error");
-//
-//                    }
-//                }
-//
-//
-//        );
-//        requestQueue.add(jsonObjectRequest);
-//    }
-//
-//    public void getData(){
-//        String getUrl = Config.BASE_URL+"seas/gcm_test/v1/updateIsScanned";
-//        StringRequest stringRequest = new StringRequest(Request.Method.POST, getUrl, new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//
-//                if (response.equals("Update success")){
-//
-//                    AlertDialog.Builder Adialog = new AlertDialog.Builder(EnterStudentID.this);
-//                    Adialog.setMessage("Attendance has been taken").setCancelable(false)
-//                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//
-//                    AlertDialog alert = Adialog.create();
-//                    alert.setTitle("Alert");
-//                    alert.show();
-//                }
-//
-//                if (response.equals("Update success")){
-//
-//                    AlertDialog.Builder Adialog = new AlertDialog.Builder(EnterStudentID.this);
-//                    Adialog.setMessage("Attendance has been taken").setCancelable(false)
-//                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//
-//                    AlertDialog alert = Adialog.create();
-//                    alert.setTitle("Alert");
-//                    alert.show();
-//                }
-//
-//            }
-//        },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        //Toast.makeText(EnterStudentID.this,error.getMessage().toString(),Toast.LENGTH_LONG).show();
-//                        Toast.makeText(EnterStudentID.this,"Student does not register for this subject.",Toast.LENGTH_LONG).show();
-//                    }
-//                }){
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String,String> params = new HashMap<String, String>();
-//                params.put("stud_id",dataStringStudentID);
-//                params.put("subject_code",dataStringSubjectCode);
-//
-//                return params;
-//            }
-//        };
-//
-//        RequestQueue requestQueue = Volley.newRequestQueue(this);
-//        requestQueue.add(stringRequest);
-//
-//    }
-//
-

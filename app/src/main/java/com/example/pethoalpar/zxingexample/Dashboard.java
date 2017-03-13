@@ -119,21 +119,21 @@ public class Dashboard extends AppCompatActivity
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
 
-        if(isNetworkStatusAvialable (getApplicationContext())) {
-            //Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
+        if(isNetworkStatusAvialable (this)) {
+            Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
             getData();
             btnNext = (Button)findViewById(R.id.buttonNext);
             btnNext.setOnClickListener(this);
 
         } else {
-            Toast.makeText(getApplicationContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
 
         }
     }
 
     private void getData(){
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"seas/student/getSubjectData.php?staff_id="+ staff_id,
+        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getSubjectData.php?staff_id="+ staff_id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -156,7 +156,7 @@ public class Dashboard extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -169,7 +169,7 @@ public class Dashboard extends AppCompatActivity
 
     private void getDetails(String subjectID, final int position){
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"seas/student/getDetailsData.php?subject_code="+subjectID,
+        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getDetailsData.php?subject_code="+subjectID,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -409,11 +409,10 @@ public class Dashboard extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menuLogout) {
             logout();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
