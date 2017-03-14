@@ -55,7 +55,13 @@
             android:name=".Dashboard"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ViewNameList"></activity>
+        <activity
+            android:name=".ViewNameList"
+            android:label="View Attendance">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".TakeAttendance" />
+        </activity>
     </application>
 
 </manifest>

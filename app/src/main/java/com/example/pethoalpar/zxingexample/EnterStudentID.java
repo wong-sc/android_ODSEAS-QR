@@ -87,7 +87,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         buttonComfirm.setOnClickListener(this);
         Intent i = getActivity().getIntent();
         dataStringSubjectCode = i.getStringExtra("passDataValue");
-        Log.d("hye datastring subject", dataStringSubjectCode);
         requestQueue = Volley.newRequestQueue(getActivity());
         return v;
     }

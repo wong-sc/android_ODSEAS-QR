@@ -73,7 +73,6 @@ public class Dashboard extends AppCompatActivity
     private Spinner spinner;
 
     SharedPreferences preferences;
-    SharedPreferences.Editor editor;
 
     Button btnNext;
 

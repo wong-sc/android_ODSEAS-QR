@@ -1,6 +1,9 @@
 package com.example.pethoalpar.zxingexample;
 
 //import android.app.Fragment;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
         import android.content.Intent;
         import android.os.Bundle;
@@ -35,6 +38,7 @@ public class DisplayResult extends Fragment {
     private TextView textViewAttended,textViewBooklet;
     RequestQueue requestQueue;
     String subjectCode;
+    SharedPreferences preferences;
 
     public static DisplayResult newInstance(int page) {
         Bundle args = new Bundle();
@@ -61,6 +65,7 @@ public class DisplayResult extends Fragment {
         Intent i = getActivity().getIntent();
         String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
         String dataStringStudentNumber = i.getStringExtra("studentnumber");
+
         subjectCode = i.getStringExtra("passDataValue");
         coursename.setText(dataStringSubjectCode);
         studentnumber.append(dataStringStudentNumber);
@@ -69,6 +74,7 @@ public class DisplayResult extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ViewNameList.class);
+                intent.putExtra("subject_code", subjectCode);
                 startActivity(intent);
             }
         });
@@ -76,6 +82,45 @@ public class DisplayResult extends Fragment {
         getAttendedData();
         getAnswerBooklet();
         return v;
+    }
+
+    //Logout function
+    private void logout(){
+        //Creating an alert dialog to confirm logout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setMessage("Are you sure you want to logout?");
+        alertDialogBuilder.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+                        //Getting out sharedpreferences
+//                        SharedPreferences preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+//                        //Getting editor
+                        SharedPreferences.Editor editor = preferences.edit();
+
+                        //Puting the value false for subjectCode
+                        editor.putBoolean(subjectCode, false);
+
+                        //Putting blank value to email
+                        editor.putString("email", "");
+
+                        //Saving the sharedpreferences
+                        editor.commit();
+                    }
+                });
+
+        alertDialogBuilder.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+                    }
+                });
+
+        //Showing the alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     public void getAttendedData() {
