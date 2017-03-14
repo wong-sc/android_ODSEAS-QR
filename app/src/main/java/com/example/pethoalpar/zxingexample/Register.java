@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Register extends AppCompatActivity  implements View.OnClickListener {
 
-    private static final String REGISTER_URL = Config.BASE_URL+"ODSEAS-QR/staff/register.php";
+    private static final String REGISTER_URL = Config.BASE_URL+Config.REGISTER;
 
     public static final String KEY_STAFF_ID = "staff_id";
     public static final String KEY_PASSWORD = "staff_password";

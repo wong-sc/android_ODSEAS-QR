@@ -28,6 +28,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,6 +42,8 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Dashboard extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, Spinner.OnItemSelectedListener {
@@ -133,7 +137,8 @@ public class Dashboard extends AppCompatActivity
 
     private void getData(){
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getSubjectData.php?staff_id="+ staff_id,
+        String getData = Config.BASE_URL + Config.GET_SUBJECT_DATA;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getData,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -158,7 +163,14 @@ public class Dashboard extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
                     }
-                });
+                }){
+            @Override
+            protected Map<String,String> getParams() throws AuthFailureError{
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("staff_id",staff_id);
+                return params;
+            }
+        };
 
         //Creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -167,9 +179,11 @@ public class Dashboard extends AppCompatActivity
         requestQueue.add(stringRequest);
     }
 
-    private void getDetails(String subjectID, final int position){
+    private void getDetails(final String subjectID, final int position){
+
+        String getDetails = Config.BASE_URL + Config.GET_DETAILS_DATA;
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Config.BASE_URL+"ODSEAS-QR/student/getDetailsData.php?subject_code="+subjectID,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, getDetails,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -194,7 +208,14 @@ public class Dashboard extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
 
                     }
-                });
+                }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("subject_code",subjectID);
+                return params;
+            }
+        };
 
         //Creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);

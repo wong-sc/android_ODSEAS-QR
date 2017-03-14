@@ -17,11 +17,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-        import com.android.volley.toolbox.Volley;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
         import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DisplayResult extends Fragment {
 
@@ -75,52 +79,60 @@ public class DisplayResult extends Fragment {
     }
 
     public void getAttendedData() {
-            requestQueue = Volley.newRequestQueue(getActivity());
-            JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"ODSEAS-QR/student/getAttendedData.php?subject_code="+subjectCode+"&isScanned=1",
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject jsonObject) {
+        requestQueue = Volley.newRequestQueue(getActivity());
+        String getAttendedData = Config.BASE_URL + Config.GET_ATTENDED_DATA;
+        StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAttendedData,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String jsonObject) {
 
-                            try {
-                                JSONArray jsonArray = jsonObject.getJSONArray("result");
+                        try {
+                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
 
-                                for(int i = 0 ; i < jsonArray.length() ; i++){
-                                    JSONObject result = jsonArray.getJSONObject(i);
+                            for(int i = 0 ; i < jsonArray.length() ; i++){
+                                JSONObject result = jsonArray.getJSONObject(i);
 
-                                    String attended = result.getString("attended");
-                                    textViewAttended.setText(attended);
-                                }
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                String attended = result.getString("attended");
+                                textViewAttended.setText(attended);
                             }
 
+                        } catch (JSONException e) {
+                                e.printStackTrace();
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Log.e("Volley","Error");
 
-                        }
                     }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e("Volley","Error");
 
-
-            );
+                    }
+                }
+            ){
+                @Override
+                protected Map<String,String> getParams(){
+                    Map<String,String> params = new HashMap<String, String>();
+                    params.put("subject_code",subjectCode);
+                    return params;
+                }
+            };
             requestQueue.add(jsonObjectRequest1);
 
     }
 
     public void getAnswerBooklet() {
+        String getAnswerBooklet = Config.BASE_URL + Config.GET_ANS_BOOKLETS;
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"ODSEAS-QR/student/getAnswerBooklet.php?subject_code="+subjectCode+"&isScanned=1",
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAnswerBooklet,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
+                    public void onResponse(String jsonObject) {
 
                         try {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
 
                             for(int i = 0 ; i < jsonArray.length() ; i++){
                                 JSONObject result = jsonArray.getJSONObject(i);
@@ -145,7 +157,14 @@ public class DisplayResult extends Fragment {
                 }
 
 
-        );
+        ){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("subject_code",subjectCode);
+                return params;
+            }
+        };
         requestQueue.add(jsonObjectRequest1);
 
     }

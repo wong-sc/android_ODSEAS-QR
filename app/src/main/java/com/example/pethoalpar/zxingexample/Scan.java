@@ -154,7 +154,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     }
 
     public void getData(){
-        String getUrl = Config.BASE_URL+"ODSEAS-QR/gcm_test/v1/updateAttendanceRecord";
+        String getUrl = Config.BASE_URL+Config.UPDATE_ATTENDANCE_DATA;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -190,7 +190,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     }
     public void checkAlreadyScan(){
         requestQueue = Volley.newRequestQueue(getContext());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL+"ODSEAS-QR/student/checkAlreadyScan.php?stud_id="+splited[0]+"&subject_code="+matchedSubject,
+        String checkAlreadyScan = Config.BASE_URL + Config.CHECK_ALREADY_SCAN;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, checkAlreadyScan,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -238,12 +239,18 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error");
-
                     }
                 }
+        ){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("student_id",splited[0]);
+                params.put("course_id",matchedSubject);
 
-
-        );
+                return params;
+            }
+        };
         requestQueue.add(jsonObjectRequest);
     }
 

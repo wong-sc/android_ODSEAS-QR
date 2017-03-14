@@ -107,14 +107,16 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     }
 
     public void checkAlreadyScan() {
+        String checkAlreadyScan = Config.BASE_URL + Config.CHECK_ALREADY_SCAN;
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/checkAlreadyScan.php?stud_id=" + dataStringStudentID + "&subject_code=" + dataStringSubjectCode,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, checkAlreadyScan,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
+                    public void onResponse(String jsonObject) {
 
                         try {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
 
                             Log.d("testing", "" + jsonArray.length());
 
@@ -156,70 +158,87 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 }
 
 
-        );
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("stud_id", dataStringStudentID);
+                params.put("subject_code", dataStringSubjectCode);
+                return params;
+            }
+        };
         requestQueue.add(jsonObjectRequest);
     }
 
     public void checkStudent() {
+        String checkStudent = Config.BASE_URL + Config.GET_STUDENT_SUBJECT;
         requestQueue = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/getStudentSubject.php?stud_id=" + dataStringStudentID,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, checkStudent,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
+                    public void onResponse(String result) {
 
                         foundStudent = false;
 
+                        Log.d("Result", result);
+
                         try {
+//
+                            JSONObject jsonObject = new JSONObject(result);
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
 
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject result = jsonArray.getJSONObject(i);
-
-                                String subject_code = result.getString("subject_code");
+                                JSONObject object = jsonArray.getJSONObject(i);
+                                String subject_code = object.getString("subject_code");
                                 Log.d("hye subject codess", subject_code);
                                 if (dataStringSubjectCode.equals(subject_code)) {
-                                    //Toast.makeText(EnterStudentID.this,"student exists",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(),"Subject found",Toast.LENGTH_LONG).show();
                                     foundStudent = true;
                                     getStudentName();
                                 }
-
                             }
                             if (!foundStudent) {
-                                //Toast.makeText(EnterStudentID.this,"student does not exists",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
                                 showMessage("Alert", "Student does not register for this subject.");
                             }
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Log.e("Volley", volleyError.toString());
-
+                        Log.e("Volley-studentError", volleyError.getLocalizedMessage() + "");
                     }
                 }
-
-
-        );
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("stud_id", dataStringStudentID);
+                return params;
+            }
+        };
         requestQueue.add(jsonObjectRequest);
     }
 
     public void getStudentName() {
 
+        String getStudentData = Config.BASE_URL + Config.GET_STUDENT_DATA;
         requestQueue = Volley.newRequestQueue(getActivity());
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Config.BASE_URL + "ODSEAS-QR/student/getStudentData.php?stud_id=" + dataStringStudentID,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, getStudentData,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
+                    public void onResponse(String jsonObject) {
+
+                        Log.d("Result --- ", jsonObject);
+                        Toast.makeText(getActivity(),"Return  result"+ jsonObject,Toast.LENGTH_LONG).show();
 
                         try {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
 
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject result = jsonArray.getJSONObject(i);
@@ -230,6 +249,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
 
                         } catch (JSONException e) {
+                            Toast.makeText(getActivity(),"JSON  Error",Toast.LENGTH_LONG).show();
                             e.printStackTrace();
                         }
                     }
@@ -238,16 +258,23 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley", "Error");
+                        Toast.makeText(getActivity(),"Volley Error",Toast.LENGTH_LONG).show();
                     }
                 }
-
-
-        );
+        ){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("stud_id", dataStringStudentID);
+                return params;
+            }
+        };
         requestQueue.add(jsonObjectRequest);
     }
 
     public void getData() {
-        String getUrl = Config.BASE_URL + "ODSEAS-QR/gcm_test/v1/updateAttendanceRecord";
+//        String getUrl = Config.BASE_URL + "ODSEAS-QR/gcm_test/v1/updateAttendanceRecord";
+        String getUrl = Config.BASE_URL + Config.UPDATE_ATTENDANCE_DATA;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -270,11 +297,10 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     }
                 }) {
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
+            protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("student_id", dataStringStudentID);
                 params.put("course_id", dataStringSubjectCode);
-
                 return params;
             }
         };
@@ -312,8 +338,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 break;
             case R.id.buttonConfirm:
                 buttonConfirm(v);
-//                studentid.clearComposingText();
-//                studentname.setText("Student Name: ");
                 break;
             default:
                 break;
