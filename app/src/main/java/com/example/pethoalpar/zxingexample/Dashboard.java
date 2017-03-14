@@ -86,14 +86,6 @@ public class Dashboard extends AppCompatActivity
          preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
         staff_id = preferences.getString("staff_id", "");
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -122,6 +114,11 @@ public class Dashboard extends AppCompatActivity
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
 
+        if(!preferences.getBoolean("firstTimeLogin", true))
+            promtDownloadData(staff_id);
+        else
+            Toast.makeText(Dashboard.this, "You already have downloaded content", Toast.LENGTH_SHORT).show();
+
         if(isNetworkStatusAvialable (this)) {
             Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
             getData();
@@ -130,8 +127,78 @@ public class Dashboard extends AppCompatActivity
 
         } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-
         }
+    }
+
+    public void promtDownloadData(String staff_id){
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("To runable during offline mode, it is encourage that to download the content first into this application.");
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alertDialogBuilder.show();
+
+    }
+
+    public void getOfflineData(String linkUrl){
+//        requestQueue = Volley.newRequestQueue(this);
+//        String getAllData = Config.BASE_URL + linkUrl;
+//        Log.d("URL", getAllData);
+//        StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAllData,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String jsonObject) {
+//
+//                        Log.d("result-----", jsonObject);
+//                        data.clear();
+//                        try {
+//                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+//                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+//                            Toast.makeText(ViewNameList.this, "Result length" + jsonArray.length(), Toast.LENGTH_SHORT).show();
+//
+//                            for(int i = 0 ; i < jsonArray.length() ; i++){
+//                                JSONObject result = jsonArray.getJSONObject(i);
+//                                ViewNameListModel model = new ViewNameListModel();
+//                                Log.d("studentName: ", result.getString("studentname"));
+//                                Log.d("matricNo: ", result.getString("matricno"));
+//                                model.setStudent_name(result.getString("studentname"));
+//                                model.setStudent_matric(result.getString("matricno"));
+//                                data.add(model);
+//                            }
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError volleyError) {
+//                        Log.e("Volley line 105","Error");
+//                    }
+//                }
+//        ){
+//            @Override
+//            protected Map<String,String> getParams(){
+//                Map<String,String> params = new HashMap<String, String>();
+//                params.put("subject_code",subjectCode);
+//                return params;
+//            }
+//        };
+//        requestQueue.add(jsonObjectRequest1);
     }
 
     private void getData(){
