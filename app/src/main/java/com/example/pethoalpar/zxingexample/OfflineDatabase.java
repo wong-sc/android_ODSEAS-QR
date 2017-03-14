@@ -74,14 +74,17 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     private static final String TABLE_VENUE_HANDLER ="venue_handler";
     private static final String VENUE_HANDLER_ID = "venue_handler_id";
 
+    Context context;
+
     public OfflineDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     // Creating Database
     @Override
     public void onCreate(SQLiteDatabase odseasqr) {
-        String CREATE_COURSE_TABLE = "CREATE TABLE" + TABLE_COURSE + "("
+        String CREATE_COURSE_TABLE = "CREATE TABLE " + TABLE_COURSE + "("
                 + COURSE_ID + " VARCHAR PRIMARY KEY,"
                 + COURSE_NAME + " VARCHAR,"
                 + COURSE_CREDIT_HOUR + " INTEGER,"
@@ -93,7 +96,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_COURSE_HANDLER_TABLE = "CREATE TABLE" + TABLE_COURSE_HANDLER + "("
+        String CREATE_COURSE_HANDLER_TABLE = "CREATE TABLE " + TABLE_COURSE_HANDLER + "("
                 + COURSE_HANDLER_ID + " INTEGER PRIMARY KEY,"
                 + STAFF_ID + " INTEGER,"
                 + COURSE_ID + " VARCHAR,"
@@ -101,7 +104,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_ENROLL_HANDLER_TABLE = "CREATE TABLE" + TABLE_ENROLL_HANDLER + "("
+        String CREATE_ENROLL_HANDLER_TABLE = "CREATE TABLE " + TABLE_ENROLL_HANDLER + "("
                 + ENROLL_HANDLER_ID + " INTEGER PRIMARY KEY,"
                 + STUDENT_ID + " INTEGER,"
                 + COURSE_ID + " VARCHAR,"
@@ -111,7 +114,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_STAFF_TABLE = "CREATE TABLE" + TABLE_STAFF + "("
+        String CREATE_STAFF_TABLE = "CREATE TABLE " + TABLE_STAFF + "("
                 + STAFF_ID + " INTEGER PRIMARY KEY,"
                 + STAFF_NAME + " VARCHAR,"
                 + STAFF_PASSWORD + " VARCHAR,"
@@ -121,7 +124,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_STUDENT_TABLE = "CREATE TABLE" + TABLE_STUDENT + "("
+        String CREATE_STUDENT_TABLE = "CREATE TABLE " + TABLE_STUDENT + "("
                 + STUDENT_ID + " INTEGER PRIMARY KEY,"
                 + STUDENT_NAME + " VARCHAR,"
                 + STUDENT_FACULTY + " VARCHAR,"
@@ -129,14 +132,14 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_VENUE_TABLE = "CREATE TABLE" + TABLE_VENUE + "("
+        String CREATE_VENUE_TABLE = "CREATE TABLE " + TABLE_VENUE + "("
                 + VENUE_ID + " VARCHAR PRIMARY KEY,"
                 + VENUE_NAME + " VARCHAR,"
                 + VENUE_CAPACITY + " INTEGER,"
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
-        String CREATE_VENUE_HANDLER_TABLE = "CREATE TABLE" + TABLE_VENUE_HANDLER + "("
+        String CREATE_VENUE_HANDLER_TABLE = "CREATE TABLE " + TABLE_VENUE_HANDLER + "("
                 + VENUE_HANDLER_ID + " INTEGER PRIMARY KEY,"
                 + VENUE_ID + " VARCHAR,"
                 + COURSE_ID + " VARCHAR,"
@@ -169,10 +172,11 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     public void insertCourseData(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_COURSE, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -189,19 +193,25 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
                 // insert row
                 long tag_id = db.insert(TABLE_COURSE, null, values);
+                Log.d("course id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
+            Toast.makeText(context, "Successfully added", Toast.LENGTH_SHORT).show();
             } catch (JSONException error){
                 Log.d("error", error.toString());
-            }
+            } finally {
+            db.endTransaction();
+        }
     }
 
     public void insertCourseHandler(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_COURSE_HANDLER, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -213,20 +223,24 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
                 long tag_id = db.insert(TABLE_COURSE_HANDLER, null, values);
-                Log.d("status = ", tag_id + " ");
+                Log.d("course handler id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
     public void insertEnrollHandler(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_ENROLL_HANDLER, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -241,20 +255,24 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
                 long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
-                Log.d("status = ", tag_id + " ");
+                Log.d("enroll_handler id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
     public void insertStaff(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_STAFF, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -269,20 +287,24 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
                 long tag_id = db.insert(TABLE_STAFF, null, values);
-                Log.d("status = ", tag_id + " ");
+                Log.d("staff id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
     public void insertStudent(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_STUDENT, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -294,21 +316,25 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CREATED_DATE, result.getString("created_date"));
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
-                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
-                Log.d("status = ", tag_id + " ");
+                long tag_id = db.insert(TABLE_STUDENT, null, values);
+                Log.d("student id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
     public void insertVenue(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_VENUE, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -319,21 +345,25 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CREATED_DATE, result.getString("created_date"));
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
-                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
-                Log.d("status = ", tag_id + " ");
+                long tag_id = db.insert(TABLE_VENUE, null, values);
+                Log.d("venue id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
     public void insertVenueHandler(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_VENUE_HANDLER, null,null);
+        db.beginTransaction();
 
         try {
-            JSONObject jsonObject1 = new JSONObject(data);
-            JSONArray jsonArray = jsonObject1.getJSONArray("result");
+            JSONArray jsonArray = new JSONArray(data);
 
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
@@ -344,11 +374,14 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CREATED_DATE, result.getString("created_date"));
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
-                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
-                Log.d("status = ", tag_id + " ");
+                long tag_id = db.insert(TABLE_VENUE_HANDLER, null, values);
+                Log.d("venue handler id = ", tag_id + " ");
             }
+            db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
         }
     }
 
@@ -370,5 +403,25 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         int isCheck =  cursor.getInt(cursor.getColumnIndex(ISCHECKED));
 
         return isCheck;
+    }
+
+    public String getSubjectData(String staff_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Array course_id;
+
+        String query = "SELECT * FROM " + TABLE_COURSE_HANDLER
+                +" JOIN " + TABLE_COURSE + " ON " + TABLE_COURSE_HANDLER + "." + COURSE_ID
+                + " = " + TABLE_COURSE + "." + COURSE_ID + " WHERE "
+                + TABLE_COURSE_HANDLER + "." + STAFF_ID + " = " + staff_id ;
+
+        Cursor cursor = db.rawQuery(query, null);
+
+//        if (cursor.moveToFirst()) {
+//            do {
+//                course_id.add()
+//            } while (cursor.moveToNext());
+//        }
+        return query;
     }
 }

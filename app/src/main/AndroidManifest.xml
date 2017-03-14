@@ -60,8 +60,17 @@
             android:label="View Attendance">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".TakeAttendance" />
+                android:value=".Dashboard" />
         </activity>
+
+        <receiver
+            android:name=".NetworkStatus"
+            android:label="NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

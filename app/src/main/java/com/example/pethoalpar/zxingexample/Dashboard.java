@@ -1,6 +1,7 @@
 package com.example.pethoalpar.zxingexample;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -73,6 +74,9 @@ public class Dashboard extends AppCompatActivity
     private Spinner spinner;
 
     SharedPreferences preferences;
+    RequestQueue requestQueue;
+    OfflineDatabase mydb;
+    ProgressDialog loading;
 
     Button btnNext;
 
@@ -86,6 +90,8 @@ public class Dashboard extends AppCompatActivity
          preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
         staff_id = preferences.getString("staff_id", "");
+        mydb = new OfflineDatabase(this);
+        loading = new ProgressDialog(Dashboard.this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -139,6 +145,11 @@ public class Dashboard extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
+                getOfflineData(Config.GET_OFFLINE_DATA);
+                loading.setTitle("Downloading Content..........");
+                loading.setMessage("Getting data from server......");
+                loading.setCancelable(true);
+                loading.show();
             }
         });
 
@@ -154,51 +165,53 @@ public class Dashboard extends AppCompatActivity
     }
 
     public void getOfflineData(String linkUrl){
-//        requestQueue = Volley.newRequestQueue(this);
-//        String getAllData = Config.BASE_URL + linkUrl;
-//        Log.d("URL", getAllData);
-//        StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAllData,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String jsonObject) {
-//
-//                        Log.d("result-----", jsonObject);
+        requestQueue = Volley.newRequestQueue(this);
+        String getAllData = Config.BASE_URL + linkUrl;
+        Log.d("URL", getAllData);
+        StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAllData,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String jsonObject) {
+
+                        Log.d("result-----", jsonObject);
 //                        data.clear();
-//                        try {
-//                            JSONObject jsonObject1 = new JSONObject(jsonObject);
-//                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
-//                            Toast.makeText(ViewNameList.this, "Result length" + jsonArray.length(), Toast.LENGTH_SHORT).show();
-//
-//                            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                                JSONObject result = jsonArray.getJSONObject(i);
-//                                ViewNameListModel model = new ViewNameListModel();
-//                                Log.d("studentName: ", result.getString("studentname"));
-//                                Log.d("matricNo: ", result.getString("matricno"));
-//                                model.setStudent_name(result.getString("studentname"));
-//                                model.setStudent_matric(result.getString("matricno"));
-//                                data.add(model);
-//                            }
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError volleyError) {
-//                        Log.e("Volley line 105","Error");
-//                    }
-//                }
-//        ){
-//            @Override
-//            protected Map<String,String> getParams(){
-//                Map<String,String> params = new HashMap<String, String>();
-//                params.put("subject_code",subjectCode);
-//                return params;
-//            }
-//        };
-//        requestQueue.add(jsonObjectRequest1);
+                        try {
+                            JSONObject jsonObject1 = new JSONObject(jsonObject);
+//                            JSONArray jsonArray = new JSONArray(jsonObject);
+                            Toast.makeText(Dashboard.this, "Result length" + jsonObject1.length(), Toast.LENGTH_SHORT).show();
+                            String course = jsonObject1.getString("course");
+                            String course_handler = jsonObject1.getString("course_handler");
+                            String enroll_handler = jsonObject1.getString("enroll_handler");
+                            String student = jsonObject1.getString("student");
+                            String venue = jsonObject1.getString("venue");
+                            String venue_handler = jsonObject1.getString("venue_handler");
+                            String staff = jsonObject1.getString("staff");
+
+                            loading.setMessage("Saving data.......");
+
+                            mydb.insertCourseData(course);
+                            mydb.insertCourseHandler(course_handler);
+                            mydb.insertEnrollHandler(enroll_handler);
+                            mydb.insertStudent(student);
+                            mydb.insertVenue(venue);
+                            mydb.insertVenueHandler(venue_handler);
+                            mydb.insertStaff(staff);
+
+                            loading.dismiss();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e("Volley line 105","Error");
+                    }
+                }
+        );
+        requestQueue.add(jsonObjectRequest1);
     }
 
     private void getData(){
