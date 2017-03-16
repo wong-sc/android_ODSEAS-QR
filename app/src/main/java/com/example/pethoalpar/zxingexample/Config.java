@@ -20,6 +20,8 @@ public class Config {
     public static final String GET_INEXAMINATION_DATA = "ODSEAS-QR/student/getInExaminationData.php";
     public static final String GET_OFFLINE_DATA = "ODSEAS-QR/student/getOfflineData.php";
 
+    public static final String WIFI_STATUS = "Wifi_Status";
+
 
     public static final String DATA_URL = "http://10.64.116.227/studsub/createJson.php";
     public static final String KEY_ID = "stud_id";

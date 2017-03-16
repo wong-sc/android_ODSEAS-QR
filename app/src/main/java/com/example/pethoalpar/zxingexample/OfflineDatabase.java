@@ -4,9 +4,12 @@ package com.example.pethoalpar.zxingexample;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.util.SparseArray;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -14,6 +17,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OfflineDatabase extends SQLiteOpenHelper {
 
@@ -181,6 +190,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
+                values.put(COURSE_ID, result.getString("course_id"));
                 values.put(COURSE_NAME, result.getString("course_name"));
                 values.put(COURSE_CREDIT_HOUR, result.getString("course_credit_hour"));
                 values.put(EXAM_DATE, result.getString("exam_date"));
@@ -202,6 +212,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertCourseHandler(String data){
@@ -216,7 +227,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(STAFF_ID, result.getString("staff_id"));
+                values.put(STAFF_ID, result.getInt("staff_id"));
                 values.put(COURSE_ID, result.getString("course_id"));
                 values.put(INVIGILATOR_POSITION, result.getString("invigilator_position"));
                 values.put(CREATED_DATE, result.getString("created_date"));
@@ -231,6 +242,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertEnrollHandler(String data){
@@ -263,6 +275,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertStaff(String data){
@@ -277,7 +290,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(STAFF_ID, result.getString("staff_id"));
+                values.put(STAFF_ID, result.getInt("staff_id"));
                 values.put(STAFF_NAME, result.getString("staff_name"));
                 values.put(STAFF_PASSWORD, result.getString("staff_password"));
                 values.put(STAFF_EMAIL, result.getString("staff_email"));
@@ -295,6 +308,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertStudent(String data){
@@ -325,6 +339,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertVenue(String data){
@@ -354,6 +369,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public void insertVenueHandler(String data){
@@ -383,6 +399,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+        db.close();
     }
 
     public int checkAlreadyScan(int student_id, String course_id){
@@ -405,23 +422,161 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         return isCheck;
     }
 
-    public String getSubjectData(String staff_id){
+    public String getSpinnerData(int staff_id){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Array course_id;
+        ArrayList<JSONObject> courseData = new ArrayList<>();
 
-        String query = "SELECT * FROM " + TABLE_COURSE_HANDLER
-                +" JOIN " + TABLE_COURSE + " ON " + TABLE_COURSE_HANDLER + "." + COURSE_ID
-                + " = " + TABLE_COURSE + "." + COURSE_ID + " WHERE "
-                + TABLE_COURSE_HANDLER + "." + STAFF_ID + " = " + staff_id ;
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s INNER JOIN %s ON %s.%s = %s.%s WHERE %s.%s = %s",
+                        TABLE_COURSE_HANDLER,
+                        TABLE_COURSE,
+                        TABLE_COURSE_HANDLER, COURSE_ID,
+                        TABLE_COURSE, COURSE_ID,
+                        TABLE_COURSE_HANDLER, STAFF_ID,
+                        staff_id);
 
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
 
-//        if (cursor.moveToFirst()) {
-//            do {
-//                course_id.add()
-//            } while (cursor.moveToNext());
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(COURSE_ID, cursor.getString(6));
+                    jsonObject.put(COURSE_NAME, cursor.getString(7));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("Result1 == ", cursor.getString(0));
+                Log.d("Result2 == ", cursor.getString(1));
+                try {
+                    Log.d("Result3 == ", courseData.get(0).getString(COURSE_ID));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+
+    }
+
+    public String getSubjectDetails(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s LEFT OUTER JOIN %s ON %s.%s = %s.%s WHERE %s.%s = %s",
+                        TABLE_COURSE_HANDLER,
+                        TABLE_COURSE,
+                        TABLE_COURSE_HANDLER, COURSE_ID,
+                        TABLE_COURSE, COURSE_ID,
+                        TABLE_COURSE_HANDLER, STAFF_ID,
+                        course_id);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(COURSE_ID, cursor.getString(6));
+                    jsonObject.put(COURSE_NAME, cursor.getString(7));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("Result1 == ", cursor.getString(0));
+                Log.d("Result2 == ", cursor.getString(1));
+                try {
+                    Log.d("Result3 == ", courseData.get(0).getString(COURSE_ID));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+
+    }
+
+    public String getSubjectData(int staff_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+        List<SubjectDetailsModel> subjectDetails = new ArrayList<SubjectDetailsModel>();
+
+        String query = "SELECT * FROM " + TABLE_COURSE_HANDLER + " as h " + " JOIN " + TABLE_COURSE + " as c " + " ON h." + COURSE_ID + " = c." + COURSE_ID
+                + " WHERE h." + STAFF_ID + " = " + staff_id;
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s LEFT OUTER JOIN %s ON %s.%s = %s.%s WHERE %s.%s = %s",
+                        TABLE_COURSE_HANDLER,
+                        TABLE_COURSE,
+                        TABLE_COURSE_HANDLER, COURSE_ID,
+                        TABLE_COURSE, COURSE_ID,
+                        TABLE_COURSE_HANDLER, STAFF_ID,
+                        staff_id);
+        Log.d("Result == ", SELECT_COURSE_DETAILS);
+
+    Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String venue = "SELECT * FROM venue_handler JOIN venue ON venue_handler.venue_id = venue.venue_id WHERE venue_handler.course_id =" + cursor.getString(2);
+                Cursor cursor2 = db.rawQuery(venue, null);
+//                JSONArray jsonArray = new JSONArray();
+                try {
+                    jsonObject.put(COURSE_HANDLER_ID, cursor.getString(0));
+                    jsonObject.put(STAFF_ID, cursor.getString(1));
+                    jsonObject.put(COURSE_ID, cursor.getString(2));
+                    jsonObject.put(COURSE_NAME, cursor.getString(7));
+                    jsonObject.put(STUDENT_NUMBER, cursor.getString(13));
+                    jsonObject.put(EXAM_DATE, cursor.getString(9));
+                    jsonObject.put(START_TIME, cursor.getString(10));
+                    jsonObject.put(END_TIME, cursor.getString(11));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("Result1 == ", cursor.getString(0));
+                Log.d("Result2 == ", cursor.getString(1));
+                try {
+                    Log.d("Result3 == ", courseData.get(0).getString(COURSE_ID));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                courseData.add(course);
+//                row++;
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+//        for(Map.Entry<Integer, ArrayList<String>> data: courseData.entrySet()){
+//            Log.d("result key -- ", data.getKey().toString());
+//            Log.d("result value -- ", data.getValue().toString());
 //        }
-        return query;
+
+        Log.d("Overall result", String.valueOf(courseData));
+//        Log.d("specific result", courseData.get(0).)
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
     }
 }

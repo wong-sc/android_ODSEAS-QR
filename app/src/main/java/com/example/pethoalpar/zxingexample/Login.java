@@ -133,7 +133,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         //Adding values to editor
         editor.putBoolean("loggedin", true);
-        editor.putBoolean("firstTimeLogin", false);
+        editor.putBoolean("firstTimeLogin", true);
         editor.putString("staff_id", staff_id);
         //editor.putString(Config.EMAIL_SHARED_PREF, email);
 

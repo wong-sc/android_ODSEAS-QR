@@ -122,8 +122,10 @@ public class Dashboard extends AppCompatActivity
 
         if(!preferences.getBoolean("firstTimeLogin", true))
             promtDownloadData(staff_id);
-        else
+        else{
             Toast.makeText(Dashboard.this, "You already have downloaded content", Toast.LENGTH_SHORT).show();
+        }
+
 
         if(isNetworkStatusAvialable (this)) {
             Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
@@ -133,6 +135,15 @@ public class Dashboard extends AppCompatActivity
 
         } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+            String spinnerData = mydb.getSpinnerData(2);
+            try {
+                JSONArray jsonArray = new JSONArray(spinnerData);
+                result = jsonArray;
+                getSubjectData(jsonArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.d("Spinner result --", spinnerData);
         }
     }
 
@@ -166,6 +177,7 @@ public class Dashboard extends AppCompatActivity
 
     public void getOfflineData(String linkUrl){
         requestQueue = Volley.newRequestQueue(this);
+        final SharedPreferences.Editor editor = preferences.edit();
         String getAllData = Config.BASE_URL + linkUrl;
         Log.d("URL", getAllData);
         StringRequest jsonObjectRequest1 = new StringRequest(Request.Method.POST, getAllData,
@@ -198,6 +210,7 @@ public class Dashboard extends AppCompatActivity
                             mydb.insertStaff(staff);
 
                             loading.dismiss();
+                            editor.putBoolean("firstTimeLogin", false);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -311,7 +324,7 @@ public class Dashboard extends AppCompatActivity
                 JSONObject json = j.getJSONObject(i);
 
                 //Adding the name of the student to array list
-                subjectData.add(json.getString("subject_code") + " " + json.getString("subject_name"));
+                subjectData.add(json.getString("course_id") + " " + json.getString("course_name"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
