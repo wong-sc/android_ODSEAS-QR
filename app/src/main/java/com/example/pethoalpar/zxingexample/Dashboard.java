@@ -120,23 +120,26 @@ public class Dashboard extends AppCompatActivity
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
 
-        if(!preferences.getBoolean("firstTimeLogin", true))
+        if(preferences.getBoolean("firstTimeLogin", false))
             promtDownloadData(staff_id);
         else{
             Toast.makeText(Dashboard.this, "You already have downloaded content", Toast.LENGTH_SHORT).show();
         }
 
+        btnNext = (Button)findViewById(R.id.buttonNext);
+        btnNext.setOnClickListener(this);
+
 
         if(isNetworkStatusAvialable (this)) {
             Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
             getData();
-            btnNext = (Button)findViewById(R.id.buttonNext);
-            btnNext.setOnClickListener(this);
-
         } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-            String spinnerData = mydb.getSpinnerData(2);
+
+            // ask sqlite to geneate spinner data by passing the staff id
+            String spinnerData = mydb.getSpinnerData(1);
             try {
+                //convert String to JSONArray == [{course_id: 'TMN2053', course_name: 'COURSE NAME 2'}]
                 JSONArray jsonArray = new JSONArray(spinnerData);
                 result = jsonArray;
                 getSubjectData(jsonArray);
@@ -211,6 +214,7 @@ public class Dashboard extends AppCompatActivity
 
                             loading.dismiss();
                             editor.putBoolean("firstTimeLogin", false);
+                            editor.commit();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -357,12 +361,35 @@ public class Dashboard extends AppCompatActivity
         tvTime.setText("Time: "+ getExamTime(position));
     }
 
+    private void processOfflineDetails(int position){
+        String invigilator = "";
+        //Traversing through all the items in the json array
+        for(int i=0;i<result2.length();i++){
+            try {
+                //Getting json object
+                JSONObject json = result2.getJSONObject(i);
+                invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        tvInvigilatorName.setText(invigilator);
+        tvCourse.setText("Course Name: "+ getSubjectCode(position) + " " + getSubjectName(position));
+        tvNoOfStudent.setText("Number of Students: "+ getStudentNumber(position));
+        tvVenue.setText("Venue: "+ getVenue(position));
+        tvDate.setText("Date: "+ getExamDate(position));
+        tvTime.setText("Time: "+ getExamTime(position));
+    }
+
 
     private String getSubjectCode (int position){
         String subjectCode = "";
         try {
             JSONObject json = result.getJSONObject(position);
-            subjectCode = json.getString("subject_code");
+            subjectCode = json.getString("course_id");
+            Log.d("Result subject code-", subjectCode);
         }catch (JSONException e){
             e.printStackTrace();
         }
@@ -373,7 +400,7 @@ public class Dashboard extends AppCompatActivity
         String subjectName = "";
         try {
             JSONObject json = result.getJSONObject(position);
-            subjectName = json.getString("subject_name");
+            subjectName = json.getString("course_name");
         }catch (JSONException e){
             e.printStackTrace();
         }
@@ -383,7 +410,7 @@ public class Dashboard extends AppCompatActivity
     private String getStudentNumber (int position){
         try {
             JSONObject json = result.getJSONObject(position);
-            student_number=json.getString("no_students");
+            student_number=json.getString("student_number");
         }catch (JSONException e){
             e.printStackTrace();
         }
@@ -430,6 +457,19 @@ public class Dashboard extends AppCompatActivity
         textViewSubjectCode.setText("Subject selected:");
         textViewSubjectName.setText(getSubjectCode(position)+" "+getSubjectName(position));
         getDetails(getSubjectCode(position), position);
+
+        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+            String subjectDetails = mydb.getSubjectDetails(getSubjectCode(position));
+            try {
+                JSONArray jsonArray2 = new JSONArray(subjectDetails);
+                result2 = jsonArray2;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            processOfflineDetails(position);
+        }
+
+
         passData = getSubjectCode(position);
         subjectInfo = getSubjectCode(position)+" "+getSubjectName(position);
     }
@@ -443,6 +483,8 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onClick(View v)
     {
+        Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
+
         if (v == findViewById(R.id.buttonNext)){
             Intent intent = new Intent(this, TakeAttendance.class);
             intent.putExtra("passDataValue",passData);
@@ -469,6 +511,7 @@ public class Dashboard extends AppCompatActivity
 
                         //Puting the value false for loggedin
                         editor.putBoolean("loggedin", false);
+                        editor.putBoolean("firstTimeLogin", false);
 
                         //Putting blank value to email
                         editor.putString("email", "");

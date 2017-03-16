@@ -254,6 +254,44 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
         requestQueue.add(jsonObjectRequest);
     }
 
+    public void processData(String result){
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(result);
+            for(int i = 0 ; i < jsonArray.length() ; i++){
+                JSONObject result2 = jsonArray.getJSONObject(i);
+                String Scanned = "1";
+                String isScanned = result2.getString("isScanned");
+                Log.d ("hye subject codess",isScanned);
+                if(Scanned.equals(isScanned)) {
+
+                    //Toast.makeText(EnterStudentID.this,dataStringStudentID+" already scanned!",Toast.LENGTH_LONG).show();
+                    AlertDialog.Builder Adialog = new AlertDialog.Builder(getContext());
+                    Adialog.setMessage(splited[0]+" has already scanned!").setCancelable(false)
+                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert = Adialog.create();
+                    alert.setTitle("Alert");
+                    alert.show();
+
+                }
+                else{
+                    getData();
+                    Toast.makeText(getContext(),"Successfully added "+splited[0],Toast.LENGTH_LONG).show();
+                }
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     public void handleResult(Result result) {
 
