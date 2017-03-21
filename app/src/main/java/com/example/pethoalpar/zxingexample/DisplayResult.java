@@ -2,6 +2,7 @@ package com.example.pethoalpar.zxingexample;
 
 //import android.app.Fragment;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
@@ -34,11 +35,11 @@ public class DisplayResult extends Fragment {
 
     public static final String ARG_PAGE = "ARF_PAGE";
 
-    private int mPage;
     private TextView textViewAttended,textViewBooklet;
     RequestQueue requestQueue;
-    String subjectCode;
+    String course_id;
     SharedPreferences preferences;
+    OfflineDatabase mydb;
 
     public static DisplayResult newInstance(int page) {
         Bundle args = new Bundle();
@@ -51,7 +52,6 @@ public class DisplayResult extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPage = getArguments().getInt(ARG_PAGE);
     }
 
     @Nullable
@@ -62,11 +62,15 @@ public class DisplayResult extends Fragment {
         TextView studentnumber = (TextView) v.findViewById(R.id.total);
         textViewAttended = (TextView) v.findViewById(R.id.attendee);
         textViewBooklet = (TextView) v.findViewById(R.id.bookletnum);
+
+        preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        mydb = new OfflineDatabase(getContext());
+
         Intent i = getActivity().getIntent();
         String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
         String dataStringStudentNumber = i.getStringExtra("studentnumber");
 
-        subjectCode = i.getStringExtra("passDataValue");
+        course_id = i.getStringExtra("passDataValue");
         coursename.setText(dataStringSubjectCode);
         studentnumber.append(dataStringStudentNumber);
         Button viewlist = (Button) v.findViewById(R.id.viewlist);
@@ -74,13 +78,22 @@ public class DisplayResult extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ViewNameList.class);
-                intent.putExtra("subject_code", subjectCode);
+                intent.putExtra("course_id", course_id);
                 startActivity(intent);
             }
         });
         Button stopscan = (Button) v.findViewById(R.id.stopscan);
-        getAttendedData();
-        getAnswerBooklet();
+        //check internet - if yes then online function else offline function
+        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+            String attendeddata = mydb.getAttendedData(course_id);
+            String bookletData = mydb.getAnswerBooklet(course_id);
+            processAttendedData(attendeddata);
+            processBookletData(bookletData);
+        } else {
+            getAttendedData();
+            getAnswerBooklet();
+        }
+
         return v;
     }
 
@@ -100,7 +113,7 @@ public class DisplayResult extends Fragment {
                         SharedPreferences.Editor editor = preferences.edit();
 
                         //Puting the value false for subjectCode
-                        editor.putBoolean(subjectCode, false);
+                        editor.putBoolean(course_id, false);
 
                         //Putting blank value to email
                         editor.putString("email", "");
@@ -130,41 +143,24 @@ public class DisplayResult extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String jsonObject) {
-
-                        try {
-                            JSONObject jsonObject1 = new JSONObject(jsonObject);
-                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
-
-                            for(int i = 0 ; i < jsonArray.length() ; i++){
-                                JSONObject result = jsonArray.getJSONObject(i);
-
-                                String attended = result.getString("attended");
-                                textViewAttended.setText(attended);
-                            }
-
-                        } catch (JSONException e) {
-                                e.printStackTrace();
-                        }
-
+                        processAttendedData(jsonObject);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error");
-
                     }
                 }
             ){
                 @Override
                 protected Map<String,String> getParams(){
                     Map<String,String> params = new HashMap<String, String>();
-                    params.put("subject_code",subjectCode);
+                    params.put("course_id",course_id);
                     return params;
                 }
             };
             requestQueue.add(jsonObjectRequest1);
-
     }
 
     public void getAnswerBooklet() {
@@ -174,43 +170,51 @@ public class DisplayResult extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String jsonObject) {
-
-                        try {
-                            JSONObject jsonObject1 = new JSONObject(jsonObject);
-                            JSONArray jsonArray = jsonObject1.getJSONArray("result");
-
-                            for(int i = 0 ; i < jsonArray.length() ; i++){
-                                JSONObject result = jsonArray.getJSONObject(i);
-
-                                String booklet = result.getString("booklet");
-                                textViewBooklet.setText(booklet);
-                            }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
+                        processBookletData(jsonObject);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error");
-
                     }
                 }
-
-
         ){
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
-                params.put("subject_code",subjectCode);
+                params.put("course_id",course_id);
                 return params;
             }
         };
         requestQueue.add(jsonObjectRequest1);
+    }
 
+    public void processAttendedData(String result){
+        textViewAttended.setText(result);
+//        try {
+//            JSONArray jsonArray = new JSONArray(result);
+//            for(int i = 0 ; i < jsonArray.length() ; i++){
+//                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                String attended = jsonObject.getString("attended");
+//                textViewAttended.setText(attended);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    public void processBookletData(String result){
+        textViewBooklet.setText(result);
+//        try {
+//            JSONArray jsonArray = new JSONArray(result);
+//            for(int i = 0 ; i < jsonArray.length() ; i++){
+//                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                String booklet = jsonObject.getString("booklet");
+//                textViewBooklet.setText(booklet);
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 }

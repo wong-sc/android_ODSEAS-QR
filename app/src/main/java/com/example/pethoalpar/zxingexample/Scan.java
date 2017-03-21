@@ -55,6 +55,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     public String[] splited;
     public String subjectCode, matchedSubject, subjectName;
     RequestQueue requestQueue;
+    SharedPreferences preferences;
+    OfflineDatabase mydb;
 
     private int mPage;
 
@@ -82,6 +84,9 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
         subjectCode = i.getStringExtra("passDataValue");
         subjectName = i.getStringExtra("passSubjectInfo");
         subjectname.setText(subjectName);
+
+        preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        mydb = new OfflineDatabase(getContext());
 
         ImageButton scan = (ImageButton) v.findViewById(R.id.imageButtonScan);
         scan.setOnClickListener(new View.OnClickListener() {
@@ -127,8 +132,15 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 }
                 if(!matched)
                     Toast.makeText(getActivity(),splited[0] + " does not belong to this examination",Toast.LENGTH_LONG).show();
-                else
+                else{
+                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
+                        String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
+                        Log.d("Result scan -", studentSubject);
+                        processStudentIschecked(studentSubject);
+                    } else
                     checkAlreadyScan();
+                }
+
 
             }
         } else {
@@ -153,20 +165,59 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
         Adialog.show();
     }
 
+    public void processStudentIschecked(String result){
+
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+
+            Log.d("testing", "" + jsonArray.toString());
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String Scanned = "1";
+                String isScanned = jsonObject.getString("ischecked");
+                Log.d("hye subject codess", isScanned);
+                if (Scanned.equals(isScanned)) {
+
+                    showMessage("Alert", splited[0] + " has already scanned!");
+
+                } else {
+                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode);
+                        processGetData(status);
+                    } else
+                        getData();
+                    Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
+                }
+            }
+
+            if (jsonArray.length() == 0) {
+                showMessage("Alert", splited[0] + " has already scanned!");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void processGetData(String response){
+        if (response.equals("success checkin")) {
+
+            showMessage("Alert", "Student has checked in for this course");
+
+        } else if (response.equals("success checkout")){
+            showMessage("Alert", "Student has checked out for this course");
+        }
+    }
+
     public void getData(){
         String getUrl = Config.BASE_URL+Config.UPDATE_ATTENDANCE_DATA;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, getUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
-                if (response.equals("success checkin")) {
-
-                    showMessage("Alert", "Student has checked in for this course");
-
-                } else if (response.equals("success checkout")){
-                    showMessage("Alert", "Student has checked out for this course");
-                }
-
+                processGetData(response);
+                mydb.updateAttendanceRecord(splited[0], subjectCode);
             }
         },
                 new Response.ErrorListener() {
@@ -203,7 +254,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                             for(int i = 0 ; i < jsonArray.length() ; i++){
                                 JSONObject result = jsonArray.getJSONObject(i);
                                 String Scanned = "1";
-                                String isScanned = result.getString("isScanned");
+                                String isScanned = result.getString("ischecked");
                                 Log.d ("hye subject codess",isScanned);
                                 if(Scanned.equals(isScanned)) {
 
@@ -261,7 +312,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
             for(int i = 0 ; i < jsonArray.length() ; i++){
                 JSONObject result2 = jsonArray.getJSONObject(i);
                 String Scanned = "1";
-                String isScanned = result2.getString("isScanned");
+                String isScanned = result2.getString("ischecked");
                 Log.d ("hye subject codess",isScanned);
                 if(Scanned.equals(isScanned)) {
 

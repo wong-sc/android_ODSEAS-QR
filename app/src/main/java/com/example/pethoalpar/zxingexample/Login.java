@@ -102,7 +102,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(Login.this,error.toString(),Toast.LENGTH_LONG ).show();
+                        Toast.makeText(Login.this,error.toString(),Toast.LENGTH_LONG).show();
                         AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
                         alert.setTitle("Result");
                         alert.setMessage(error.toString());
@@ -116,10 +116,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 map.put(KEY_STAFF_ID, staff_id);
                 map.put(KEY_PASSWORD, staff_password);
                 return map;
-
             }
         };
-
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }

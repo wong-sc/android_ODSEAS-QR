@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.SimpleCursorAdapter;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -403,25 +405,50 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
-    public int checkAlreadyScan(int student_id, String course_id){
-        SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT  * FROM " + TABLE_ENROLL_HANDLER +
-                " WHERE "
-                + STUDENT_ID + " = " + student_id
-                + " AND "
-                + COURSE_ID + " = " + course_id;
-
-        Log.e("Log", selectQuery);
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        int isCheck =  cursor.getInt(cursor.getColumnIndex(ISCHECKED));
-
-        return isCheck;
-    }
+//    public String checkAlreadyScan(int student_id, String course_id){
+//
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        ArrayList<JSONObject> courseData = new ArrayList<>();
+//
+//        String SELECT_COURSE_DETAILS =
+//                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s = '%s'",
+//                        TABLE_ENROLL_HANDLER,
+//                        STUDENT_ID, student_id,
+//                        COURSE_ID, course_id);
+//
+//        Log.e("Log", SELECT_COURSE_DETAILS);
+//
+//        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+//
+//        if (cursor.moveToFirst()) {
+//            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+//
+//            do {
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject.put(STAFF_NAME, cursor.getString(0));
+//                    jsonObject.put(INVIGILATOR_POSITION, cursor.getString(1));
+//                    courseData.add(cursor.getPosition(),jsonObject);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.d("Result1 == ", cursor.getString(0));
+//                Log.d("Result2 == ", cursor.getString(1));
+//                try {
+//                    Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            } while (cursor.moveToNext());
+//        } else Log.d("Result == ", "NO");
+//
+//        Log.d("Overall result", String.valueOf(courseData));
+//
+//        cursor.close();
+//        db.close();
+//
+//        return String.valueOf(courseData);
+//    }
 
     public String getSpinnerData(int staff_id){
 
@@ -534,5 +561,625 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         db.close();
         return String.valueOf(courseData);
 
+    }
+
+    public String checkAlreadyScan(String course_id,String student_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT %s FROM %s WHERE %s = '%s' AND %s = '%s'",
+                        ISCHECKED,
+                        TABLE_ENROLL_HANDLER,
+                        STUDENT_ID, student_id,
+                        COURSE_ID,course_id);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(ISCHECKED, cursor.getString(0));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getAbsenteesData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NULL AND %s IS NULL ORDER BY %s ASC",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKIN_TIME,CHECKOUT_TIME,
+                        STUDENT_ID);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
+                Cursor cursor2 = db.rawQuery(SELECT_STUDENT, null);
+                if(cursor2.moveToNext()){
+                    Log.d("Result student", DatabaseUtils.dumpCursorToString(cursor2));
+                    do{
+                        try {
+                            jsonObject.put(STUDENT_NAME, cursor2.getString(0));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while(cursor2.moveToNext());
+                }
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getAllData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+//        Log.d("course id: ", course_id);
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' ORDER BY %s ASC",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        STUDENT_ID);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
+                Cursor cursor2 = db.rawQuery(SELECT_STUDENT, null);
+                Log.d("Result cursor2--", DatabaseUtils.dumpCursorToString(cursor2));
+                if(cursor2.moveToNext()){
+                    Log.d("Result student", DatabaseUtils.dumpCursorToString(cursor2));
+                    do{
+                        try {
+                            jsonObject.put(STUDENT_NAME, cursor2.getString(0));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while(cursor2.moveToNext());
+                }
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getAnswerBooklet(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+        int count = 0;
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKOUT_TIME);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+            count = cursor.getCount();
+
+//            do {
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject.put("booklet", cursor.getString(0));
+//                    courseData.add(cursor.getPosition(),jsonObject);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                // Log.d("Result1 == ", cursor.getString(0));
+//                // Log.d("Result2 == ", cursor.getString(1));
+//                // try {
+//                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+//                // } catch (JSONException e) {
+//                //     e.printStackTrace();
+//                // }
+//            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(count));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(count);
+    }
+
+    public String getAttendedData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+        int count = 0;
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKIN_TIME);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+            count = cursor.getCount();
+
+//            do {
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject.put("attended", cursor.getString(0));
+//                    courseData.add(cursor.getPosition(),jsonObject);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+//            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+//        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(count);
+    }
+
+    public String getAttendeesData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL ORDER BY %s ASC",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKIN_TIME,
+                        STUDENT_ID);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
+                Cursor cursor2 = db.rawQuery(SELECT_STUDENT, null);
+                if(cursor2.moveToNext()){
+                    Log.d("Result student", DatabaseUtils.dumpCursorToString(cursor2));
+                    do{
+                        try {
+                            jsonObject.put(STUDENT_NAME, cursor2.getString(0));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while(cursor2.moveToNext());
+                }
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getInExaminationData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL AND %s IS NULL ORDER BY %s ASC",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKIN_TIME, CHECKOUT_TIME,
+                        STUDENT_ID);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
+                Cursor cursor2 = db.rawQuery(SELECT_STUDENT, null);
+                if(cursor2.moveToNext()){
+                    Log.d("Result student", DatabaseUtils.dumpCursorToString(cursor2));
+                    do{
+                        try {
+                            jsonObject.put(STUDENT_NAME, cursor2.getString(0));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while(cursor2.moveToNext());
+                }
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getResultData(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT %s FROM %s WHERE %s = '%s' AND %s = 0",
+                        STUDENT_ID,
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        ISCHECKED);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(0));
+                    jsonObject.put(STUDENT_NAME, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);              //DUN KNOW              //row_gid
+    }
+
+    public String getStudentData(String student_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_STUDENT_DETAILS =
+                String.format("SELECT %s FROM %s WHERE %s = '%s'",
+                        STUDENT_NAME,
+                        TABLE_STUDENT,
+                        STUDENT_ID, student_id);
+
+        Log.d("query", SELECT_STUDENT_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_STUDENT_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(STUDENT_NAME, cursor.getString(0));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getStudentSubject(String student_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT %s FROM %s WHERE %s = '%s'",
+                        COURSE_ID,
+                        TABLE_ENROLL_HANDLER,
+                        STUDENT_ID, student_id);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put(COURSE_ID, cursor.getString(0));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getSubmittedData (String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL ORDER BY %s ASC",
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        CHECKOUT_TIME,
+                        STUDENT_ID);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
+                Cursor cursor2 = db.rawQuery(SELECT_STUDENT, null);
+                if(cursor2.moveToNext()){
+                    Log.d("Result student", DatabaseUtils.dumpCursorToString(cursor2));
+                    do{
+                        try {
+                            jsonObject.put(STUDENT_NAME, cursor2.getString(0));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while(cursor2.moveToNext());
+                }
+                try {
+                    jsonObject.put(STUDENT_ID, cursor.getString(1));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // Log.d("Result1 == ", cursor.getString(0));
+                // Log.d("Result2 == ", cursor.getString(1));
+                // try {
+                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
+                // } catch (JSONException e) {
+                //     e.printStackTrace();
+                // }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String getTotalStudent(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+
+        String SELECT_COURSE_DETAILS =
+                String.format("SELECT %s FROM %s WHERE %s = '%s'",
+                        STUDENT_ID,
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id);
+
+        Log.d("query", SELECT_COURSE_DETAILS);
+
+        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("total", cursor.getString(0));
+                    courseData.add(cursor.getPosition(),jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        Log.d("Overall result", String.valueOf(courseData));
+
+        cursor.close();
+        db.close();
+        return String.valueOf(courseData);
+    }
+
+    public String updateAttendanceRecord(String student_id, String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<JSONObject> courseData = new ArrayList<>();
+        String isChecked = "";
+
+        String CHECK_STUDENT =
+                String.format("SELECT %s FROM %s WHERE %s = '%s' AND %s = '%s'",
+                        CHECKIN_TIME,
+                        TABLE_ENROLL_HANDLER,
+                        COURSE_ID, course_id,
+                        STUDENT_ID, student_id);
+
+        Cursor cursor = db.rawQuery(CHECK_STUDENT, null);
+
+        if (cursor.moveToFirst()) {
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+
+            do {
+                isChecked = cursor.getString(0);
+            } while (cursor.moveToNext());
+        } else Log.d("Result == ", "NO");
+
+        if(isChecked.equals("null")){
+
+            ContentValues values = new ContentValues();
+            values.put(CHECKIN_TIME, " time('now') ");
+            db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            return "success checkin";
+
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(CHECKOUT_TIME, " time('now') ");
+            db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+
+            ContentValues valuess = new ContentValues();
+            values.put(ISCHECKED, 1);
+            db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            return "success checkout";
+
+        }
     }
 }

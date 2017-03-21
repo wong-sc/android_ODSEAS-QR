@@ -39,12 +39,15 @@ public class NetworkUtils {
         if (conn == NetworkUtils.TYPE_WIFI) {
             status = "Wifi enabled";
             editor.putString(Config.WIFI_STATUS, status);
+            editor.commit();
         } else if (conn == NetworkUtils.TYPE_MOBILE) {
             status = "Mobile data enabled";
             editor.putString(Config.WIFI_STATUS, status);
+            editor.commit();
         } else if (conn == NetworkUtils.TYPE_NOT_CONNECTED) {
             status = "Not connected to Internet";
             editor.putString(Config.WIFI_STATUS, status);
+            editor.commit();
         }
 
         editor.apply();

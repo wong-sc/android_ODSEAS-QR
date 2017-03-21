@@ -2,7 +2,7 @@ package com.example.pethoalpar.zxingexample;
 
 public class Config {
 
-    public static final String BASE_URL = "http://10.64.116.227/";
+    public static final String BASE_URL = "http://10.16.160.48/";
     public static final String GET_SUBJECT_DATA = "ODSEAS-QR/student/getSubjectData.php";
     public static final String GET_DETAILS_DATA = "ODSEAS-QR/student/getDetailsData.php";
     public static final String GET_ATTENDED_DATA = "ODSEAS-QR/student/getAttendedData.php";
@@ -23,7 +23,7 @@ public class Config {
     public static final String WIFI_STATUS = "Wifi_Status";
 
 
-    public static final String DATA_URL = "http://10.64.116.227/studsub/createJson.php";
+    public static final String DATA_URL = "http://10.16.142.219/studsub/createJson.php";
     public static final String KEY_ID = "stud_id";
     public static final String KEY_SUBJECT = "sub_code";
     public static final String JSON_ARRAY = "result";
