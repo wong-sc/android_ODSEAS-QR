@@ -60,6 +60,8 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     private static final String ISCHECKED = "ischecked";
     private static final String CHECKIN_TIME = "checkin_time";
     private static final String CHECKOUT_TIME = "checkout_time";
+    private static final String CHECKOUT_STAFFID = "checkout_staffID";
+    private static final String CHECKIN_STAFFID = "checkin_staffID";
 
     // Staff Table & Columns Names
     private static final String TABLE_STAFF ="staff";
@@ -122,6 +124,8 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + ISCHECKED + " BOOLEAN,"
                 + CHECKIN_TIME + " DATETIME,"
                 + CHECKOUT_TIME + " DATETIME,"
+                + CHECKIN_STAFFID + " INTEGER,"
+                + CHECKOUT_STAFFID + " INTEGER,"
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
 
