@@ -73,6 +73,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         preferences = getActivity().getSharedPreferences("myloginapp",Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(getContext());
         requestQueue = Volley.newRequestQueue(getActivity());
+        preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         return v;
     }
 

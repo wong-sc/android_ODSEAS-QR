@@ -466,6 +466,10 @@ public class Dashboard extends AppCompatActivity
         Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
 
         if (v == findViewById(R.id.buttonNext)){
+//            String status = preferences.getString(Config.WIFI_STATUS, "");
+//            Toast.makeText(Dashboard.this, "No internet -- " + status, Toast.LENGTH_SHORT).show();
+//            if(status.equals("Not connected to Internet"))
+//                Toast.makeText(Dashboard.this, "No internet -- " + status, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, TakeAttendance.class);
             intent.putExtra("passDataValue",passData);
             intent.putExtra("passSubjectInfo",subjectInfo);
