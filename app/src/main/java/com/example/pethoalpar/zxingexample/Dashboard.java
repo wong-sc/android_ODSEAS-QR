@@ -9,8 +9,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +38,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,14 +47,10 @@ public class Dashboard extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, Spinner.OnItemSelectedListener {
 
     private ArrayList<String> subjectData;
-    private ArrayList<String> subjectDetails;
 
     private JSONArray result;
     private JSONArray result2;
 
-    private TextView textViewSubjectCode;
-    private TextView textViewSubjectName;
-    private TextView detail;
     private TextView tvCourse;
     private TextView tvInvigilatorName;
     private TextView tvNoOfStudent;
@@ -87,7 +80,7 @@ public class Dashboard extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
         staff_id = preferences.getString("staff_id", "");
         mydb = new OfflineDatabase(this);
@@ -103,17 +96,13 @@ public class Dashboard extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         subjectData = new ArrayList<String>();
-        subjectDetails = new ArrayList<String>();
         spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(this);
 
-        textViewSubjectCode = (TextView) findViewById(R.id.textViewSubjectCode);
-        textViewSubjectName = (TextView) findViewById(R.id.textViewSubjectName);
         tvNoOfStudent = (TextView) findViewById(R.id.tvNoOfStudent);
         tvVenue = (TextView) findViewById(R.id.tvVenue);
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvTime = (TextView) findViewById(R.id.tvTime);
-        detail = (TextView) findViewById(R.id.name);
         card = (CardView) findViewById(R.id.card_view);
         card.setVisibility(View.GONE);
 
@@ -129,25 +118,27 @@ public class Dashboard extends AppCompatActivity
         btnNext = (Button)findViewById(R.id.buttonNext);
         btnNext.setOnClickListener(this);
 
-
-        if(isNetworkStatusAvialable (this)) {
-            Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
+        if(isNetworkStatusAvailable(this)) {
+            Toast.makeText(getApplicationContext(), "internet available", Toast.LENGTH_SHORT).show();
             getData();
         } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-
             // ask sqlite to geneate spinner data by passing the staff id
-            String spinnerData = mydb.getSpinnerData(1);
-            try {
-                //convert String to JSONArray == [{course_id: 'TMN2053', course_name: 'COURSE NAME 2'}]
-                JSONArray jsonArray = new JSONArray(spinnerData);
-                result = jsonArray;
-                getSubjectData(jsonArray);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Log.d("Spinner result --", spinnerData);
+            getSpinnerData();
         }
+    }
+
+    public void getSpinnerData(){
+        String spinnerData = mydb.getSpinnerData(staff_id);
+        try {
+            //convert String to JSONArray == [{course_id: 'TMN2053', course_name: 'COURSE NAME 2'}]
+            JSONArray jsonArray = new JSONArray(spinnerData);
+            result = jsonArray;
+            getSubjectData(jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("Spinner result --", spinnerData);
     }
 
     public void promtDownloadData(String staff_id){
@@ -166,16 +157,13 @@ public class Dashboard extends AppCompatActivity
                 loading.show();
             }
         });
-
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
             }
         });
-
         alertDialogBuilder.show();
-
     }
 
     public void getOfflineData(String linkUrl){
@@ -192,7 +180,6 @@ public class Dashboard extends AppCompatActivity
 //                        data.clear();
                         try {
                             JSONObject jsonObject1 = new JSONObject(jsonObject);
-//                            JSONArray jsonArray = new JSONArray(jsonObject);
                             Toast.makeText(Dashboard.this, "Result length" + jsonObject1.length(), Toast.LENGTH_SHORT).show();
                             String course = jsonObject1.getString("course");
                             String course_handler = jsonObject1.getString("course_handler");
@@ -258,6 +245,7 @@ public class Dashboard extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
+                        getSpinnerData();
                     }
                 }){
             @Override
@@ -267,10 +255,8 @@ public class Dashboard extends AppCompatActivity
                 return params;
             }
         };
-
         //Creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-
         //Adding request to the queue
         requestQueue.add(stringRequest);
     }
@@ -293,7 +279,6 @@ public class Dashboard extends AppCompatActivity
                             result2 = j.getJSONArray("result");
 //                            detail.setText(result2.toString());
                             processDetails(result2, position);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -303,6 +288,14 @@ public class Dashboard extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
+                        String subjectDetails = mydb.getSubjectDetails(getSubjectCode(position));
+                        try {
+                            JSONArray jsonArray2 = new JSONArray(subjectDetails);
+                            result2 = jsonArray2;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        processOfflineDetails(position);
                     }
                 }){
             @Override
@@ -312,10 +305,8 @@ public class Dashboard extends AppCompatActivity
                 return params;
             }
         };
-
         //Creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-
         //Adding request to the queue
         requestQueue.add(stringRequest);
     }
@@ -326,14 +317,12 @@ public class Dashboard extends AppCompatActivity
             try {
                 //Getting json object
                 JSONObject json = j.getJSONObject(i);
-
                 //Adding the name of the student to array list
                 subjectData.add(json.getString("course_id") + " " + json.getString("course_name"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         //Setting adapter to show the items in the spinner
         spinner.setAdapter(new ArrayAdapter<String>(Dashboard.this, android.R.layout.simple_spinner_dropdown_item, subjectData));
         card.setVisibility(View.VISIBLE);
@@ -347,12 +336,10 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = j.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         tvInvigilatorName.setText(invigilator);
         tvCourse.setText("Course Name: "+ getSubjectCode(position) + " " + getSubjectName(position));
         tvNoOfStudent.setText("Number of Students: "+ getStudentNumber(position));
@@ -369,12 +356,10 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = result2.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         tvInvigilatorName.setText(invigilator);
         tvCourse.setText("Course Name: "+ getSubjectCode(position) + " " + getSubjectName(position));
         tvNoOfStudent.setText("Number of Students: "+ getStudentNumber(position));
@@ -382,7 +367,6 @@ public class Dashboard extends AppCompatActivity
         tvDate.setText("Date: "+ getExamDate(position));
         tvTime.setText("Time: "+ getExamTime(position));
     }
-
 
     private String getSubjectCode (int position){
         String subjectCode = "";
@@ -454,9 +438,6 @@ public class Dashboard extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        textViewSubjectCode.setText("Subject selected:");
-        textViewSubjectName.setText(getSubjectCode(position)+" "+getSubjectName(position));
-        getDetails(getSubjectCode(position), position);
 
         if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
             String subjectDetails = mydb.getSubjectDetails(getSubjectCode(position));
@@ -467,17 +448,16 @@ public class Dashboard extends AppCompatActivity
                 e.printStackTrace();
             }
             processOfflineDetails(position);
+        } else {
+            getDetails(getSubjectCode(position), position);
         }
-
-
         passData = getSubjectCode(position);
         subjectInfo = getSubjectCode(position)+" "+getSubjectName(position);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        textViewSubjectCode.setText("");
-        textViewSubjectName.setText("");
+
     }
 
     @Override
@@ -523,7 +503,6 @@ public class Dashboard extends AppCompatActivity
                         Intent intent = new Intent(Dashboard.this, Login.class);
                         startActivity(intent);
                         finish();
-
                     }
                 });
 
@@ -531,10 +510,8 @@ public class Dashboard extends AppCompatActivity
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
-
                     }
                 });
-
         //Showing the alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -589,9 +566,7 @@ public class Dashboard extends AppCompatActivity
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_logout) {
-
             logout();
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -599,7 +574,7 @@ public class Dashboard extends AppCompatActivity
         return true;
     }
 
-    public static boolean isNetworkStatusAvialable (Context context) {
+    public static boolean isNetworkStatusAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null)
         {

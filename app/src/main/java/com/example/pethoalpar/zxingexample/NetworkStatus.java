@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
-/**
- * Created by Shi Chee on 15-Mar-17.
- */
-
 public class NetworkStatus extends BroadcastReceiver {
 
     @Override

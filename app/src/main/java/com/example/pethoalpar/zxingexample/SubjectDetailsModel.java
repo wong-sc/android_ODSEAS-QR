@@ -1,9 +1,5 @@
 package com.example.pethoalpar.zxingexample;
 
-/**
- * Created by Shi Chee on 16-Mar-17.
- */
-
 public class SubjectDetailsModel {
     private String subjectCode, subjectName, venue, date, time, numberOfStudent;
     private String invigilator, position;

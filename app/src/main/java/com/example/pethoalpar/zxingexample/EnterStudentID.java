@@ -39,7 +39,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public String dataStringSubjectCode;
     SharedPreferences preferences;
     OfflineDatabase mydb;
-
     RequestQueue requestQueue;
 
     private Button buttonEnter, buttonComfirm;
@@ -88,7 +87,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         }
         else
         checkStudent();
-
     }
 
     public void buttonConfirm(View v) {
@@ -198,14 +196,11 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 String isScanned = jsonObject.getString("ischecked");
                 Log.d("hye subject codess", isScanned);
                 if (Scanned.equals(isScanned)) {
-
                     showMessage("Alert", dataStringStudentID + " has already scanned!");
                     studentid.setText("");
                     studentname.setText("Student Name: ");
-
                 } else {
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-//                        showMessage("Alert", "No internet");
                         String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode);
                         processGetData(status);
                     } else
@@ -215,7 +210,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     studentname.setText("Student Name: ");
                 }
             }
-
             if (jsonArray.length() == 0) {
                 showMessage("Alert", dataStringStudentID + " has already scanned!");
             }
@@ -223,7 +217,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public void processStudentName(String result){
@@ -240,7 +233,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(),"JSON  Error",Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
-
     }
 
     public void getStudentName() {
@@ -309,10 +301,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 return params;
             }
         };
-
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         requestQueue.add(stringRequest);
-
     }
 
     public void showMessage(String title, String message) {
@@ -325,7 +315,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                         dialog.cancel();
                     }
                 });
-
         AlertDialog alert = Adialog.create();
         alert.setTitle(title);
         Adialog.show();

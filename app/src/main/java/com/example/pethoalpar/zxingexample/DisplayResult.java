@@ -93,7 +93,6 @@ public class DisplayResult extends Fragment {
             getAttendedData();
             getAnswerBooklet();
         }
-
         return v;
     }
 
@@ -192,29 +191,9 @@ public class DisplayResult extends Fragment {
 
     public void processAttendedData(String result){
         textViewAttended.setText(result);
-//        try {
-//            JSONArray jsonArray = new JSONArray(result);
-//            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                String attended = jsonObject.getString("attended");
-//                textViewAttended.setText(attended);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void processBookletData(String result){
         textViewBooklet.setText(result);
-//        try {
-//            JSONArray jsonArray = new JSONArray(result);
-//            for(int i = 0 ; i < jsonArray.length() ; i++){
-//                JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                String booklet = jsonObject.getString("booklet");
-//                textViewBooklet.setText(booklet);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
     }
 }

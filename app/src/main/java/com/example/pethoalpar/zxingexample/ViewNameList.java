@@ -50,7 +50,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewnamelist);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         preferences = ViewNameList.this.getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(this);
@@ -71,7 +71,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
         switch (i){
             case 0:
-                Toast.makeText(ViewNameList.this, "Item postion: 0 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewNameList.this, "Item position: 0 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                     getnamelist = mydb.getAllData(course_id);
                     processNameList(getnamelist);
@@ -79,7 +79,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ALL_DATA);
                 break;
             case 1:
-                Toast.makeText(ViewNameList.this, "Item postion: 1 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewNameList.this, "Item position: 1 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                     getnamelist = mydb.getAttendeesData(course_id);
                     processNameList(getnamelist);
@@ -87,7 +87,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ATTENDEES_DATA);
                 break;
             case 2:
-                Toast.makeText(ViewNameList.this, "Item postion: 2 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewNameList.this, "Item position: 2 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
                     getnamelist = mydb.getAbsenteesData(course_id);
                     processNameList(getnamelist);
@@ -95,7 +95,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ABSENTEES_DATA);
                 break;
             case 3:
-                Toast.makeText(ViewNameList.this, "Item postion: 3 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewNameList.this, "Item position: 3 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                     getnamelist = mydb.getSubmittedData(course_id);
                     processNameList(getnamelist);
@@ -103,7 +103,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_SUBMITTED_DATA);
                 break;
             case 4:
-                Toast.makeText(ViewNameList.this, "Item postion: 4 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewNameList.this, "Item position: 4 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                     getnamelist = mydb.getInExaminationData(course_id);
                     processNameList(getnamelist);
@@ -173,6 +173,5 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
     }
 }

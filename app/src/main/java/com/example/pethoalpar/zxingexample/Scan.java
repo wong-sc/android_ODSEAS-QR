@@ -190,15 +190,12 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
                 }
             }
-
             if (jsonArray.length() == 0) {
                 showMessage("Alert", splited[0] + " has already scanned!");
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public void processGetData(String response){
@@ -235,7 +232,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 return params;
             }
         };
-
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         requestQueue.add(stringRequest);
     }
@@ -279,11 +275,9 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                                 }
 
                             }
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -325,22 +319,18 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                                     dialog.cancel();
                                 }
                             });
-
                     AlertDialog alert = Adialog.create();
                     alert.setTitle("Alert");
                     alert.show();
-
                 }
                 else{
                     getData();
                     Toast.makeText(getContext(),"Successfully added "+splited[0],Toast.LENGTH_LONG).show();
                 }
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

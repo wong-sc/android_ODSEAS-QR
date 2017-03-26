@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -13,131 +13,118 @@
     tools:context="com.example.pethoalpar.zxingexample.Dashboard"
     tools:showIn="@layout/app_bar_dashboard">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon"
-        android:paddingTop="20dp"
-        android:paddingBottom="390dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/imageView" />
-
-    <Spinner
-        android:id="@+id/spinner"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="113dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"></Spinner>
+        android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/spinner">
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="30dp"
+            android:paddingTop="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon" />
 
-        <RelativeLayout
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:layout_below="@+id/imageView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:padding="10dp"
-                android:textSize="20dp"
-                android:fontFamily="monospace"
-                android:text="Details"/>
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="4dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/spinner">
 
-            <TextView
-                android:id="@+id/tvCourse"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/name"
-                android:text="Course:"/>
+                android:padding="5dp">
 
-            <TextView
-                android:id="@+id/tvVenue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvCourse"
-                android:text="Venue:"/>
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:padding="10dp"
+                    android:textSize="20dp"
+                    android:fontFamily="monospace"
+                    android:text="Details"/>
 
-            <TextView
-                android:id="@+id/tvDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvVenue"
-                android:text="Date:"/>
+                <TextView
+                    android:id="@+id/tvCourse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/name"
+                    android:text="Course:"/>
 
-            <TextView
-                android:id="@+id/tvTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvDate"
-                android:text="Time:"/>
+                <TextView
+                    android:id="@+id/tvVenue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvCourse"
+                    android:text="Venue:"/>
 
-            <TextView
-                android:id="@+id/tvNoOfStudent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvTime"
-                android:text="Number of Student:"/>
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvVenue"
+                    android:text="Date:"/>
 
-            <TextView
-                android:id="@+id/tvInvigilator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvNoOfStudent"
-                android:text="Invigilator:"/>
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvDate"
+                    android:text="Time:"/>
 
-            <TextView
-                android:id="@+id/tvInvigilatorName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvInvigilator"
-                android:textSize="14dp"
-                android:text="1. Name "/>
+                <TextView
+                    android:id="@+id/tvNoOfStudent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvTime"
+                    android:text="Number of Student:"/>
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tvInvigilator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvNoOfStudent"
+                    android:text="Invigilator:"/>
 
-    </android.support.v7.widget.CardView>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Continue to Scan"
-        android:id="@+id/buttonNext"
-        android:layout_alignBottom="@+id/textViewSubjectName"
-        android:layout_centerHorizontal="true" />
+                <TextView
+                    android:id="@+id/tvInvigilatorName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvInvigilator"
+                    android:textSize="14dp"
+                    android:text="1. Name "/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textViewSubjectCode"
-        android:textSize="16dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="97dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#ffffff" />
+            </RelativeLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textViewSubjectName"
-        android:hint="name"
-        android:textSize="16dp"
-        android:layout_below="@+id/textViewSubjectCode"
-        android:textColor="#ffffff"
-        android:layout_alignParentLeft="true"/>
+        </android.support.v7.widget.CardView>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Continue to Scan"
+            android:id="@+id/buttonNext"
+            android:layout_below="@+id/card_view"
+            android:layout_centerHorizontal="true" />
 
-</RelativeLayout>
+    </RelativeLayout>
+
+
+
+</ScrollView>

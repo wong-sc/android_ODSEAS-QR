@@ -6,28 +6,37 @@
 
         <TextView
             android:id="@+id/number"
-            android:text="No."
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dip"
+            android:layout_weight="0.5"
             android:padding="10dip"
-            android:textColor="#000000"/>
+            android:text="No."
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            android:textColor="#000000"
+            android:textSize="14dip" />
 
         <TextView
             android:id="@+id/matricno"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Matric No."
-            android:textSize="20dip"
+            android:layout_weight="1.5"
             android:padding="10dip"
-            android:textColor="#000000"/>
+            android:text="Matric No."
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            android:textColor="#000000"
+            android:textSize="14dip" />
 
         <TextView
             android:id="@+id/studentname"
-            android:text="Student Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dip"
+            android:layout_weight="3"
             android:padding="10dip"
-            android:textColor="#000000"/>
+            android:text="Student Name"
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            android:textColor="#000000"
+            android:textSize="14dip" />
 </LinearLayout>

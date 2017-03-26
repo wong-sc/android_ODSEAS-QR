@@ -450,7 +450,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 //        return String.valueOf(courseData);
 //    }
 
-    public String getSpinnerData(int staff_id){
+    public String getSpinnerData(String staff_id){
 
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<JSONObject> courseData = new ArrayList<>();
@@ -481,7 +481,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     } while(cursor2.moveToNext());
                 }
                 try {
@@ -506,11 +505,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         } else Log.d("Result == ", "NO");
 
         Log.d("Overall result", String.valueOf(courseData));
-
         cursor.close();
         db.close();
         return String.valueOf(courseData);
-
     }
 
     public String getSubjectDetails(String course_id){
@@ -560,7 +557,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return String.valueOf(courseData);
-
     }
 
     public String checkAlreadyScan(String course_id,String student_id){
@@ -666,16 +662,13 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<JSONObject> courseData = new ArrayList<>();
-//        Log.d("course id: ", course_id);
 
         String SELECT_COURSE_DETAILS =
                 String.format("SELECT * FROM %s WHERE %s = '%s' ORDER BY %s ASC",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         STUDENT_ID);
-
         Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
-
         if (cursor.moveToFirst()) {
             Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
 
@@ -692,7 +685,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     } while(cursor2.moveToNext());
                 }
                 try {
@@ -701,18 +693,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // Log.d("Result1 == ", cursor.getString(0));
-                // Log.d("Result2 == ", cursor.getString(1));
-                // try {
-                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
-                // } catch (JSONException e) {
-                //     e.printStackTrace();
-                // }
             } while (cursor.moveToNext());
         } else Log.d("Result == ", "NO");
-
         Log.d("Overall result", String.valueOf(courseData));
-
         cursor.close();
         db.close();
         return String.valueOf(courseData);
@@ -766,7 +749,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     public String getAttendedData(String course_id){
 
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<JSONObject> courseData = new ArrayList<>();
         int count = 0;
 
         String SELECT_COURSE_DETAILS =
@@ -782,26 +764,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
             count = cursor.getCount();
-
-//            do {
-//                JSONObject jsonObject = new JSONObject();
-//                try {
-//                    jsonObject.put("attended", cursor.getString(0));
-//                    courseData.add(cursor.getPosition(),jsonObject);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-                // Log.d("Result1 == ", cursor.getString(0));
-                // Log.d("Result2 == ", cursor.getString(1));
-                // try {
-                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
-                // } catch (JSONException e) {
-                //     e.printStackTrace();
-                // }
-//            } while (cursor.moveToNext());
         } else Log.d("Result == ", "NO");
-
-//        Log.d("Overall result", String.valueOf(courseData));
 
         cursor.close();
         db.close();
@@ -846,13 +809,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // Log.d("Result1 == ", cursor.getString(0));
-                // Log.d("Result2 == ", cursor.getString(1));
-                // try {
-                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
-                // } catch (JSONException e) {
-                //     e.printStackTrace();
-                // }
             } while (cursor.moveToNext());
         } else Log.d("Result == ", "NO");
 
@@ -916,51 +872,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return String.valueOf(courseData);
-    }
-
-    public String getResultData(String course_id){
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<JSONObject> courseData = new ArrayList<>();
-
-        String SELECT_COURSE_DETAILS =
-                String.format("SELECT %s FROM %s WHERE %s = '%s' AND %s = 0",
-                        STUDENT_ID,
-                        TABLE_ENROLL_HANDLER,
-                        COURSE_ID, course_id,
-                        ISCHECKED);
-
-        Log.d("query", SELECT_COURSE_DETAILS);
-
-        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
-
-        if (cursor.moveToFirst()) {
-            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
-
-            do {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put(STUDENT_ID, cursor.getString(0));
-                    jsonObject.put(STUDENT_NAME, cursor.getString(1));
-                    courseData.add(cursor.getPosition(),jsonObject);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // Log.d("Result1 == ", cursor.getString(0));
-                // Log.d("Result2 == ", cursor.getString(1));
-                // try {
-                //     Log.d("Result3 == ", courseData.get(0).getString(STAFF_NAME));
-                // } catch (JSONException e) {
-                //     e.printStackTrace();
-                // }
-            } while (cursor.moveToNext());
-        } else Log.d("Result == ", "NO");
-
-        Log.d("Overall result", String.valueOf(courseData));
-
-        cursor.close();
-        db.close();
-        return String.valueOf(courseData);              //DUN KNOW              //row_gid
     }
 
     public String getStudentData(String student_id){
@@ -1065,7 +976,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
-
             do {
                 JSONObject jsonObject = new JSONObject();
                 String SELECT_STUDENT = String.format("SELECT student_name FROM student WHERE student_id = '%s'", cursor.getString(1));
@@ -1078,54 +988,10 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     } while(cursor2.moveToNext());
                 }
                 try {
                     jsonObject.put(STUDENT_ID, cursor.getString(1));
-                    courseData.add(cursor.getPosition(),jsonObject);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // Log.d("Result1 == ", cursor.getString(0));
-                // Log.d("Result2 == ", cursor.getString(1));
-                // try {
-                //     Log.d("Result3 == ", courseData.get(0).getString(STUDENT_ID));
-                // } catch (JSONException e) {
-                //     e.printStackTrace();
-                // }
-            } while (cursor.moveToNext());
-        } else Log.d("Result == ", "NO");
-
-        Log.d("Overall result", String.valueOf(courseData));
-
-        cursor.close();
-        db.close();
-        return String.valueOf(courseData);
-    }
-
-    public String getTotalStudent(String course_id){
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<JSONObject> courseData = new ArrayList<>();
-
-        String SELECT_COURSE_DETAILS =
-                String.format("SELECT %s FROM %s WHERE %s = '%s'",
-                        STUDENT_ID,
-                        TABLE_ENROLL_HANDLER,
-                        COURSE_ID, course_id);
-
-        Log.d("query", SELECT_COURSE_DETAILS);
-
-        Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);
-
-        if (cursor.moveToFirst()) {
-            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
-
-            do {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("total", cursor.getString(0));
                     courseData.add(cursor.getPosition(),jsonObject);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1142,10 +1008,12 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
     public String updateAttendanceRecord(String student_id, String course_id){
 
+        /*this method is  used to update the attendance in the enroll_handler table*/
+
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<JSONObject> courseData = new ArrayList<>();
         String isChecked = "";
 
+        /*query to select the checkin time of specific student*/
         String CHECK_STUDENT =
                 String.format("SELECT %s FROM %s WHERE %s = '%s' AND %s = '%s'",
                         CHECKIN_TIME,
@@ -1153,33 +1021,38 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                         COURSE_ID, course_id,
                         STUDENT_ID, student_id);
 
+        /*cursor to search in the database*/
         Cursor cursor = db.rawQuery(CHECK_STUDENT, null);
 
         if (cursor.moveToFirst()) {
+            /*only will execute this "IF loop" if there is a matched result*/
             Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
 
             do {
+                /* since only one item will be selected therefore first index will be 0*/
                 isChecked = cursor.getString(0);
             } while (cursor.moveToNext());
         } else Log.d("Result == ", "NO");
 
         if(isChecked.equals("null")){
-
+            /* content values will store the data that want to update in its */
             ContentValues values = new ContentValues();
             values.put(CHECKIN_TIME, " time('now') ");
+            /*db.update will update the value in the content values to the database*/
             db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            /*return success checkin if the checkin time is null*/
             return "success checkin";
 
         } else {
-            ContentValues values = new ContentValues();
-            values.put(CHECKOUT_TIME, " time('now') ");
-            db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            ContentValues values_checkin = new ContentValues();
+            values_checkin.put(CHECKOUT_TIME, " time('now') ");
+            db.update(TABLE_ENROLL_HANDLER,values_checkin, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
 
-            ContentValues valuess = new ContentValues();
-            values.put(ISCHECKED, 1);
-            db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            ContentValues values_checkout = new ContentValues();
+            values_checkout.put(ISCHECKED, 1);
+            db.update(TABLE_ENROLL_HANDLER,values_checkout, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+            /*return success checkout if the checkin time is not null this mean that the student already checkin before*/
             return "success checkout";
-
         }
     }
 }
