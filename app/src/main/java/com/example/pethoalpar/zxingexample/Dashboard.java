@@ -188,6 +188,7 @@ public class Dashboard extends AppCompatActivity
                             String venue = jsonObject1.getString("venue");
                             String venue_handler = jsonObject1.getString("venue_handler");
                             String staff = jsonObject1.getString("staff");
+                            String style = jsonObject1.getString("attendance_style");
 
                             loading.setMessage("Saving data.......");
 
@@ -198,6 +199,7 @@ public class Dashboard extends AppCompatActivity
                             mydb.insertVenue(venue);
                             mydb.insertVenueHandler(venue_handler);
                             mydb.insertStaff(staff);
+                            mydb.insertAttendanceStyle(style);
 
                             loading.dismiss();
                             editor.putBoolean("firstTimeLogin", false);
@@ -273,10 +275,11 @@ public class Dashboard extends AppCompatActivity
                         JSONObject j = null;
                         try {
                             //Parsing the fetched Json String to JSON Object
-                            j = new JSONObject(response);
+//                            j = new JSONObject(response);
 
                             //Storing the Array of JSON String to our JSON Array
-                            result2 = j.getJSONArray("result");
+//                            result2 = j.getJSONArray("result");
+                            result2 = new JSONArray(response);
 //                            detail.setText(result2.toString());
                             processDetails(result2, position);
                         } catch (JSONException e) {

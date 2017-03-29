@@ -23,6 +23,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.HashMap;
@@ -87,6 +90,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        try {
+                            JSONObject result = new JSONObject(response);
+                            if(result.getString("status").equals("Successfully Login")){
+                                openProfile(result.getString("staff_id"));
+                            }else{
+                                AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
+                                alert.setTitle("Result");
+                                alert.setMessage(result.getString("status"));
+                                alert.setCancelable(true);
+                                alert.show();
+                                Toast.makeText(Login.this,response,Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         if(response.trim().equals("Successfully Login")){
                             openProfile(staff_id);
                         }else{
@@ -136,6 +154,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         //editor.putString(Config.EMAIL_SHARED_PREF, email);
 
         //Saving values to editor
+        editor.apply();
         editor.commit();
 
         Intent intent = new Intent(this, Dashboard.class);

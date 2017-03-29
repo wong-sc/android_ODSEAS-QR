@@ -3,7 +3,7 @@ package com.example.pethoalpar.zxingexample;
 public class Config {
 
     /*every static variable will be stored here to ease the modification*/
-    public static final String BASE_URL = "http://10.16.160.250/";
+    public static final String BASE_URL = "http://192.168.137.1/";
     public static final String GET_SUBJECT_DATA = "ODSEAS-QR/student/getSubjectData.php";
     public static final String GET_DETAILS_DATA = "ODSEAS-QR/student/getDetailsData.php";
     public static final String GET_ATTENDED_DATA = "ODSEAS-QR/student/getAttendedData.php";
@@ -20,10 +20,10 @@ public class Config {
     public static final String GET_SUBMITTED_DATA = "ODSEAS-QR/student/getSubmittedData.php";
     public static final String GET_INEXAMINATION_DATA = "ODSEAS-QR/student/getInExaminationData.php";
     public static final String GET_OFFLINE_DATA = "ODSEAS-QR/student/getOfflineData.php";
+    public static final String SYNC = "ODSEAS-QR/gcm_test/v1/sync";
 
     public static final String WIFI_STATUS = "Wifi_Status";
-
-
+    public static final String BROADCAST_SYNC_STATUS = "finished sync";
     public static final String DATA_URL = "http://10.64.116.227/studsub/createJson.php";
     public static final String KEY_ID = "stud_id";
     public static final String KEY_SUBJECT = "sub_code";

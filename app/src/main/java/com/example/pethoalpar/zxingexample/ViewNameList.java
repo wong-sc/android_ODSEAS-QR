@@ -157,10 +157,16 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 Log.d("student_id: ", jsonObject.getString("student_id"));
                 model.setStudent_name(jsonObject.getString("student_name"));
                 model.setStudent_matric(jsonObject.getString("student_id"));
+                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
+                    if(jsonObject.getString("status").equals("1"))
+                        model.setStatus(R.drawable.ic_check_circle_black_24dp);
+                    else
+                        model.setStatus(R.drawable.ic_sync_problem_black_24dp);
+                } else model.setStatus(R.drawable.ic_check_circle_black_24dp);
                 data.add(model);
             }
 
-            Toast.makeText(ViewNameList.this, "Result length" + data.size(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(ViewNameList.this, "Result length " + data.size(), Toast.LENGTH_SHORT).show();
             nameList = (RecyclerView) findViewById(R.id.namelist);
             nameListAdapter = new ViewNameListAdapter(ViewNameList.this, data);
             nameList.setAdapter(nameListAdapter);

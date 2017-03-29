@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class ViewNameListAdapter extends RecyclerView.Adapter<ViewNameListAdapte
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView number, studentName, studentMatric;
+        public ImageView status;
         public MyViewHolder(View itemView) {
             super(itemView);
             number = (TextView) itemView.findViewById(R.id.number);
             studentName = (TextView) itemView.findViewById(R.id.studentname);
             studentMatric = (TextView) itemView.findViewById(R.id.matricno);
+            status = (ImageView) itemView.findViewById(R.id.status);
         }
     }
 
@@ -42,6 +45,7 @@ public class ViewNameListAdapter extends RecyclerView.Adapter<ViewNameListAdapte
         holder.number.setText( position+1 + ". ");
         holder.studentName.setText(models.getStudent_name());
         holder.studentMatric.setText(models.getStudent_matric());
+        holder.status.setImageResource(models.getStatus());
     }
 
     @Override

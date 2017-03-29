@@ -37,6 +37,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public static final String ARG_PAGE = "ARF_PAGE";
     public String dataStringStudentID;
     public String dataStringSubjectCode;
+    public String staffID;
     SharedPreferences preferences;
     OfflineDatabase mydb;
     RequestQueue requestQueue;
@@ -70,10 +71,10 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         buttonComfirm.setOnClickListener(this);
         Intent i = getActivity().getIntent();
         dataStringSubjectCode = i.getStringExtra("passDataValue");
-        preferences = getActivity().getSharedPreferences("myloginapp",Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(getContext());
         requestQueue = Volley.newRequestQueue(getActivity());
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        staffID = preferences.getString("staff_id", "null");
         return v;
     }
 
@@ -202,7 +203,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     studentname.setText("Student Name: ");
                 } else {
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode);
+                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
                         processGetData(status);
                     } else
                     getData();
@@ -285,7 +286,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
-                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode);
+                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
             }
         },
                 new Response.ErrorListener() {
@@ -299,6 +300,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("student_id", dataStringStudentID);
                 params.put("course_id", dataStringSubjectCode);
+                params.put("staff_id", staffID);
+                params.put("style_id", "2");
                 return params;
             }
         };

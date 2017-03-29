@@ -39,4 +39,17 @@
             android:layout_gravity="start"
             android:textColor="#000000"
             android:textSize="14dip" />
+
+
+        <ImageView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:padding="10dip"
+            android:src="@drawable/ic_check_circle_black_24dp"
+            android:textAlignment="viewStart"
+            android:layout_gravity="start"
+            android:textColor="#000000"
+            android:textSize="14dip" />
 </LinearLayout>

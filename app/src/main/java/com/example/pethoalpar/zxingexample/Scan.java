@@ -53,7 +53,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     public static final String ARG_PAGE = "ARF_PAGE";
     private ZXingScannerView mScannerView;
     public String[] splited;
-    public String subjectCode, matchedSubject, subjectName;
+    public String subjectCode, matchedSubject, subjectName, staffID;
     RequestQueue requestQueue;
     SharedPreferences preferences;
     OfflineDatabase mydb;
@@ -86,6 +86,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
         subjectname.setText(subjectName);
 
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        staffID = preferences.getString("staff_id", "null");
         mydb = new OfflineDatabase(getContext());
 
         ImageButton scan = (ImageButton) v.findViewById(R.id.imageButtonScan);
@@ -140,8 +141,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     } else
                     checkAlreadyScan();
                 }
-
-
             }
         } else {
             // This is important, otherwise the result will not be passed to the fragment
@@ -183,7 +182,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
                 } else {
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode);
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
                         processGetData(status);
                     } else
                         getData();
@@ -214,7 +213,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
-                mydb.updateAttendanceRecord(splited[0], subjectCode);
+                mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
             }
         },
                 new Response.ErrorListener() {
@@ -228,7 +227,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("student_id",splited[0]);
                 params.put("course_id",matchedSubject);
-
+                params.put("staff_id", staffID);
+                params.put("style_id", "1");
                 return params;
             }
         };
@@ -238,14 +238,16 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     public void checkAlreadyScan(){
         requestQueue = Volley.newRequestQueue(getContext());
         String checkAlreadyScan = Config.BASE_URL + Config.CHECK_ALREADY_SCAN;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, checkAlreadyScan,
-                new Response.Listener<JSONObject>() {
+        StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, checkAlreadyScan,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject jsonObject) {
+                    public void onResponse(String jsonObject) {
+
+                        Boolean foundStudent = false;
 
                         try {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-                            Log.d ("hye subject codess",jsonObject.toString());
+                            JSONArray jsonArray = new JSONArray(jsonObject);
+                            Log.d ("hye subject codess",jsonArray.toString());
 
                             for(int i = 0 ; i < jsonArray.length() ; i++){
                                 JSONObject result = jsonArray.getJSONObject(i);
@@ -253,7 +255,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                                 String isScanned = result.getString("ischecked");
                                 Log.d ("hye subject codess",isScanned);
                                 if(Scanned.equals(isScanned)) {
-
+                                    foundStudent = true;
                                     //Toast.makeText(EnterStudentID.this,dataStringStudentID+" already scanned!",Toast.LENGTH_LONG).show();
                                     AlertDialog.Builder Adialog = new AlertDialog.Builder(getContext());
                                     Adialog.setMessage(splited[0]+" has already scanned!").setCancelable(false)
@@ -283,7 +285,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Log.e("Volley","Error");
+                        Log.e("Volley","Error" + volleyError.toString());
                     }
                 }
         ){

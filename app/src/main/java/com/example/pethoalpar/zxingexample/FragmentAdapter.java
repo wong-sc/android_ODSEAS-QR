@@ -26,16 +26,6 @@ public class FragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        Boolean status = preferences.getBoolean("FirstTimes", false);
-//        Log.d("PAGE RESULT--", ""+position);
-//
-//        if(status){
-//            position = 1;
-//            SharedPreferences.Editor editor = preferences.edit();
-//            editor.putBoolean("FirstTimes", false);
-//            editor.apply();
-//        }
 
         switch (position) {
             case 0: // Fragment # 0 - This will show FirstFragment
@@ -51,18 +41,6 @@ public class FragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        Boolean status = preferences.getBoolean("FirstTimes", false);
-//        Log.d("PAGE RESULT--", ""+position);
-//
-//        if(status){
-//            position = 1;
-//            SharedPreferences.Editor editor = preferences.edit();
-//            editor.putBoolean("FirstTimes", false);
-//            editor.apply();
-//        }
-        // Generate title based on item position
         return tabTitles[position];
     }
 }
