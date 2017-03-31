@@ -123,6 +123,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 splited = contentResult.split("\\s+");
                 Log.d("Result Array----", splited[1]);
                 Log.d("DataString", subjectCode);
+
+                /*SEARCH WHETHER THE STUDENT QR CODE CONTAIN THE SELECTED SUBJECT CODE*/
                 for(int i = 1 ; i < splited.length ; i++){
                     if(subjectCode.equals(splited[i])) {
                         matchedSubject = splited[i];
@@ -183,6 +185,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 } else {
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                         String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
+                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
                         processGetData(status);
                     } else
                         getData();

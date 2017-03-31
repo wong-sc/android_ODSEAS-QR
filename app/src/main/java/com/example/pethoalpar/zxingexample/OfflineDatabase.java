@@ -609,7 +609,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         ArrayList<JSONObject> courseData = new ArrayList<>();
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NULL AND %s IS NULL ORDER BY %s ASC",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s = 'null' AND %s = 'null' ORDER BY %s ASC",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         CHECKIN_TIME,CHECKOUT_TIME,
@@ -702,7 +702,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         int count = 0;
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s != 'null'",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         CHECKOUT_TIME);
@@ -729,7 +729,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         int count = 0;
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s != 'null'",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         CHECKIN_TIME);
@@ -754,7 +754,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         ArrayList<JSONObject> courseData = new ArrayList<>();
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL ORDER BY %s ASC",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s != 'null' ORDER BY %s ASC",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         CHECKIN_TIME,
@@ -803,7 +803,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         ArrayList<JSONObject> courseData = new ArrayList<>();
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL AND %s IS NULL ORDER BY %s ASC",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s != 'null' AND %s = 'null' ORDER BY %s ASC",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
                         CHECKIN_TIME, CHECKOUT_TIME,
@@ -924,10 +924,10 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         ArrayList<JSONObject> courseData = new ArrayList<>();
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s IS NOT NULL ORDER BY %s ASC",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s = 1 ORDER BY %s ASC",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
-                        CHECKOUT_TIME,
+                        ISCHECKED,
                         STUDENT_ID);
 
         Cursor cursor = db.rawQuery(SELECT_COURSE_DETAILS, null);

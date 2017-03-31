@@ -36,6 +36,7 @@ public class NetworkStatus extends BroadcastReceiver {
         this.context = context;
         mydb = new OfflineDatabase(context);
 
+        /*IF CONNECTION ENABLE, SYNC WITH SERVER*/
         if(status.equals("Wifi enabled") || status.equals("Mobile data enabled")){
             Intent startsync = new Intent(context, SyncService.class);
             startsync.putExtra(Config.WIFI_STATUS, status);

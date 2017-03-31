@@ -149,9 +149,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         //Adding values to editor
         editor.putBoolean("loggedin", true);
+
+        /*CHECK WHETHER IS FIRST TIME LOGIN, DECIDE WANT TO DOWNLOAD DATA FROM SERVER OR NOT*/
         editor.putBoolean("firstTimeLogin", true);
+
+        /*STORE STAFF ID AS PREFERENCES FOR FUTURE USAGE*/
         editor.putString("staff_id", staff_id);
-        //editor.putString(Config.EMAIL_SHARED_PREF, email);
 
         //Saving values to editor
         editor.apply();

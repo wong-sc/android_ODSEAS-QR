@@ -73,6 +73,9 @@ public class SyncService extends IntentService {
                 Log.d("Result == ", "NO");
                 Toast.makeText(getApplicationContext(), "All data synced with server", Toast.LENGTH_SHORT).show();
             }
+
+            cursor.close();
+            mydb.close();
     }
 
     private void syncDatabase(final String data){

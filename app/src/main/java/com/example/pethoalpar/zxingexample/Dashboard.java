@@ -129,6 +129,7 @@ public class Dashboard extends AppCompatActivity
     }
 
     public void getSpinnerData(){
+        Log.d("tagdata", staff_id);
         String spinnerData = mydb.getSpinnerData(staff_id);
         try {
             //convert String to JSONArray == [{course_id: 'TMN2053', course_name: 'COURSE NAME 2'}]

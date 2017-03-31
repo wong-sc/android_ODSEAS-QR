@@ -72,6 +72,7 @@
             </intent-filter>
         </receiver>
 
+        <!--SYNC DATA WITH SERVER-->
         <service
             android:name=".SyncService"
             android:exported="false"/>
