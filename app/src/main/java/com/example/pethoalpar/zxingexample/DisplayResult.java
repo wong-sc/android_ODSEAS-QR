@@ -2,9 +2,14 @@ package com.example.pethoalpar.zxingexample;
 
 //import android.app.Fragment;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
         import android.content.Intent;
         import android.os.Bundle;
@@ -15,8 +20,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
         import android.widget.TextView;
+import android.widget.Toast;
 
-        import com.android.volley.Request;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -30,16 +36,21 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class DisplayResult extends Fragment {
 
     public static final String ARG_PAGE = "ARF_PAGE";
+    private static final int CONNECT_DEVICE = 1;
 
     private TextView textViewAttended,textViewBooklet;
+    private Button sync;
     RequestQueue requestQueue;
     String course_id;
     SharedPreferences preferences;
     OfflineDatabase mydb;
+    BluetoothAdapter bluetooth;
+    BluetoothService mChatService = null;
 
     public static DisplayResult newInstance(int page) {
         Bundle args = new Bundle();
@@ -62,6 +73,12 @@ public class DisplayResult extends Fragment {
         TextView studentnumber = (TextView) v.findViewById(R.id.total);
         textViewAttended = (TextView) v.findViewById(R.id.attendee);
         textViewBooklet = (TextView) v.findViewById(R.id.bookletnum);
+        sync = (Button) v.findViewById(R.id.sync);
+        bluetooth = BluetoothAdapter.getDefaultAdapter();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        getActivity().registerReceiver(mReceiver, filter);
+        // Initialize the BluetoothChatService to perform bluetooth connections
+        mChatService = new BluetoothService(getActivity());
 
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(getContext());
@@ -82,7 +99,24 @@ public class DisplayResult extends Fragment {
                 startActivity(intent);
             }
         });
-        Button stopscan = (Button) v.findViewById(R.id.stopscan);
+
+        sync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!bluetooth.isEnabled()){
+                    Intent onBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(onBluetooth, 0);
+                    Toast.makeText(getActivity(), "Bluetooth enabled", Toast.LENGTH_SHORT).show();
+                    Intent server = new Intent(getActivity(), DeviceLists.class);
+                    startActivityForResult(server, CONNECT_DEVICE);
+                } else {
+                    Toast.makeText(getActivity(), "Bluetooth already ON", Toast.LENGTH_SHORT).show();
+                    Intent server = new Intent(getActivity(), DeviceLists.class);
+                    startActivityForResult(server, CONNECT_DEVICE);
+                }
+            }
+        });
+//        Button stopscan = (Button) v.findViewById(R.id.stopscan);
         //check internet - if yes then online function else offline function
         if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
             String attendeddata = mydb.getAttendedData(course_id);
@@ -95,6 +129,54 @@ public class DisplayResult extends Fragment {
         }
         return v;
     }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Discovery has found a device. Get the BluetoothDevice
+                // object and its info from the Intent.
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress(); // MAC address
+                Log.d("Discover ", "device name: " + deviceName + " Device address: "+deviceHardwareAddress);
+            }
+        }
+    };
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("line146", "request code: " + requestCode + " " + "result code: " + resultCode + " " + "Intent data: " + data);
+        if(requestCode == 1){
+            connectDevice(data, true);
+//            Set<BluetoothDevice> pairedDevices = bluetooth.getBondedDevices();
+//
+//            if (pairedDevices.size() > 0) {
+//                // There are paired devices. Get the name and address of each paired device.
+//                for (BluetoothDevice device : pairedDevices) {
+//                    String deviceName = device.getName();
+//                    String deviceHardwareAddress = device.getAddress(); // MAC address
+//                    Log.d("Devices: ", deviceName + " Device address: " + deviceHardwareAddress);
+//                }
+//            }
+//
+//            bluetooth.startDiscovery();
+        }
+    }
+
+    /**
+     * Establish connection with other device
+     */
+    private void connectDevice(Intent data, boolean secure) {
+        // Get the device MAC address
+        String address = data.getExtras()
+                .getString(DeviceLists.EXTRA_DEVICE_ADDRESS);
+        // Get the BluetoothDevice object
+        BluetoothDevice device = bluetooth.getRemoteDevice(address);
+        Log.d("line173", device.toString());
+        // Attempt to connect to the device
+        mChatService.connect(device, secure);
+    }
+
 
     //Logout function
     private void logout(){

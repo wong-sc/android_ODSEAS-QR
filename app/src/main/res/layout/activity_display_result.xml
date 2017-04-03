@@ -16,13 +16,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="View Attendance"
-            android:id="@+id/viewattendance" />
-
         <android.support.v7.widget.CardView
             android:id="@+id/card_view"
             android:layout_gravity="center"
@@ -30,7 +23,7 @@
             android:layout_height="wrap_content"
             card_view:cardCornerRadius="10dp"
             card_view:cardElevation="10dp"
-            android:layout_marginTop="18dp">
+            android:layout_marginTop="5dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -148,11 +141,11 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/stopscan"
+            android:id="@+id/sync"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Stop Scan"
+            android:text="Sync Attendance"
             android:textSize="18sp" />
 
     </LinearLayout>

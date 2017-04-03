@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.pethoalpar.zxingexample">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
@@ -65,18 +67,21 @@
 
         <receiver
             android:name=".NetworkStatus"
-            android:label="NetworkChangeReceiver" >
+            android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
-        <!--SYNC DATA WITH SERVER-->
+        <!-- SYNC DATA WITH SERVER -->
         <service
             android:name=".SyncService"
-            android:exported="false"/>
+            android:exported="false" />
 
+        <activity
+            android:name=".DeviceLists"
+            android:theme="@style/AppTheme.Dialog"/>
     </application>
 
 </manifest>
