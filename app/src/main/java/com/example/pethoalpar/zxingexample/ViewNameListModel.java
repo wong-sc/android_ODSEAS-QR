@@ -1,9 +1,5 @@
 package com.example.pethoalpar.zxingexample;
 
-/**
- * Created by User on 14/3/2017.
- */
-
 public class ViewNameListModel {
     String student_name;
     String student_matric;
