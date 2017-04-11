@@ -38,10 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DisplayResult extends Fragment {
+public class DisplayResult extends Fragment implements View.OnClickListener{
 
     public static final String ARG_PAGE = "ARF_PAGE";
-    private static final int CONNECT_DEVICE = 1;
 
     private TextView textViewAttended,textViewBooklet;
     private Button sync;
@@ -49,8 +48,6 @@ public class DisplayResult extends Fragment {
     String course_id;
     SharedPreferences preferences;
     OfflineDatabase mydb;
-    BluetoothAdapter bluetooth;
-    BluetoothService mChatService = null;
 
     public static DisplayResult newInstance(int page) {
         Bundle args = new Bundle();
@@ -74,11 +71,8 @@ public class DisplayResult extends Fragment {
         textViewAttended = (TextView) v.findViewById(R.id.attendee);
         textViewBooklet = (TextView) v.findViewById(R.id.bookletnum);
         sync = (Button) v.findViewById(R.id.sync);
-        bluetooth = BluetoothAdapter.getDefaultAdapter();
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        getActivity().registerReceiver(mReceiver, filter);
-        // Initialize the BluetoothChatService to perform bluetooth connections
-        mChatService = new BluetoothService(getActivity());
+
+        sync.setOnClickListener(this);
 
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(getContext());
@@ -100,22 +94,6 @@ public class DisplayResult extends Fragment {
             }
         });
 
-        sync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!bluetooth.isEnabled()){
-                    Intent onBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(onBluetooth, 0);
-                    Toast.makeText(getActivity(), "Bluetooth enabled", Toast.LENGTH_SHORT).show();
-                    Intent server = new Intent(getActivity(), DeviceLists.class);
-                    startActivityForResult(server, CONNECT_DEVICE);
-                } else {
-                    Toast.makeText(getActivity(), "Bluetooth already ON", Toast.LENGTH_SHORT).show();
-                    Intent server = new Intent(getActivity(), DeviceLists.class);
-                    startActivityForResult(server, CONNECT_DEVICE);
-                }
-            }
-        });
 //        Button stopscan = (Button) v.findViewById(R.id.stopscan);
         //check internet - if yes then online function else offline function
         if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
@@ -129,54 +107,6 @@ public class DisplayResult extends Fragment {
         }
         return v;
     }
-
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                Log.d("Discover ", "device name: " + deviceName + " Device address: "+deviceHardwareAddress);
-            }
-        }
-    };
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("line146", "request code: " + requestCode + " " + "result code: " + resultCode + " " + "Intent data: " + data);
-        if(requestCode == 1){
-            connectDevice(data, true);
-//            Set<BluetoothDevice> pairedDevices = bluetooth.getBondedDevices();
-//
-//            if (pairedDevices.size() > 0) {
-//                // There are paired devices. Get the name and address of each paired device.
-//                for (BluetoothDevice device : pairedDevices) {
-//                    String deviceName = device.getName();
-//                    String deviceHardwareAddress = device.getAddress(); // MAC address
-//                    Log.d("Devices: ", deviceName + " Device address: " + deviceHardwareAddress);
-//                }
-//            }
-//
-//            bluetooth.startDiscovery();
-        }
-    }
-
-    /**
-     * Establish connection with other device
-     */
-    private void connectDevice(Intent data, boolean secure) {
-        // Get the device MAC address
-        String address = data.getExtras()
-                .getString(DeviceLists.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
-        BluetoothDevice device = bluetooth.getRemoteDevice(address);
-        Log.d("line173", device.toString());
-        // Attempt to connect to the device
-        mChatService.connect(device, secure);
-    }
-
 
     //Logout function
     private void logout(){
@@ -277,5 +207,13 @@ public class DisplayResult extends Fragment {
 
     public void processBookletData(String result){
         textViewBooklet.setText(result);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.sync:
+                startActivity(new Intent(getActivity(), SyncActivity.class));
+        }
     }
 }
