@@ -289,6 +289,9 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error" + volleyError.toString());
+                        String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
+                        Log.d("Result scan -", studentSubject);
+                        processStudentIschecked(studentSubject);
                     }
                 }
         ){

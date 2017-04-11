@@ -113,6 +113,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley", volleyError.toString());
+                        String checkScan = mydb.checkAlreadyScan(dataStringSubjectCode, dataStringStudentID);
+                        processStudentIschecked(checkScan);
                     }
                 }
         ){
@@ -143,6 +145,10 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley-studentError", volleyError.getLocalizedMessage() + "");
+                        /*Loading local data once server encounter error*/
+                        String studentSubject = mydb.getStudentSubject(dataStringStudentID);
+                        Log.d("Result scan -", studentSubject);
+                        processStudentSubject(studentSubject);
                     }
                 }
         ){
@@ -257,6 +263,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley", "Error");
                         Toast.makeText(getActivity(),"Volley Error",Toast.LENGTH_LONG).show();
+                        String studentName = mydb.getStudentData(dataStringStudentID);
+                        processStudentName(studentName);
                     }
                 }
         ){
@@ -293,6 +301,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(), error.toString(),Toast.LENGTH_LONG).show();
+                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
+                        processGetData(status);
                     }
                 }) {
             @Override

@@ -44,6 +44,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
     RecyclerView nameList;
     SharedPreferences preferences;
     OfflineDatabase mydb;
+    Boolean connection = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +116,36 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void getNameList(String linkUrl){
+    public void methodOptions(String url){
+        String getnamelist;
+        switch (url){
+            case Config.GET_ALL_DATA:
+                    getnamelist = mydb.getAllData(course_id);
+                    processNameList(getnamelist);
+                break;
+            case Config.GET_ATTENDEES_DATA:
+                    getnamelist = mydb.getAttendeesData(course_id);
+                    processNameList(getnamelist);
+                break;
+            case Config.GET_ABSENTEES_DATA:
+                    getnamelist = mydb.getAbsenteesData(course_id);
+                    processNameList(getnamelist);
+                break;
+            case Config.GET_SUBMITTED_DATA:
+                    getnamelist = mydb.getSubmittedData(course_id);
+                    processNameList(getnamelist);
+                break;
+            case Config.GET_INEXAMINATION_DATA:
+                    getnamelist = mydb.getInExaminationData(course_id);
+                    processNameList(getnamelist);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    public void getNameList(final String linkUrl){
         requestQueue = Volley.newRequestQueue(this);
         String getAllData = Config.BASE_URL + linkUrl;
         Log.d("URL", getAllData);
@@ -130,6 +160,8 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley line 105","Error");
+                        connection = false;
+                        methodOptions(linkUrl);
                     }
                 }
         ){
@@ -157,7 +189,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 Log.d("student_id: ", jsonObject.getString("student_id"));
                 model.setStudent_name(jsonObject.getString("student_name"));
                 model.setStudent_matric(jsonObject.getString("student_id"));
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
+                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
                     if(jsonObject.getString("status").equals("1"))
                         model.setStatus(R.drawable.ic_check_circle_black_24dp);
                     else

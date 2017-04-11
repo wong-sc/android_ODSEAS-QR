@@ -122,8 +122,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     jsonObject.put("ischecked", cursor.getString(3));
                     jsonObject.put("checkin_time", cursor.getString(4));
                     jsonObject.put("checkout_time", cursor.getString(5));
-                    jsonObject.put("checkin_staffID", cursor.getString(6));
-                    jsonObject.put("checkout_staffID", cursor.getString(7));
+                    jsonObject.put("checkin_staffID", cursor.getInt(6));
+                    jsonObject.put("checkout_staffID", cursor.getInt(7));
                     jsonObject.put("checkin_style_id", cursor.getString(8));
                     jsonObject.put("checkout_style_id", cursor.getString(9));
                     jsonObject.put("status", cursor.getString(10));
@@ -245,6 +245,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
         private Context context;
         private TextView statusText;
+        OfflineDatabase mydb;
 
         /**
          * @param context
@@ -253,6 +254,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;
+            mydb = new OfflineDatabase(context);
         }
 
         @Override
@@ -301,6 +303,12 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         protected void onPostExecute(String result) {
             if (result != null) {
                 Log.d(SyncActivity.TAG, "Result: "+ result);
+                String status = mydb.insertDataFrom_(result);
+                if(status.equals("success update")){
+                    Toast.makeText(context.getApplicationContext(), "Successfully update data", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context.getApplicationContext(), "Error occur", Toast.LENGTH_SHORT).show();
+                }
 //                statusText.setText("File copied - " + result);
 //                Intent intent = new Intent();
 //                intent.setAction(android.content.Intent.ACTION_VIEW);

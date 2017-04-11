@@ -161,6 +161,9 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error");
+                        String attendeddata = mydb.getAttendedData(course_id);
+                        mydb.close();
+                        processAttendedData(attendeddata);
                     }
                 }
             ){
@@ -188,6 +191,9 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Log.e("Volley","Error");
+                        String bookletData = mydb.getAnswerBooklet(course_id);
+                        mydb.close();
+                        processBookletData(bookletData);
                     }
                 }
         ){

@@ -457,6 +457,51 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
+    /*[{
+    "created_date":"2017-03-31 13:37:48",
+    "checkout_time":"2017-04-12 00:45:43",
+    "checkin_time":"2017-03-31 13:42:11",
+    "updated_date":"2017-03-31 13:37:48",
+    "checkout_staffID":"1",
+    "status":"0",
+    "checkout_style_id":"2",
+    "enroll_handler_id":"1",
+    "student_id":"44648",
+    "checkin_style_id":"1",
+    "ischecked":"1",
+    "course_id":"TMN2053"
+    }]*/
+
+    public String insertDataFrom_ (String result){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            for(int i = 0 ; i < jsonArray.length() ; i++){
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(CHECKIN_TIME, jsonObject.getString(CHECKIN_TIME));
+                values.put(CHECKOUT_TIME, jsonObject.getString(CHECKOUT_TIME));
+                values.put(CHECKIN_STAFFID, jsonObject.getInt(CHECKIN_STAFFID));
+                values.put(CHECKOUT_STAFFID, jsonObject.getInt(CHECKOUT_STAFFID));
+                values.put(STATUS, jsonObject.getInt(STATUS));
+                values.put(CHECKIN_STYLE_ID, jsonObject.getInt(CHECKIN_STYLE_ID));
+                values.put(CHECKOUT_STYLE_ID, jsonObject.getInt(CHECKOUT_STAFFID));
+                values.put(ISCHECKED, jsonObject.getString(ISCHECKED));
+
+                db.update(TABLE_ENROLL_HANDLER, values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?",
+                        new String[]{jsonObject.getString("student_id"), jsonObject.getString("course_id")});
+            }
+            db.setTransactionSuccessful();
+        } catch (JSONException error){
+            Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
+        }
+        db.close();
+        return "success update";
+    }
+
     public String getSpinnerData(String staff_id){
 
         SQLiteDatabase db = this.getReadableDatabase();
