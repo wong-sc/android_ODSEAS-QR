@@ -69,6 +69,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         buttonEnter.setOnClickListener(this);
         buttonComfirm = (Button)v.findViewById(R.id.buttonConfirm);
         buttonComfirm.setOnClickListener(this);
+        buttonComfirm.setClickable(false);
         Intent i = getActivity().getIntent();
         dataStringSubjectCode = i.getStringExtra("passDataValue");
         mydb = new OfflineDatabase(getContext());
@@ -95,8 +96,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
             String checkScan = mydb.checkAlreadyScan(dataStringSubjectCode, dataStringStudentID);
             processStudentIschecked(checkScan);
-        }
-        checkAlreadyScan();
+        } else
+            checkAlreadyScan();
     }
 
     public void checkAlreadyScan() {
@@ -174,6 +175,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 if (dataStringSubjectCode.equals(subject_code)) {
                     Toast.makeText(getActivity(),"Subject found",Toast.LENGTH_LONG).show();
                     foundStudent = true;
+                    buttonComfirm.setClickable(true);
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                         String studentName = mydb.getStudentData(dataStringStudentID);
                         processStudentName(studentName);
@@ -185,6 +187,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             if (!foundStudent) {
                 Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
                 showMessage("Alert", "Student does not register for this subject.");
+                buttonComfirm.setClickable(false);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -207,6 +210,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     showMessage("Alert", dataStringStudentID + " has already scanned!");
                     studentid.setText("");
                     studentname.setText("Student Name: ");
+                    buttonComfirm.setClickable(false);
                 } else {
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
                         String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
@@ -217,9 +221,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     studentid.setText("");
                     studentname.setText("Student Name: ");
                 }
-            }
-            if (jsonArray.length() == 0) {
-                showMessage("Alert", dataStringStudentID + " has already scanned!");
             }
 
         } catch (JSONException e) {
@@ -282,9 +283,11 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         if (response.equals("success checkin")) {
 
             showMessage("Alert", "Student has checked in for this course");
+            buttonComfirm.setClickable(false);
 
         } else if (response.equals("success checkout")){
             showMessage("Alert", "Student has checked out for this course");
+            buttonComfirm.setClickable(false);
         }
     }
 

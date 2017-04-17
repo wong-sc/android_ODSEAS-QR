@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="background_holo_light">#979797</color>
     <color name="holo_light_primary">#ff9999</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
 </resources>

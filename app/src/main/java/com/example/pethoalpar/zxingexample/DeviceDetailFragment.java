@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
@@ -43,6 +44,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     ProgressDialog progressDialog = null;
     OfflineDatabase mydb;
     ArrayList<JSONObject> courseData = new ArrayList<>();
+    SharedPreferences preferences;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -103,6 +105,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     }
                 });
 
+        preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+
         return mContentView;
     }
 
@@ -137,6 +141,16 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 sendToChief(courseData.toString());
             } while (cursor.moveToNext());
         }
+    }
+
+    public void sync(){
+
+        if(preferences.getString(Config.WIFI_STATUS, "").equals("Wifi enabled") ||
+                preferences.getString(Config.WIFI_STATUS, "").equals("Mobile data enabled")){
+            Intent startsync = new Intent(getActivity(), SyncService.class);
+            getActivity().startService(startsync);
+        }
+
     }
 
     private void sendToChief(String result){
@@ -241,7 +255,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
      * A simple server socket that accepts connection and writes some data on
      * the stream.
      */
-    public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+    public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
 
         private Context context;
         private TextView statusText;
@@ -306,6 +320,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 String status = mydb.insertDataFrom_(result);
                 if(status.equals("success update")){
                     Toast.makeText(context.getApplicationContext(), "Successfully update data", Toast.LENGTH_SHORT).show();
+                    sync();
                 } else {
                     Toast.makeText(context.getApplicationContext(), "Error occur", Toast.LENGTH_SHORT).show();
                 }

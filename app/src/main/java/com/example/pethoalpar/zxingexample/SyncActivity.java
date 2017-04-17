@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +29,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
+    private Toolbar toolbar;
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -39,6 +42,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sync);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // add necessary intent values to be matched.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -107,7 +113,8 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                 if (!isWifiP2pEnabled) {
                     Toast.makeText(SyncActivity.this, "Enable P2P from action bar button above or system settings",
                             Toast.LENGTH_SHORT).show();
-                    break;
+                    WifiManager wManager = (WifiManager)this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    wManager.setWifiEnabled(true);
                 }
 
                 final DeviceListsFragment fragment = (DeviceListsFragment) getFragmentManager()

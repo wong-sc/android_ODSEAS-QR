@@ -46,77 +46,170 @@
             android:layout_marginTop="10dp"
             android:layout_below="@+id/spinner">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:padding="10dp"
-                    android:textSize="20dp"
-                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:textSize="20sp"
                     android:text="Details"/>
 
-                <TextView
-                    android:id="@+id/tvCourse"
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/name"
-                    android:text="Course:"/>
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tvVenue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvCourse"
-                    android:text="Venue:"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelname"
+                            android:text="@string/coursename"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvCourse"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/tvDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvVenue"
-                    android:text="Date:"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelvenue"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:text="@string/venue"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvVenue"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/tvTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvDate"
-                    android:text="Time:"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelDate"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:text="@string/date"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvDate"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/tvNoOfStudent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvTime"
-                    android:text="Number of Student:"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelTime"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:text="@string/time"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvTime"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/tvInvigilator"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvNoOfStudent"
-                    android:text="Invigilator:"/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelNo"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:text="@string/no_of_stud"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvNoOfStudent"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/tvInvigilatorName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvInvigilator"
-                    android:textSize="14dp"
-                    android:text="1. Name "/>
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:weightSum="3">
+                        <TextView
+                            android:id="@+id/txtLabelInvigilator"
+                            android:layout_weight="0.9"
+                            android:layout_width="0dp"
+                            android:text="@string/invigilator"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:text=":"
+                            android:layout_weight="0.1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/tvInvigilatorName"
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"/>
+                    </TableRow>
+                </TableLayout>
 
-            </RelativeLayout>
-
+            </LinearLayout>
         </android.support.v7.widget.CardView>
+
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:textColor="#ffffff"
             android:layout_marginTop="10dp"
             android:text="Continue to Scan"
             android:id="@+id/buttonNext"

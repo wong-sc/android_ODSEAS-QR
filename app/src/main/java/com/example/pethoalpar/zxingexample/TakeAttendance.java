@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,9 +22,15 @@ import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarBadge;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TakeAttendance extends AppCompatActivity {
 
     FragmentAdapter adapterViewPager;
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
 
     @Override
@@ -35,48 +43,98 @@ public class TakeAttendance extends AppCompatActivity {
         editor.putBoolean("FirstTimes", true);
         editor.apply();
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if(getSupportActionBar() != null)
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
         // Get the ViewPager and set it's PagerAdapter so that it can display items
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        adapterViewPager = new FragmentAdapter(getSupportFragmentManager(), this);
+//        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+//        adapterViewPager = new FragmentAdapter(getSupportFragmentManager(), this);
+//
+//        viewPager.setAdapter(adapterViewPager);
+//        viewPager.setCurrentItem(1, true);
+//        PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 
-        viewPager.setAdapter(adapterViewPager);
-        viewPager.setCurrentItem(1, true);
-        PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+//        tabsStrip.setViewPager(viewPager);
+//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+////                Toast.makeText(TakeAttendance.this,"Selected page position: " + position, Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//
+//                switch (position){
+//                    case 0:
+//                        // Case 0 - QR Scanner
+//                        Toast.makeText(TakeAttendance.this,"Selected page position: 1", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    case 1:
+//                        // Case 1
+//                        Toast.makeText(TakeAttendance.this,"Selected page position: 2", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    case 2:
+//                        Toast.makeText(TakeAttendance.this,"Selected page position: 3", Toast.LENGTH_SHORT).show();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
+    }
 
-        tabsStrip.setViewPager(viewPager);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new EnterStudentID(), "Enter PIN");
+        adapter.addFragment(new Scan(), "Scan QR");
+        adapter.addFragment(new DisplayResult(), "Overall");
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(1);
+    }
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//                Toast.makeText(TakeAttendance.this,"Selected page position: " + position, Toast.LENGTH_SHORT).show();
-            }
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-            @Override
-            public void onPageSelected(int position) {
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
 
-                switch (position){
-                    case 0:
-                        // Case 0 - QR Scanner
-                        Toast.makeText(TakeAttendance.this,"Selected page position: 1", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 1:
-                        // Case 1
-                        Toast.makeText(TakeAttendance.this,"Selected page position: 2", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 2:
-                        Toast.makeText(TakeAttendance.this,"Selected page position: 3", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
 
-            }
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
 
-            }
-        });
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
     public boolean onCreateOptionalMenu (Menu menu) {

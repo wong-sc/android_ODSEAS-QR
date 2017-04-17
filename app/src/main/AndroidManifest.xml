@@ -28,7 +28,6 @@
             android:label="Exam Attendance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -52,7 +51,13 @@
         <!-- android:label="Enter Student ID" /> -->
         <activity
             android:name=".TakeAttendance"
-            android:label="Take Attendance" />
+            android:label="Take Attendance" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.pethoalpar.zxingexample.Dashboard" />
+
+        </activity>
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
@@ -87,7 +92,7 @@
         <!-- Used for transferring files  after a successful connection -->
         <service android:enabled="true" android:name=".FileTransferService" />
 
-        <activity android:name=".SyncActivity"></activity>
+        <activity android:name=".SyncActivity" android:label="Local Sync"></activity>
     </application>
 
 </manifest>
