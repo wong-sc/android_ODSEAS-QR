@@ -489,14 +489,16 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CHECKOUT_STYLE_ID, jsonObject.getInt(CHECKOUT_STAFFID));
                 values.put(ISCHECKED, jsonObject.getString(ISCHECKED));
 
-                db.update(TABLE_ENROLL_HANDLER, values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?",
+                int status = db.update(TABLE_ENROLL_HANDLER, values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?",
                         new String[]{jsonObject.getString("student_id"), jsonObject.getString("course_id")});
+                Log.d("status", status+"");
             }
             db.setTransactionSuccessful();
         } catch (JSONException error){
             Log.d("error", error.toString());
         } finally {
             db.endTransaction();
+
         }
         db.close();
         return "success update";

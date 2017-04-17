@@ -76,15 +76,17 @@ public class Dashboard extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*Set the activity_dashboard.xml file to the view*/
         setContentView(R.layout.activity_dashboard);
+
+        /*Set the toolbar/ actionbar in the page*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        /*SharedPreferences are simply sets of data values that stored persistently.
+        Persistently which mean data you stored in the SharedPreferences are still
+        exist even if you stop the application or turn off the device*/
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
-
-        staff_id = preferences.getString("staff_id", "");
-        mydb = new OfflineDatabase(this);
-        loading = new ProgressDialog(Dashboard.this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,6 +97,10 @@ public class Dashboard extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        /*Declare variable*/
+        staff_id = preferences.getString("staff_id", "");
+        mydb = new OfflineDatabase(this);
+        loading = new ProgressDialog(Dashboard.this);
         subjectData = new ArrayList<String>();
         spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(this);
@@ -105,17 +111,18 @@ public class Dashboard extends AppCompatActivity
         tvTime = (TextView) findViewById(R.id.tvTime);
         card = (CardView) findViewById(R.id.card_view);
         card.setVisibility(View.GONE);
-
+        btnNext = (Button)findViewById(R.id.buttonNext);
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
 
+        /*If user first time login (included user who log out the device previously),
+        * then it will prompt user to download*/
         if(preferences.getBoolean("firstTimeLogin", false))
             promtDownloadData(staff_id);
         else{
             Toast.makeText(Dashboard.this, "You already have downloaded content", Toast.LENGTH_SHORT).show();
         }
 
-        btnNext = (Button)findViewById(R.id.buttonNext);
         btnNext.setOnClickListener(this);
 
         if(isNetworkStatusAvailable(this)) {
@@ -152,9 +159,11 @@ public class Dashboard extends AppCompatActivity
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
                 getOfflineData(Config.GET_OFFLINE_DATA);
+                loading.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                loading.isIndeterminate();
                 loading.setTitle("Downloading Content..........");
                 loading.setMessage("Getting data from server......");
-                loading.setCancelable(true);
+                loading.setCancelable(false);
                 loading.show();
             }
         });
@@ -345,11 +354,11 @@ public class Dashboard extends AppCompatActivity
             }
         }
         tvInvigilatorName.setText(invigilator);
-        tvCourse.setText("Course Name: "+ getSubjectCode(position) + " " + getSubjectName(position));
-        tvNoOfStudent.setText("Number of Students: "+ getStudentNumber(position));
-        tvVenue.setText("Venue: "+ getVenue(position));
-        tvDate.setText("Date: "+ getExamDate(position));
-        tvTime.setText("Time: "+ getExamTime(position));
+        tvCourse.setText(getSubjectCode(position) + " " + getSubjectName(position));
+        tvNoOfStudent.setText(getStudentNumber(position));
+        tvVenue.setText(getVenue(position));
+        tvDate.setText(getExamDate(position));
+        tvTime.setText(getExamTime(position));
     }
 
     private void processOfflineDetails(int position){
@@ -565,15 +574,9 @@ public class Dashboard extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             // Handle the home action
-        } else if (id == R.id.nav_download) {
+        }else if (id == R.id.nav_viewattendance) {
 
-        } else if (id == R.id.nav_viewattendance) {
-
-        } else if (id == R.id.nav_setting) {
-
-        } else if (id == R.id.nav_help) {
-
-        } else if (id == R.id.nav_logout) {
+        }else if (id == R.id.nav_logout) {
             logout();
         }
 

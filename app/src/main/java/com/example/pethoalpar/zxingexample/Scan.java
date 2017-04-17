@@ -72,7 +72,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPage = getArguments().getInt(ARG_PAGE);
+//        mPage = getArguments().getInt(ARG_PAGE);
     }
     @Nullable
     @Override
@@ -222,7 +222,10 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        showMessage("Alert", "Student does not register for this subject.");
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
+                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
+                        processGetData(status);
+//                        showMessage("Alert", "Student does not register for this subject.");
                     }
                 }){
             @Override

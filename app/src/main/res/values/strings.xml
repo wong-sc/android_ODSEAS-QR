@@ -23,6 +23,20 @@
     <string name="title_connected_to">connected to <xliff:g id="device_name">%1$s</xliff:g></string>
     <string name="title_not_connected">not connected</string>
 
+    <!-- Dashboard Activity-->
+    <string name="coursename">Course Name </string>
+    <string name="venue">Venue </string>
+    <string name="date">Date </string>
+    <string name="time">Time </string>
+    <string name="no_of_stud">Number of Student</string>
+    <string name="invigilator">Invigilators</string>
+
+    <!--View name list activity-->
+    <string name="bil">No.</string>
+    <string name="matric">Matric No.</string>
+    <string name="stud_name">Student Name</string>
+    <string name="status">Status</string>
+
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices</string>
     <string name="select_device">select a device to connect</string>
@@ -44,7 +58,7 @@
     <string name="label_peers">PEERS</string>
     <string name="connect_peer_button">Connect</string>
     <string name="disconnect_peer_button">Disconnect</string>
-    <string name="get_file_button">Launch Gallery</string>
+    <string name="get_file_button">Sync Data</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>

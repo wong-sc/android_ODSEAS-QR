@@ -12,8 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -45,6 +49,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
     SharedPreferences preferences;
     OfflineDatabase mydb;
     Boolean connection = true;
+    TableLayout table;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,12 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        table = (TableLayout) findViewById(R.id.namelist);
+
+//        nameList = (RecyclerView) findViewById(R.id.namelist);
+//        nameListAdapter = new ViewNameListAdapter(ViewNameList.this, data);
+//        nameList.setAdapter(nameListAdapter);
+//        nameList.setLayoutManager(new LinearLayoutManager(ViewNameList.this));
     }
 
     @Override
@@ -181,28 +192,74 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         try {
             JSONArray jsonArray = new JSONArray(result); // convert string to JSON Array
             Toast.makeText(ViewNameList.this, "Result length" + jsonArray.length(), Toast.LENGTH_SHORT).show();
+            int count = table.getChildCount();
+            Log.d("count", count + "");
+            if (count > 1) {
+                table.removeViews(1, count - 1);
+            }
 
             for(int i = 0 ; i < jsonArray.length() ; i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                ViewNameListModel model = new ViewNameListModel();
-                Log.d("student_name: ", jsonObject.getString("student_name"));
-                Log.d("student_id: ", jsonObject.getString("student_id"));
-                model.setStudent_name(jsonObject.getString("student_name"));
-                model.setStudent_matric(jsonObject.getString("student_id"));
+                TableRow row = new TableRow(this);
+//                row.setWeightSum(8);
+                row.setPadding(5, 5, 5, 5);
+
+                TableRow.LayoutParams bilParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.1f);
+//                bilParams.weight = 1;
+
+                TableRow.LayoutParams matricParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f);
+//                bilParams.weight = 2;
+
+                TableRow.LayoutParams studentNameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.35f);
+//                studentNameParams.weight = 4;
+
+                TableRow.LayoutParams statusParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.18f);
+//                statusParams.weight = 1;
+
+                TextView bil = new TextView(this);
+                bil.setText(String.valueOf(i+1));
+                bil.setLayoutParams(bilParams);
+                row.addView(bil);
+
+                TextView matric = new TextView(this);
+                matric.setText(jsonObject.getString("student_id"));
+                matric.setLayoutParams(matricParams);
+                row.addView(matric);
+
+                TextView student_name = new TextView(this);
+                student_name.setText(jsonObject.getString("student_name"));
+                student_name.setLayoutParams(studentNameParams);
+                row.addView(student_name);
+
+                ImageView status = new ImageView(this);
                 if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
                     if(jsonObject.getString("status").equals("1"))
-                        model.setStatus(R.drawable.ic_check_circle_black_24dp);
+                        status.setImageResource(R.drawable.ic_check_circle_black_24dp);
                     else
-                        model.setStatus(R.drawable.ic_sync_problem_black_24dp);
-                } else model.setStatus(R.drawable.ic_check_circle_black_24dp);
-                data.add(model);
+                        status.setImageResource(R.drawable.ic_sync_problem_black_24dp);
+                } else status.setImageResource(R.drawable.ic_check_circle_black_24dp);
+
+                status.setLayoutParams(statusParams);
+                row.addView(status);
+                table.addView(row);
+
+//                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                ViewNameListModel model = new ViewNameListModel();
+//                Log.d("student_name: ", jsonObject.getString("student_name"));
+//                Log.d("student_id: ", jsonObject.getString("student_id"));
+//                model.setStudent_name(jsonObject.getString("student_name"));
+//                model.setStudent_matric(jsonObject.getString("student_id"));
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
+//                    if(jsonObject.getString("status").equals("1"))
+//                        model.setStatus(R.drawable.ic_check_circle_black_24dp);
+//                    else
+//                        model.setStatus(R.drawable.ic_sync_problem_black_24dp);
+//                } else model.setStatus(R.drawable.ic_check_circle_black_24dp);
+//                data.add(model);
             }
 
+//            nameListAdapter.notifyDataSetChanged();
             Toast.makeText(ViewNameList.this, "Result length " + data.size(), Toast.LENGTH_SHORT).show();
-            nameList = (RecyclerView) findViewById(R.id.namelist);
-            nameListAdapter = new ViewNameListAdapter(ViewNameList.this, data);
-            nameList.setAdapter(nameListAdapter);
-            nameList.setLayoutManager(new LinearLayoutManager(ViewNameList.this));
 
         } catch (JSONException e) {
             e.printStackTrace();
