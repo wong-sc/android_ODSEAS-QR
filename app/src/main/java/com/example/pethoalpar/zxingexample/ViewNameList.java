@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -31,10 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.GenericArrayType;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ViewNameList extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
@@ -43,9 +37,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
     String course_id, course_full_name;
     Intent intent;
     RequestQueue requestQueue;
-    ArrayList<ViewNameListModel> data = new ArrayList<>();
-    ViewNameListAdapter nameListAdapter;
-    RecyclerView nameList;
     SharedPreferences preferences;
     OfflineDatabase mydb;
     Boolean connection = true;
@@ -186,7 +177,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
     public void processNameList(String result){
         Log.d("result-----", result);
-        data.clear();
         try {
             JSONArray jsonArray = new JSONArray(result); // convert string to JSON Array
             Toast.makeText(ViewNameList.this, "Result length" + jsonArray.length(), Toast.LENGTH_SHORT).show();
@@ -199,20 +189,12 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
             for(int i = 0 ; i < jsonArray.length() ; i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 TableRow row = new TableRow(this);
-//                row.setWeightSum(8);
                 row.setPadding(5, 5, 5, 5);
 
                 TableRow.LayoutParams bilParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.1f);
-//                bilParams.weight = 1;
-
                 TableRow.LayoutParams matricParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f);
-//                bilParams.weight = 2;
-
                 TableRow.LayoutParams studentNameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.35f);
-//                studentNameParams.weight = 4;
-
                 TableRow.LayoutParams statusParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.18f);
-//                statusParams.weight = 1;
 
                 TextView bil = new TextView(this);
                 bil.setText(String.valueOf(i+1));
@@ -241,8 +223,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 row.addView(status);
                 table.addView(row);
             }
-            Toast.makeText(ViewNameList.this, "Result length " + data.size(), Toast.LENGTH_SHORT).show();
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

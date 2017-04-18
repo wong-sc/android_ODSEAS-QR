@@ -1,15 +1,10 @@
 package com.example.pethoalpar.zxingexample;
 
-//import android.app.Fragment;
+
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
         import android.content.Intent;
         import android.os.Bundle;
@@ -20,23 +15,18 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
         import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-        import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
 
 public class DisplayResult extends Fragment implements View.OnClickListener{
 
@@ -95,7 +85,6 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
             }
         });
 
-//        Button stopscan = (Button) v.findViewById(R.id.stopscan);
         //check internet - if yes then online function else offline function
         if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
             String attendeddata = mydb.getAttendedData(course_id);

@@ -3,12 +3,10 @@ package com.example.pethoalpar.zxingexample;
 import android.graphics.Paint;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.os.Bundle;
 import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,17 +21,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
-    //public static final String LOGIN_URL = "http://simplifiedcoding.16mb.com/UserRegistration/volleyLogin.php";
     private static final String LOGIN_URL = Config.BASE_URL+Config.LOGIN;
 
     public static final String KEY_STAFF_ID="staff_id";

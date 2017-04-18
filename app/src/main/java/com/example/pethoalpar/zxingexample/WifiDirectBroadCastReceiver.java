@@ -49,9 +49,9 @@ public class WifiDirectBroadCastReceiver extends BroadcastReceiver {
             Log.d("BroadCast", "P2P state changed - " + state);
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
-            // request available peers from the wifi p2p manager. This is an
-            // asynchronous call and the calling activity is notified with a
-            // callback on PeerListListener.onPeersAvailable()
+            /* request available peers from the wifi p2p manager. This is an
+               asynchronous call and the calling activity is notified with a
+                callback on PeerListListener.onPeersAvailable() */
             if (manager != null) {
                 manager.requestPeers(channel, (WifiP2pManager.PeerListListener) activity.getFragmentManager()
                         .findFragmentById(R.id.frag_list));
@@ -83,7 +83,6 @@ public class WifiDirectBroadCastReceiver extends BroadcastReceiver {
                     .findFragmentById(R.id.frag_list);
             fragment.updateThisDevice((WifiP2pDevice) intent.getParcelableExtra(
                     WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
-
         }
     }
 }

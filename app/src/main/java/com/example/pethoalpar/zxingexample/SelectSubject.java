@@ -1,6 +1,5 @@
 package com.example.pethoalpar.zxingexample;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.util.Log;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -59,11 +57,6 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-//        spinner = (Spinner)findViewById(R.id.spinner);
-//        adapter = ArrayAdapter.createFromResource(this, R.array.subject_names, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(adapter);
-        // ArrayList<String> subjectData = new ArrayList<String>();
 
         subjectData = new ArrayList<String>();
         spinner = (Spinner)findViewById(R.id.spinner);
@@ -76,7 +69,6 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
         card.setVisibility(View.GONE);
 
         if(isNetworkStatusAvialable (getApplicationContext())) {
-            //Toast.makeText(getApplicationContext(), "internet avialable", Toast.LENGTH_SHORT).show();
             getData();
             btnNext = (Button)findViewById(R.id.buttonNext);
             btnNext.setOnClickListener(this);
@@ -206,7 +198,6 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
         textViewSubjectName.setText(getSubjectCode(position)+" "+getSubjectName(position));
         detail.setText(getSubjectCode(position));
         getDetails(getSubjectCode(position));
-
         passData = getSubjectCode(position);
         subjectInfo = getSubjectCode(position)+" "+getSubjectName(position);
     }
@@ -227,8 +218,6 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
         }
     }
-
-
 
     //Logout function
     private void logout(){
@@ -303,6 +292,4 @@ public class SelectSubject extends AppCompatActivity implements View.OnClickList
         }
         return false;
     }
-
-
 }

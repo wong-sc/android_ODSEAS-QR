@@ -1,9 +1,6 @@
 package com.example.pethoalpar.zxingexample;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DownloadManager;
-//import android.app.Fragment;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,15 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +21,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -37,7 +28,6 @@ import com.google.zxing.Result;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,18 +37,14 @@ import org.json.JSONObject;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-import static com.example.pethoalpar.zxingexample.R.id.imageButtonScan;
 
 public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     public static final String ARG_PAGE = "ARF_PAGE";
-    private ZXingScannerView mScannerView;
     public String[] splited;
     public String subjectCode, matchedSubject, subjectName, staffID;
     RequestQueue requestQueue;
     SharedPreferences preferences;
     OfflineDatabase mydb;
-
-    private int mPage;
 
 
     public static Scan newInstance(int page) {
@@ -72,7 +58,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mPage = getArguments().getInt(ARG_PAGE);
     }
     @Nullable
     @Override
@@ -225,7 +210,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                         String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
                         /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
                         processGetData(status);
-//                        showMessage("Alert", "Student does not register for this subject.");
                     }
                 }){
             @Override
@@ -249,8 +233,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     @Override
                     public void onResponse(String jsonObject) {
 
-                        Boolean foundStudent = false;
-
                         try {
                             JSONArray jsonArray = new JSONArray(jsonObject);
                             Log.d ("hye subject codess",jsonArray.toString());
@@ -261,8 +243,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                                 String isScanned = result.getString("ischecked");
                                 Log.d ("hye subject codess",isScanned);
                                 if(Scanned.equals(isScanned)) {
-                                    foundStudent = true;
-                                    //Toast.makeText(EnterStudentID.this,dataStringStudentID+" already scanned!",Toast.LENGTH_LONG).show();
                                     AlertDialog.Builder Adialog = new AlertDialog.Builder(getContext());
                                     Adialog.setMessage(splited[0]+" has already scanned!").setCancelable(false)
                                             .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
@@ -308,40 +288,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
             }
         };
         requestQueue.add(jsonObjectRequest);
-    }
-
-    public void processData(String result){
-        JSONArray jsonArray = null;
-        try {
-            jsonArray = new JSONArray(result);
-            for(int i = 0 ; i < jsonArray.length() ; i++){
-                JSONObject result2 = jsonArray.getJSONObject(i);
-                String Scanned = "1";
-                String isScanned = result2.getString("ischecked");
-                Log.d ("hye subject codess",isScanned);
-                if(Scanned.equals(isScanned)) {
-
-                    //Toast.makeText(EnterStudentID.this,dataStringStudentID+" already scanned!",Toast.LENGTH_LONG).show();
-                    AlertDialog.Builder Adialog = new AlertDialog.Builder(getContext());
-                    Adialog.setMessage(splited[0]+" has already scanned!").setCancelable(false)
-                            .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alert = Adialog.create();
-                    alert.setTitle("Alert");
-                    alert.show();
-                }
-                else{
-                    getData();
-                    Toast.makeText(getContext(),"Successfully added "+splited[0],Toast.LENGTH_LONG).show();
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

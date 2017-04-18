@@ -3,7 +3,6 @@ package com.example.pethoalpar.zxingexample;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,16 +10,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.astuetz.PagerSlidingTabStrip;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.BottomBarBadge;
-import com.roughike.bottombar.OnMenuTabClickListener;
 
 import java.util.ArrayList;
 import java.util.List;

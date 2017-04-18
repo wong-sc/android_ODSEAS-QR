@@ -3,7 +3,6 @@ package com.example.pethoalpar.zxingexample;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -181,10 +180,8 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
-
             }
         }
-
     }
 
     @Override
@@ -205,8 +202,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                         Toast.LENGTH_SHORT).show();
             }
         });
-
-    }
+ }
 
     @Override
     public void disconnect() {
@@ -227,6 +223,5 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
             }
 
         });
-
-    }
+   }
 }

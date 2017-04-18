@@ -3,8 +3,6 @@ package com.example.pethoalpar.zxingexample;
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;

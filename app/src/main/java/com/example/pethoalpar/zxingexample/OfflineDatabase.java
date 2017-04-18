@@ -1,32 +1,23 @@
 package com.example.pethoalpar.zxingexample;
 
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.CalendarContract;
 import android.util.Log;
-import android.util.SparseArray;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+
 
 public class OfflineDatabase extends SQLiteOpenHelper {
 
@@ -1081,26 +1072,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         /*cursor to search in the database*/
         return db.rawQuery(CHECK_UNSYNC, null);
-    }
-
-    public void trackChanges(){
-
-        /* GET THE ID FROM UPDATE ATTENDANCE RECORD
-        * IF ID EXISTS IN THIS TABLE THEN IGNORE
-        * ELSE INSERT THE ID IN THIS TABLE
-        * THIS IS TO KEEP TRACK THE RECORD CHANGES
-        * SO THAT IT CAN BE SYNC CORRECTLY WITH THE SERVER AND BETWEEN PEERS*/
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        /*query to select the checkin time of specific student*/
-        String CHECK_UNSYNC =
-                String.format("SELECT * FROM %s WHERE %s = %s",
-                        TABLE_ENROLL_HANDLER,
-                        STATUS, 0);
-
-        /*cursor to search in the database*/
-        Cursor cursor = db.rawQuery(CHECK_UNSYNC, null);
     }
 
     public void markedSyncRecord(JSONObject data){

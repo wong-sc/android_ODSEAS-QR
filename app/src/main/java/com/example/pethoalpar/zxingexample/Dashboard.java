@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -347,7 +346,7 @@ public class Dashboard extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-//        refreshNavigationView();
+
         //Setting adapter to show the items in the spinner
         spinner.setAdapter(new ArrayAdapter<String>(Dashboard.this, android.R.layout.simple_spinner_dropdown_item, subjectData));
         card.setVisibility(View.VISIBLE);
