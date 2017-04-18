@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,7 +23,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.HeaderViewListAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,8 +43,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Dashboard extends AppCompatActivity
@@ -63,6 +69,8 @@ public class Dashboard extends AppCompatActivity
     public String subjectInfo;
     private String staff_id;
     private String student_number;
+    List<Integer> courseid = new ArrayList<>();
+    HashMap<Integer, String> params = new HashMap<Integer, String>();
 
     private Spinner spinner;
 
@@ -70,6 +78,7 @@ public class Dashboard extends AppCompatActivity
     RequestQueue requestQueue;
     OfflineDatabase mydb;
     ProgressDialog loading;
+    NavigationView navigationView;
 
     Button btnNext;
 
@@ -94,7 +103,7 @@ public class Dashboard extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         /*Declare variable*/
@@ -284,13 +293,7 @@ public class Dashboard extends AppCompatActivity
                         Log.d("testing data", response);
                         JSONObject j = null;
                         try {
-                            //Parsing the fetched Json String to JSON Object
-//                            j = new JSONObject(response);
-
-                            //Storing the Array of JSON String to our JSON Array
-//                            result2 = j.getJSONArray("result");
                             result2 = new JSONArray(response);
-//                            detail.setText(result2.toString());
                             processDetails(result2, position);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -326,19 +329,37 @@ public class Dashboard extends AppCompatActivity
 
     private void getSubjectData(JSONArray j){
         //Traversing through all the items in the json array
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navView.getMenu();
         for(int i=0;i<j.length();i++){
             try {
                 //Getting json object
                 JSONObject json = j.getJSONObject(i);
                 //Adding the name of the student to array list
                 subjectData.add(json.getString("course_id") + " " + json.getString("course_name"));
+                int itemID = Integer.valueOf(json.getString("course_id").substring(3));
+                menu.add(R.id.group_2, itemID, 500,json.getString("course_id") + " " + json.getString("course_name"));
+                params.put(itemID, json.getString("course_id"));
+                courseid.add(itemID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+//        refreshNavigationView();
         //Setting adapter to show the items in the spinner
         spinner.setAdapter(new ArrayAdapter<String>(Dashboard.this, android.R.layout.simple_spinner_dropdown_item, subjectData));
         card.setVisibility(View.VISIBLE);
+    }
+
+    private void refreshNavigationView(){
+        for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {
+        final View child = navigationView.getChildAt(i);
+        if (child != null && child instanceof ListView) {
+        final ListView menuView = (ListView) child;
+        final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
+        final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
+        wrapped.notifyDataSetChanged();}
+        }
     }
 
     private void processDetails(JSONArray j,int position){
@@ -374,11 +395,11 @@ public class Dashboard extends AppCompatActivity
             }
         }
         tvInvigilatorName.setText(invigilator);
-        tvCourse.setText("Course Name: "+ getSubjectCode(position) + " " + getSubjectName(position));
-        tvNoOfStudent.setText("Number of Students: "+ getStudentNumber(position));
-        tvVenue.setText("Venue: "+ getVenue(position));
-        tvDate.setText("Date: "+ getExamDate(position));
-        tvTime.setText("Time: "+ getExamTime(position));
+        tvCourse.setText(getSubjectCode(position) + " " + getSubjectName(position));
+        tvNoOfStudent.setText(getStudentNumber(position));
+        tvVenue.setText(getVenue(position));
+        tvDate.setText(getExamDate(position));
+        tvTime.setText(getExamTime(position));
     }
 
     private String getSubjectCode (int position){
@@ -479,10 +500,6 @@ public class Dashboard extends AppCompatActivity
         Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
 
         if (v == findViewById(R.id.buttonNext)){
-//            String status = preferences.getString(Config.WIFI_STATUS, "");
-//            Toast.makeText(Dashboard.this, "No internet -- " + status, Toast.LENGTH_SHORT).show();
-//            if(status.equals("Not connected to Internet"))
-//                Toast.makeText(Dashboard.this, "No internet -- " + status, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, TakeAttendance.class);
             intent.putExtra("passDataValue",passData);
             intent.putExtra("passSubjectInfo",subjectInfo);
@@ -571,12 +588,19 @@ public class Dashboard extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Log.d("id", id+"");
 
-        if (id == R.id.nav_home) {
+        if (params.containsKey(id)){
+            String variable = params.get(id);
+            Intent intent = new Intent(Dashboard.this, ViewNameList.class);
+            intent.putExtra("course_id", variable);
+            intent.putExtra("course_full_name", subjectInfo);
+            startActivity(intent);
+        } else if (id == R.id.nav_home) {
             // Handle the home action
-        }else if (id == R.id.nav_viewattendance) {
+        } else if (id == R.id.nav_viewattendance) {
 
-        }else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_logout) {
             logout();
         }
 

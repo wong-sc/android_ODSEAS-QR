@@ -40,7 +40,7 @@ import java.util.Map;
 public class ViewNameList extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     Spinner spinner;
-    String course_id;
+    String course_id, course_full_name;
     Intent intent;
     RequestQueue requestQueue;
     ArrayList<ViewNameListModel> data = new ArrayList<>();
@@ -63,17 +63,15 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         spinner = (Spinner) findViewById(R.id.sort);
         intent = getIntent();
         course_id = intent.getStringExtra("course_id");
+        course_full_name = intent.getStringExtra("course_full_name");
+        TextView course_name = (TextView) findViewById(R.id.coursename);
+        course_name.setText(course_full_name);
         Toast.makeText(ViewNameList.this, course_id, Toast.LENGTH_SHORT).show();
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.sorting,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         table = (TableLayout) findViewById(R.id.namelist);
-
-//        nameList = (RecyclerView) findViewById(R.id.namelist);
-//        nameListAdapter = new ViewNameListAdapter(ViewNameList.this, data);
-//        nameList.setAdapter(nameListAdapter);
-//        nameList.setLayoutManager(new LinearLayoutManager(ViewNameList.this));
     }
 
     @Override
@@ -242,23 +240,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 status.setLayoutParams(statusParams);
                 row.addView(status);
                 table.addView(row);
-
-//                JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                ViewNameListModel model = new ViewNameListModel();
-//                Log.d("student_name: ", jsonObject.getString("student_name"));
-//                Log.d("student_id: ", jsonObject.getString("student_id"));
-//                model.setStudent_name(jsonObject.getString("student_name"));
-//                model.setStudent_matric(jsonObject.getString("student_id"));
-//                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
-//                    if(jsonObject.getString("status").equals("1"))
-//                        model.setStatus(R.drawable.ic_check_circle_black_24dp);
-//                    else
-//                        model.setStatus(R.drawable.ic_sync_problem_black_24dp);
-//                } else model.setStatus(R.drawable.ic_check_circle_black_24dp);
-//                data.add(model);
             }
-
-//            nameListAdapter.notifyDataSetChanged();
             Toast.makeText(ViewNameList.this, "Result length " + data.size(), Toast.LENGTH_SHORT).show();
 
         } catch (JSONException e) {
