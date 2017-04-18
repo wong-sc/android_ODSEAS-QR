@@ -15,10 +15,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-/**
- * Created by User on 11/4/2017.
- */
-
 public class FileTransferService extends IntentService {
 
     private static final int SOCKET_TIMEOUT = 5000;
