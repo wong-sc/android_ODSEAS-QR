@@ -78,7 +78,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
         mydb = new OfflineDatabase(getContext());
 
         Intent i = getActivity().getIntent();
-        String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
+        final String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
         String dataStringStudentNumber = i.getStringExtra("studentnumber");
 
         course_id = i.getStringExtra("passDataValue");
@@ -90,6 +90,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ViewNameList.class);
                 intent.putExtra("course_id", course_id);
+                intent.putExtra("course_full_name", dataStringSubjectCode);
                 startActivity(intent);
             }
         });

@@ -40,7 +40,7 @@ import java.util.Map;
 public class ViewNameList extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     Spinner spinner;
-    String course_id;
+    String course_id, course_full_name;
     Intent intent;
     RequestQueue requestQueue;
     ArrayList<ViewNameListModel> data = new ArrayList<>();
@@ -63,17 +63,15 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         spinner = (Spinner) findViewById(R.id.sort);
         intent = getIntent();
         course_id = intent.getStringExtra("course_id");
+        course_full_name = intent.getStringExtra("course_full_name");
+        TextView course_name = (TextView) findViewById(R.id.coursename);
+        course_name.setText(course_full_name);
         Toast.makeText(ViewNameList.this, course_id, Toast.LENGTH_SHORT).show();
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.sorting,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         table = (TableLayout) findViewById(R.id.namelist);
-
-//        nameList = (RecyclerView) findViewById(R.id.namelist);
-//        nameListAdapter = new ViewNameListAdapter(ViewNameList.this, data);
-//        nameList.setAdapter(nameListAdapter);
-//        nameList.setLayoutManager(new LinearLayoutManager(ViewNameList.this));
     }
 
     @Override
