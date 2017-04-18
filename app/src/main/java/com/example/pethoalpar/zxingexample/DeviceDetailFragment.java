@@ -95,11 +95,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                     @Override
                     public void onClick(View v) {
-                        // Allow user to pick an image from Gallery or other
-                        // registered apps
-//                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                        intent.setType("image/*");
-//                        startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
                         Log.d(SyncActivity.TAG, "Enter onclick");
                         getUnsyncData();
                     }
@@ -138,9 +133,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                sendToChief(courseData.toString());
             } while (cursor.moveToNext());
         }
+        Toast.makeText(getActivity(), courseData.size()+"", Toast.LENGTH_SHORT).show();
+        sendToChief(courseData.toString());
     }
 
     public void sync(){

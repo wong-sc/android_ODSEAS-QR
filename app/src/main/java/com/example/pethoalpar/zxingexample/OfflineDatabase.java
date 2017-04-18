@@ -478,6 +478,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         try {
             JSONArray jsonArray = new JSONArray(result);
             for(int i = 0 ; i < jsonArray.length() ; i++){
+                Log.d(SyncActivity.TAG, jsonArray.length() + "");
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
                 values.put(CHECKIN_TIME, jsonObject.getString(CHECKIN_TIME));

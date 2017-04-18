@@ -71,6 +71,7 @@ public class Dashboard extends AppCompatActivity
     private String student_number;
     List<Integer> courseid = new ArrayList<>();
     HashMap<Integer, String> params = new HashMap<Integer, String>();
+    HashMap<Integer, String> params_name = new HashMap<Integer, String>();
 
     private Spinner spinner;
 
@@ -340,6 +341,7 @@ public class Dashboard extends AppCompatActivity
                 int itemID = Integer.valueOf(json.getString("course_id").substring(3));
                 menu.add(R.id.group_2, itemID, 500,json.getString("course_id") + " " + json.getString("course_name"));
                 params.put(itemID, json.getString("course_id"));
+                params_name.put(itemID, json.getString("course_id") + " " + json.getString("course_name"));
                 courseid.add(itemID);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -594,7 +596,8 @@ public class Dashboard extends AppCompatActivity
             String variable = params.get(id);
             Intent intent = new Intent(Dashboard.this, ViewNameList.class);
             intent.putExtra("course_id", variable);
-            intent.putExtra("course_full_name", subjectInfo);
+            String full_course = params_name.get(id);
+            intent.putExtra("course_full_name", full_course);
             startActivity(intent);
         } else if (id == R.id.nav_home) {
             // Handle the home action

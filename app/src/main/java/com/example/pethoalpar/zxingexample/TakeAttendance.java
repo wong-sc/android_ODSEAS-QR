@@ -27,7 +27,6 @@ import java.util.List;
 
 public class TakeAttendance extends AppCompatActivity {
 
-    FragmentAdapter adapterViewPager;
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -54,56 +53,13 @@ public class TakeAttendance extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-
-        // Get the ViewPager and set it's PagerAdapter so that it can display items
-//        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-//        adapterViewPager = new FragmentAdapter(getSupportFragmentManager(), this);
-//
-//        viewPager.setAdapter(adapterViewPager);
-//        viewPager.setCurrentItem(1, true);
-//        PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-
-//        tabsStrip.setViewPager(viewPager);
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-////                Toast.makeText(TakeAttendance.this,"Selected page position: " + position, Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//
-//                switch (position){
-//                    case 0:
-//                        // Case 0 - QR Scanner
-//                        Toast.makeText(TakeAttendance.this,"Selected page position: 1", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case 1:
-//                        // Case 1
-//                        Toast.makeText(TakeAttendance.this,"Selected page position: 2", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case 2:
-//                        Toast.makeText(TakeAttendance.this,"Selected page position: 3", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new EnterStudentID(), "Enter PIN");
         adapter.addFragment(new Scan(), "Scan QR");
-        adapter.addFragment(new DisplayResult(), "Overall");
+        adapter.addFragment(new DisplayResult(), "Attendance");
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(1);
     }
