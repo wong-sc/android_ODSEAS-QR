@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import app.app.app.odseasqr.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -212,12 +213,25 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 row.addView(student_name);
 
                 ImageView status = new ImageView(this);
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
-                    if(jsonObject.getString("status").equals("1"))
-                        status.setImageResource(R.drawable.ic_check_circle_black_24dp);
-                    else
+                switch (mydb.getStatus(jsonObject.getString("student_id"), course_id)){
+                    case "0":
+                        status.setImageResource(R.drawable.ic_cancel_black_24px);
+                        break;
+                    case "1":
+                        status.setImageResource(R.drawable.ic_done_black_24px);
+                        break;
+                    case "2":
+                        status.setImageResource(R.drawable.ic_done_all_black_24px);
+                        break;
+                    default:
                         status.setImageResource(R.drawable.ic_sync_problem_black_24dp);
-                } else status.setImageResource(R.drawable.ic_check_circle_black_24dp);
+                }
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
+//                    if(jsonObject.getString("status").equals("1"))
+//                        status.setImageResource(R.drawable.ic_check_circle_black_24dp);
+//                    else
+//                        status.setImageResource(R.drawable.ic_sync_problem_black_24dp);
+//                } else status.setImageResource(R.drawable.ic_check_circle_black_24dp);
 
                 status.setLayoutParams(statusParams);
                 row.addView(status);

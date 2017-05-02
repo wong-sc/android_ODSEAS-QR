@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import app.app.app.odseasqr.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,6 +185,8 @@ public class DeviceListsFragment extends ListFragment implements WifiP2pManager.
         void connect(WifiP2pConfig config);
 
         void disconnect();
+
+        void receiveconnection();
     }
 
 }

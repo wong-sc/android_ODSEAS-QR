@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import app.app.app.odseasqr.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -177,14 +179,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         this.getView().setVisibility(View.VISIBLE);
 
         // The owner IP is now known.
-        TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
-        String owner = getResources().getString(R.string.group_owner_text) + ((info.isGroupOwner) ? "Yes" : "No");
-        view.setText(owner);
+//        TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
+//        String owner = getResources().getString(R.string.group_owner_text) + ((info.isGroupOwner) ? "Yes" : "No");
+//        view.setText(owner);
 
         // InetAddress from WifiP2pInfo struct.
-        view = (TextView) mContentView.findViewById(R.id.device_info);
-        String group_owner_ip = "Group Owner IP - " + info.groupOwnerAddress.getHostAddress();
-        view.setText(group_owner_ip);
+//        view = (TextView) mContentView.findViewById(R.id.device_info);
+//        String group_owner_ip = "Group Owner IP - " + info.groupOwnerAddress.getHostAddress();
+//        view.setText(group_owner_ip);
 
         // After the group negotiation, we assign the group owner as the file
         // server. The file server is single threaded, single connection server
@@ -201,6 +203,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         }
         // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
+        ((DeviceListsFragment.DeviceActionListener) getActivity()).receiveconnection();
     }
 
     /**
@@ -211,10 +214,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     public void showDetails(WifiP2pDevice device) {
         this.device = device;
         this.getView().setVisibility(View.VISIBLE);
-        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
-        view.setText(device.deviceAddress);
-        view = (TextView) mContentView.findViewById(R.id.device_info);
-        view.setText(device.toString());
+//        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
+//        view.setText(device.deviceAddress);
+//        view = (TextView) mContentView.findViewById(R.id.device_info);
+//        view.setText(device.toString());
     }
 
     /**
@@ -222,14 +225,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
      */
     public void resetViews() {
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.VISIBLE);
-        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
-        view.setText("");
-        view = (TextView) mContentView.findViewById(R.id.device_info);
-        view.setText("");
-        view = (TextView) mContentView.findViewById(R.id.group_owner);
-        view.setText("");
-        view = (TextView) mContentView.findViewById(R.id.status_text);
-        view.setText("");
+//        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
+//        view.setText("");
+//        view = (TextView) mContentView.findViewById(R.id.device_info);
+//        view.setText("");
+//        view = (TextView) mContentView.findViewById(R.id.group_owner);
+//        view.setText("");
+//        view = (TextView) mContentView.findViewById(R.id.status_text);
+//        view.setText("");
         mContentView.findViewById(R.id.btn_start_client).setVisibility(View.GONE);
         this.getView().setVisibility(View.GONE);
     }

@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.IntentService;
 import android.content.Context;

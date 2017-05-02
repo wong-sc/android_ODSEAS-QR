@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.graphics.Paint;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import app.app.app.odseasqr.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,7 +89,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         try {
                             JSONObject result = new JSONObject(response);
                             if(result.getString("status").equals("Successfully Login")){
-                                openProfile(result.getString("staff_id"));
+                                openProfile(result.getString("staff_id"), result.getString("staff_name"));
                             }else{
                                 AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
                                 alert.setTitle("Result");
@@ -99,16 +100,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
-                        if(response.trim().equals("Successfully Login")){
-                            openProfile(staff_id);
-                        }else{
-                            AlertDialog.Builder alert = new AlertDialog.Builder(Login.this);
-                            alert.setTitle("Result");
-                            alert.setMessage(response.toString());
-                            alert.setCancelable(true);
-                            alert.show();
-                            Toast.makeText(Login.this,response,Toast.LENGTH_LONG).show();
                         }
                     }
                 },
@@ -135,7 +126,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         requestQueue.add(stringRequest);
     }
 
-    private void openProfile(String staff_id){
+    private void openProfile(String staff_id, String staff_name){
 
         SharedPreferences sharedPreferences = Login.this.getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
@@ -150,6 +141,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         /*STORE STAFF ID AS PREFERENCES FOR FUTURE USAGE*/
         editor.putString("staff_id", staff_id);
+        editor.putString("staff_name", staff_name);
 
         //Saving values to editor
         editor.apply();

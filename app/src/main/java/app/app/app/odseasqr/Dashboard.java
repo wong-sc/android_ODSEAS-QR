@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -37,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import app.app.app.odseasqr.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,6 +111,9 @@ public class Dashboard extends AppCompatActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        TextView txtProfileName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
+        txtProfileName.setText(preferences.getString("staff_name","Unknown"));
+
         /*Declare variable*/
         staff_id = preferences.getString("staff_id", "");
         mydb = new OfflineDatabase(this);
@@ -165,17 +169,16 @@ public class Dashboard extends AppCompatActivity
     public void promtDownloadData(String staff_id){
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("To runable during offline mode, it is encourage that to download the content first into this application.");
+        alertDialogBuilder.setMessage("To runable during offline mode, it is encourage to download the content first into this application.");
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
                 getOfflineData(Config.GET_OFFLINE_DATA);
-                loading.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                loading.isIndeterminate();
+                loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 loading.setTitle("Downloading Content..........");
-                loading.setMessage("Getting data from server......");
+                loading.setMessage("Getting data from server, may take some time......");
                 loading.setCancelable(false);
                 loading.show();
             }
@@ -537,6 +540,7 @@ public class Dashboard extends AppCompatActivity
 
                         //Saving the sharedpreferences
                         editor.commit();
+                        getApplicationContext().deleteDatabase(OfflineDatabase.DATABASE_NAME);
 
                         //Starting login activity
                         Intent intent = new Intent(Dashboard.this, Login.class);
@@ -564,6 +568,14 @@ public class Dashboard extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        Menu course = navigationView.getMenu();
+        MenuItem item = course.findItem(R.id.nav_viewattendance);
+        item.setEnabled(false);
+        return true;
     }
 
     @Override
@@ -613,6 +625,11 @@ public class Dashboard extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
     }
 
     public static boolean isNetworkStatusAvailable(Context context) {

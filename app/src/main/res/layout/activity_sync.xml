@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.pethoalpar.zxingexample.SyncActivity">
+    android:id="@+id/coordinate"
+    tools:context="app.app.app.odseasqr.SyncActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,34 +22,42 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/search"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/search"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/linearLayout1"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/syn_actionbar"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_marginBottom="40dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/frag_list"
+                class="app.app.app.odseasqr.DeviceListsFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <!-- Preview: layout=@layout/row_devices -->
+            <fragment
+                android:id="@+id/frag_detail"
+                class="app.app.app.odseasqr.DeviceDetailFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <!-- Preview: layout=@layout/device_detail -->
+        </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/linearLayout1"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/syn_actionbar"
-        android:layout_marginTop="25dp"
-        android:orientation="vertical">
-        <fragment
-            class="com.example.pethoalpar.zxingexample.DeviceListsFragment"
-            android:id="@+id/frag_list"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+        <Button
+            android:id="@+id/search"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/phone_list_height">
-            <!-- Preview: layout=@layout/row_devices -->
-        </fragment>
-        <fragment
-            class="com.example.pethoalpar.zxingexample.DeviceDetailFragment"
-            android:id="@+id/frag_detail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- Preview: layout=@layout/device_detail -->
-        </fragment>
+            android:layout_height="wrap_content"
+            app:layout_anchorGravity="bottom|center_horizontal"
+            android:text="@string/search" />
     </LinearLayout>
 
-</RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

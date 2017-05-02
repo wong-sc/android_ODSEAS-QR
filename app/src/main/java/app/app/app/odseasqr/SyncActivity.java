@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -8,6 +8,8 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +17,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import app.app.app.odseasqr.R;
 
 public class SyncActivity extends AppCompatActivity implements DeviceListsFragment.DeviceActionListener, WifiP2pManager.ChannelListener, View.OnClickListener {
 
@@ -29,6 +33,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
     private Toolbar toolbar;
+    private CoordinatorLayout coordinatorLayout;
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -44,6 +49,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id
+                .coordinate);
 
         // add necessary intent values to be matched.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -119,6 +127,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                 final DeviceListsFragment fragment = (DeviceListsFragment) getFragmentManager()
                         .findFragmentById(R.id.frag_list);
                 fragment.onInitiateDiscovery();
+                Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "Initializing discovery.....", Snackbar.LENGTH_LONG);
+                snackbar.show();
                 manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
                     @Override
@@ -146,6 +157,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
         DeviceDetailFragment fragment = (DeviceDetailFragment) getFragmentManager()
                 .findFragmentById(R.id.frag_detail);
         fragment.showDetails(device);
+        Snackbar snackbar = Snackbar
+                .make(coordinatorLayout, "Select Connect Button", Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
     @Override
@@ -189,11 +203,18 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
 
         config.groupOwnerIntent = 15;
 
+        Snackbar snackbar = Snackbar
+                .make(coordinatorLayout, "Opening Socket Server", Snackbar.LENGTH_LONG);
+        snackbar.show();
+
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
             @Override
             public void onSuccess() {
-                // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                search.setVisibility(View.GONE);
+                Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "Connected Successful", Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
 
             @Override
@@ -202,6 +223,14 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                         Toast.LENGTH_SHORT).show();
             }
         });
+ }
+
+ @Override
+ public void receiveconnection(){
+     search.setVisibility(View.GONE);
+     Snackbar snackbar = Snackbar
+             .make(coordinatorLayout, "Connection Received", Snackbar.LENGTH_LONG);
+     snackbar.show();
  }
 
     @Override
@@ -219,7 +248,13 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
 
             @Override
             public void onSuccess() {
+
                 fragment.getView().setVisibility(View.GONE);
+                search.setVisibility(View.VISIBLE);
+
+                Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "Disconnected", Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
 
         });

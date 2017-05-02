@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.AlertDialog;
 import android.support.v4.app.Fragment;
@@ -24,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import app.app.app.odseasqr.R;
 import com.google.zxing.Result;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -168,11 +169,11 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     showMessage("Alert", splited[0] + " has already scanned!");
 
                 } else {
-                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
-                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
-                        processGetData(status);
-                    } else
+//                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+//                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 1);
+//                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
+//                        processGetData(status);
+//                    } else
                         getData();
                     Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
                 }
@@ -187,10 +188,14 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
     public void processGetData(String response){
         if (response.equals("success checkin")) {
-
+            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
+            mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 1);
+//            else mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked in for this course");
-
         } else if (response.equals("success checkout")){
+            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
+            mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 2);
+//            else mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked out for this course");
         }
     }
@@ -201,13 +206,12 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
-                mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1");
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
                         /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
                         processGetData(status);
                     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pethoalpar.zxingexample">
+    package="app.app.app.odseasqr">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -18,21 +18,22 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:label="@string/app_name">
 
         <!-- <activity -->
         <!-- android:name=".SelectSubject" -->
         <!-- android:label="Select Subject" /> -->
         <activity
-            android:name=".Login"
-            android:label="Exam Attendance">
+            android:name="app.app.app.odseasqr.Login"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".Register"
+            android:name="app.app.app.odseasqr.Register"
             android:label="Register" />
         <!-- <activity -->
         <!-- android:name=".Scan" -->
@@ -50,33 +51,33 @@
         <!-- android:name=".EnterStudentID" -->
         <!-- android:label="Enter Student ID" /> -->
         <activity
-            android:name=".TakeAttendance"
+            android:name="app.app.app.odseasqr.TakeAttendance"
             android:label="Take Attendance" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.pethoalpar.zxingexample.Dashboard" />
+                android:value="app.app.app.odseasqr.Dashboard" />
 
         </activity>
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".Dashboard" />
+            android:value="app.app.app.odseasqr.Dashboard" />
 
         <activity
-            android:name=".Dashboard"
+            android:name="app.app.app.odseasqr.Dashboard"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ViewNameList"
+            android:name="app.app.app.odseasqr.ViewNameList"
             android:label="View Attendance">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Dashboard" />
+                android:value="app.app.app.odseasqr.Dashboard" />
         </activity>
 
         <receiver
-            android:name=".NetworkStatus"
+            android:name="app.app.app.odseasqr.NetworkStatus"
             android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
@@ -86,13 +87,13 @@
 
         <!-- SYNC DATA WITH SERVER -->
         <service
-            android:name=".SyncService"
+            android:name="app.app.app.odseasqr.SyncService"
             android:exported="false" />
 
         <!-- Used for transferring files  after a successful connection -->
-        <service android:enabled="true" android:name=".FileTransferService" />
+        <service android:enabled="true" android:name="app.app.app.odseasqr.FileTransferService" />
 
-        <activity android:name=".SyncActivity" android:label="Local Sync"></activity>
+        <activity android:name="app.app.app.odseasqr.SyncActivity" android:label="Local Sync"></activity>
     </application>
 
 </manifest>

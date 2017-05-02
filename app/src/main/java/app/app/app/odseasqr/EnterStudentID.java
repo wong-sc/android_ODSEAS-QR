@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.AlertDialog;
 import android.support.v4.app.Fragment;
@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import app.app.app.odseasqr.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -212,10 +213,10 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     studentname.setText("Student Name: ");
                     buttonComfirm.setClickable(false);
                 } else {
-                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
-                        processGetData(status);
-                    } else
+//                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+//                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 3);
+//                        processGetData(status);
+//                    } else
                     getData();
                     Toast.makeText(getContext(), "Successfully added " + dataStringStudentID, Toast.LENGTH_LONG).show();
                     studentid.setText("");
@@ -282,10 +283,16 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public void processGetData(String response){
         if (response.equals("success checkin")) {
 
+            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
+                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 1);
+//            else mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked in for this course");
             buttonComfirm.setClickable(false);
 
         } else if (response.equals("success checkout")){
+            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
+                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 2);
+//            else mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked out for this course");
             buttonComfirm.setClickable(false);
         }
@@ -297,14 +304,13 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
-                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(), error.toString(),Toast.LENGTH_LONG).show();
-                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2");
+                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 3);
                         processGetData(status);
                     }
                 }) {

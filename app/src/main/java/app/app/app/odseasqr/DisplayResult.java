@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 
 import android.app.AlertDialog;
@@ -23,6 +23,7 @@ import com.android.volley.VolleyError;
 
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import app.app.app.odseasqr.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -212,4 +213,23 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
                 startActivity(new Intent(getActivity(), SyncActivity.class));
         }
     }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            getAttendedData();
+            getAnswerBooklet();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("resume--", "true");
+        getAttendedData();
+        getAnswerBooklet();
+    }
+
 }

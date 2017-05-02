@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Exam Attendance</string>
+    <string name="app_name">ODSEAS-QR</string>
     <string name="title_activity_dashboard">Dashboard</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

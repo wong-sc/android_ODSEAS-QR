@@ -1,4 +1,4 @@
-package com.example.pethoalpar.odseasqr;
+package app.app.app.odseasqr;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -86,7 +86,7 @@ public class SyncService extends IntentService {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(final String result) {
-                        Log.d("Result", result);
+                        Log.d("Result222", result);
                         try {
                             JSONArray jsonArray = new JSONArray(result);
                             for (int i = 0; i < jsonArray.length(); i++){
