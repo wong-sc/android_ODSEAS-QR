@@ -38,7 +38,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public static final String ARG_PAGE = "ARF_PAGE";
     public String dataStringStudentID;
     public String dataStringSubjectCode;
-    public String staffID;
+    public String staffID, position;
     SharedPreferences preferences;
     OfflineDatabase mydb;
     RequestQueue requestQueue;
@@ -77,6 +77,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         requestQueue = Volley.newRequestQueue(getActivity());
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         staffID = preferences.getString("staff_id", "null");
+        position = preferences.getString(Dashboard.POSITION, "null");
         return v;
     }
 
@@ -84,21 +85,51 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
         studentid = (EditText) getActivity().findViewById(R.id.studentid);
         dataStringStudentID = studentid.getText().toString();
-        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
-            String studentSubject = mydb.getStudentSubject(dataStringStudentID);
-            Log.d("Result scan -", studentSubject);
-            processStudentSubject(studentSubject);
+
+        /* get the invigilator position, if == CHIEF then perform both offline/online function
+        * else only go for offline function*/
+        if(is_time_available()){
+            if(position.equals(Config.CHIEF)){
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
+                    String studentSubject = mydb.getStudentSubject(dataStringStudentID);
+                    Log.d("Result scan -", studentSubject);
+                    processStudentSubject(studentSubject);
+                }
+                else
+                    checkStudent();
+            } else {
+                String studentSubject = mydb.getStudentSubject(dataStringStudentID);
+                Log.d("Result scan -", studentSubject);
+                processStudentSubject(studentSubject);
+            }
+        } else {
+            showMessage("Expired course", "You have exceed 30minute after exam.. GG");
         }
-        else
-        checkStudent();
+    }
+
+    private boolean is_time_available(){
+        String available = mydb.CheckCourseTime(dataStringSubjectCode);
+        if(available.equals(Config.AVAILABLE))
+            return true;
+        else return false;
     }
 
     public void buttonConfirm(View v) {
-        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-            String checkScan = mydb.checkAlreadyScan(dataStringSubjectCode, dataStringStudentID);
-            processStudentIschecked(checkScan);
-        } else
-            checkAlreadyScan();
+
+            if(position.equals(Config.CHIEF)){
+
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+                    String checkScan = mydb.checkAlreadyScan(dataStringSubjectCode, dataStringStudentID);
+                    processStudentIschecked(checkScan);
+                } else
+                    checkAlreadyScan();
+
+            } else {
+
+                String checkScan = mydb.checkAlreadyScan(dataStringSubjectCode, dataStringStudentID);
+                processStudentIschecked(checkScan);
+
+            }
     }
 
     public void checkAlreadyScan() {
@@ -207,17 +238,26 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 String Scanned = "1";
                 String isScanned = jsonObject.getString("ischecked");
                 Log.d("hye subject codess", isScanned);
+
+                /* if isChecked == 1, this student had taken the attendance */
                 if (Scanned.equals(isScanned)) {
                     showMessage("Alert", dataStringStudentID + " has already scanned!");
                     studentid.setText("");
                     studentname.setText("Student Name: ");
                     buttonComfirm.setClickable(false);
                 } else {
+
 //                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
 //                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 3);
 //                        processGetData(status);
 //                    } else
-                    getData();
+                    if(position.equals(Config.CHIEF))
+                        getData();
+                    else {
+                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 0);
+                        processGetData(status);
+                    }
+
                     Toast.makeText(getContext(), "Successfully added " + dataStringStudentID, Toast.LENGTH_LONG).show();
                     studentid.setText("");
                     studentname.setText("Student Name: ");
@@ -283,18 +323,14 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public void processGetData(String response){
         if (response.equals("success checkin")) {
 
-            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
-                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 1);
-//            else mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked in for this course");
             buttonComfirm.setClickable(false);
 
         } else if (response.equals("success checkout")){
-            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
-                mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 2);
-//            else mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "1", 3);
+
             showMessage("Alert", "Student has checked out for this course");
             buttonComfirm.setClickable(false);
+
         }
     }
 
@@ -304,13 +340,15 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
+                String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 1);
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(), error.toString(),Toast.LENGTH_LONG).show();
-                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 3);
+
+                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 0);
                         processGetData(status);
                     }
                 }) {

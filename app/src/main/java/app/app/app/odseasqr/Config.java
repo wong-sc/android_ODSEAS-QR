@@ -23,4 +23,11 @@ public class Config {
     public static final String SYNC = "ODSEAS-QR/gcm_test/v1/sync";
 
     public static final String WIFI_STATUS = "Wifi_Status";
+    public static final String CHIEF = "CHIEF";
+    public static final String NOT_CONNECTED = "Not connected to Internet";
+    public static final int FROM_SERVER = 1;
+    public static final int FROM_DB = 0;
+    public static final String COURSE_ID = "course_id";
+    public static final String AVAILABLE = "available";
+    public static final String UNAVAILABLE = "unavailable";
 }

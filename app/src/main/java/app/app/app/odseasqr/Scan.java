@@ -42,7 +42,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     public static final String ARG_PAGE = "ARF_PAGE";
     public String[] splited;
-    public String subjectCode, matchedSubject, subjectName, staffID;
+    public String subjectCode, matchedSubject, subjectName, staffID, position;
     RequestQueue requestQueue;
     SharedPreferences preferences;
     OfflineDatabase mydb;
@@ -71,8 +71,10 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
         subjectName = i.getStringExtra("passSubjectInfo");
         subjectname.setText(subjectName);
 
+
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         staffID = preferences.getString("staff_id", "null");
+        position = preferences.getString(Dashboard.POSITION, "null");
         mydb = new OfflineDatabase(getContext());
 
         ImageButton scan = (ImageButton) v.findViewById(R.id.imageButtonScan);
@@ -122,13 +124,21 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 if(!matched)
                     Toast.makeText(getActivity(),splited[0] + " does not belong to this examination",Toast.LENGTH_LONG).show();
                 else{
-                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
+
+//                    if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
+//                        String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
+//                        Log.d("Result scan -", studentSubject);
+//                        processStudentIschecked(studentSubject);
+//                    } else
+                    if(position.equals(Config.CHIEF))
+                        checkAlreadyScan();
+                    else{
                         String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
-                        Log.d("Result scan -", studentSubject);
                         processStudentIschecked(studentSubject);
-                    } else
-                    checkAlreadyScan();
-                }
+                    }
+
+                    }
+//                }
             }
         } else {
             // This is important, otherwise the result will not be passed to the fragment
@@ -174,7 +184,12 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 //                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
 //                        processGetData(status);
 //                    } else
+                    if(position.equals(Config.CHIEF))
                         getData();
+                    else {
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 0);
+                        processGetData(status);
+                    }
                     Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
                 }
             }
@@ -188,14 +203,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
     public void processGetData(String response){
         if (response.equals("success checkin")) {
-            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
-            mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 1);
-//            else mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked in for this course");
         } else if (response.equals("success checkout")){
-            if(!preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet"))
-            mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 2);
-//            else mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
             showMessage("Alert", "Student has checked out for this course");
         }
     }
@@ -206,12 +215,13 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
             @Override
             public void onResponse(String response) {
                 processGetData(response);
+                mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 1);
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 3);
+                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 0);
                         /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
                         processGetData(status);
                     }

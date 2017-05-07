@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,7 +109,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 + EXAM_DATE + " DATE,"
                 + START_TIME + " VARCHAR,"
                 + END_TIME + " VARCHAR,"
-                + STATUS + " BOOLEAN,"
+                + STATUS + " INTEGER,"
                 + STUDENT_NUMBER + " INTEGER,"
                 + CREATED_DATE + " DATETIME,"
                 + UPDATED_DATE + " DATETIME" + ")";
@@ -1011,7 +1012,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         return String.valueOf(courseData);
     }
 
-    public String updateAttendanceRecord(String student_id, String course_id, String staffID, String style_id, int status){
+    public String updateAttendanceRecord(String student_id, String course_id, String staffID, String style_id, int mode){
 
         /*this method is  used to update the attendance in the enroll_handler table*/
 
@@ -1044,36 +1045,69 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             values.put(CHECKIN_TIME, getDateTime());
             values.put(CHECKIN_STAFFID, staffID);
             values.put(CHECKIN_STYLE_ID, style_id);
-            values.put(STATUS, status);
+
+            if(mode == 1)
+                values.put(STATUS, 1);
+            else if(mode == 0)
+                values.put(STATUS, 3);
+
             /*db.update will update the value in the content values to the database*/
             db.update(TABLE_ENROLL_HANDLER,values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
             /*return success checkin if the checkin time is null*/
             return "success checkin";
 
         } else {
-            ContentValues values_checkin = new ContentValues();
-            values_checkin.put(CHECKOUT_TIME, getDateTime());
-            values_checkin.put(CHECKOUT_STAFFID, staffID);
-            values_checkin.put(CHECKOUT_STYLE_ID, style_id);
-            values_checkin.put(STATUS, status);
-            db.update(TABLE_ENROLL_HANDLER,values_checkin, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
-
             ContentValues values_checkout = new ContentValues();
-            values_checkout.put(ISCHECKED, 1);
+            values_checkout.put(CHECKOUT_TIME, getDateTime());
+            values_checkout.put(CHECKOUT_STAFFID, staffID);
+            values_checkout.put(CHECKOUT_STYLE_ID, style_id);
+
+            if(mode == 1)
+                values_checkout.put(STATUS, 2);
+            else if (mode == 0)
+                values_checkout.put(STATUS, 4);
+
             db.update(TABLE_ENROLL_HANDLER,values_checkout, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
+
+            ContentValues values_isChecked = new ContentValues();
+            values_isChecked.put(ISCHECKED, 1);
+            db.update(TABLE_ENROLL_HANDLER,values_isChecked, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?", new String[]{student_id, course_id});
             /*return success checkout if the checkin time is not null this mean that the student already checkin before*/
             return "success checkout";
         }
     }
 
-    public Cursor getUnsyscData(){
+    public String StopCourse(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(STATUS, 1);
+        db.update(TABLE_COURSE, values, COURSE_ID + "= ?", new String[]{course_id});
+        return "success";
+    }
+
+    public Boolean check_course_status(String course_id){
+        boolean status = false;
+
         SQLiteDatabase db = this.getReadableDatabase();
 
         /*query to select the checkin time of specific student*/
         String CHECK_UNSYNC =
-                String.format("SELECT * FROM %s WHERE %s = %s",
+                String.format("SELECT %s FROM %s WHERE %s = '%s'",
+                        STATUS,TABLE_COURSE, COURSE_ID, course_id);
+
+        return status;
+    }
+
+    public Cursor getUnsyscData(String course_id){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        /*query to select the checkin time of specific student*/
+        String CHECK_UNSYNC =
+                String.format("SELECT * FROM %s WHERE %s = %s OR %s = %s AND %s = '%s'",
                         TABLE_ENROLL_HANDLER,
-                        STATUS, 3);
+                        STATUS, 3, STATUS, 4, COURSE_ID, course_id);
 
         /*cursor to search in the database*/
         return db.rawQuery(CHECK_UNSYNC, null);
@@ -1141,10 +1175,124 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             return status;
         } else {
             db.close();
-            return "3";
+            return "0";
         }
 
 
+    }
+
+    public String CheckCourseTime(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String GET_TIME =
+                String.format("SELECT * FROM %s WHERE %s = '%s'",
+                        TABLE_COURSE,
+                        COURSE_ID, course_id);
+
+        Cursor cursor = db.rawQuery(GET_TIME, null);
+        Log.d("Result coursetime", DatabaseUtils.dumpCursorToString(cursor));
+//        cursor.moveToNext()
+        if ((cursor != null) && (cursor.getCount() > 0)){
+            cursor.moveToFirst();
+
+            String date = cursor.getString(3);
+            String s_time = cursor.getString(4);
+            String e_time = cursor.getString(5);
+
+            String st_time = String.format("%s %s", date, s_time);
+            String ed_time = String.format("%s %s", date, e_time);
+
+            String start_time = validate_start_time(st_time);
+            String end_time = validate_end_time(ed_time);
+
+            cursor.close();
+            db.close();
+
+            if(start_time.equals("0") && end_time.equals("0"))
+                return Config.AVAILABLE;
+            else
+                return Config.UNAVAILABLE;
+
+        } else {
+            db.close();
+            return Config.UNAVAILABLE;
+        }
+
+    }
+
+    private String validate_end_time(String format) {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String current = getDateTime();
+
+        Date date = null;
+        Date now = null;
+        String status = "0";
+
+        try {
+
+            date = dateFormat.parse(format);
+            now = dateFormat.parse(current);
+
+            long diff = now.getTime() - date.getTime();
+            status = calculate_time(diff);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
+    private String calculate_time(long diff){
+
+        long diffMinutes = diff / (60 * 1000) % 60;
+        long diffHours = diff / (60 * 60 * 1000) % 24;
+        long diffDays = diff / (24 * 60 * 60 * 1000);
+
+        Log.d("start_min", " " + diffMinutes);
+        Log.d("start_hour", " " + diffHours);
+        Log.d("start_day", " " + diffDays);
+
+        if(diffDays>0) {
+            Log.d("Time", diffDays + " days ago");
+            return String.valueOf(diffDays);
+        } else if(diffHours>1) {
+            Log.d("Time", diffHours + " hours ago");
+            return String.valueOf(diffHours);
+        } else if(diffMinutes>30) {
+            Log.d("Time", diffMinutes + " minutes ago");
+            return String.valueOf(diffMinutes);
+        } else {
+            Log.d("Time", String.valueOf("Now"));
+            return String.valueOf(0);
+        }
+    }
+
+    private String validate_start_time(String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String current = getDateTime();
+
+        Date date = null;
+        Date now = null;
+        String status = "0";
+
+        try {
+
+            date = dateFormat.parse(format);
+            now = dateFormat.parse(current);
+
+            long diff = date.getTime() - now.getTime();
+            Log.d("start", " " + diff);
+            status = calculate_time(diff);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return status;
     }
 
     private String getDateTime() {

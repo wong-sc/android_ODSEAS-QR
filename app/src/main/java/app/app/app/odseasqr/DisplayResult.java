@@ -36,7 +36,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     private TextView textViewAttended,textViewBooklet;
     private Button sync;
     RequestQueue requestQueue;
-    String course_id;
+    String course_id, position;
     SharedPreferences preferences;
     OfflineDatabase mydb;
 
@@ -67,7 +67,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
 
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(getContext());
-
+        position = preferences.getString(Dashboard.POSITION, "null");
         Intent i = getActivity().getIntent();
         final String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
         String dataStringStudentNumber = i.getStringExtra("studentnumber");
@@ -86,17 +86,23 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
             }
         });
 
-        //check internet - if yes then online function else offline function
-        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+        init();
+
+        return v;
+    }
+
+    private void init(){
+
+        if(position.equals(Config.CHIEF)) {
+                getAttendedData();
+                getAnswerBooklet();
+        } else {
             String attendeddata = mydb.getAttendedData(course_id);
             String bookletData = mydb.getAnswerBooklet(course_id);
             processAttendedData(attendeddata);
             processBookletData(bookletData);
-        } else {
-            getAttendedData();
-            getAnswerBooklet();
         }
-        return v;
+
     }
 
     //Logout function
@@ -199,10 +205,12 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     }
 
     public void processAttendedData(String result){
+        Log.d("count_attend", result);
         textViewAttended.setText(result);
     }
 
     public void processBookletData(String result){
+        Log.d("count_booklet", result);
         textViewBooklet.setText(result);
     }
 
@@ -219,8 +227,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            getAttendedData();
-            getAnswerBooklet();
+            init();
         }
     }
 
@@ -228,8 +235,6 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     public void onResume() {
         super.onResume();
         Log.d("resume--", "true");
-        getAttendedData();
-        getAnswerBooklet();
+        init();
     }
-
 }

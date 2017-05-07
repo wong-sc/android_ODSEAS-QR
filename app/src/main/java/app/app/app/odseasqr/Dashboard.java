@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
@@ -71,16 +72,19 @@ public class Dashboard extends AppCompatActivity
     List<Integer> courseid = new ArrayList<>();
     HashMap<Integer, String> params = new HashMap<Integer, String>();
     HashMap<Integer, String> params_name = new HashMap<Integer, String>();
+    public static final String POSITION = "position";
 
     private Spinner spinner;
 
     SharedPreferences preferences;
+    SharedPreferences.Editor editor;
     RequestQueue requestQueue;
     OfflineDatabase mydb;
     ProgressDialog loading;
     NavigationView navigationView;
+    private SwipeRefreshLayout swipeContainer;
 
-    Button btnNext;
+    Button btnNext, btnStop;
 //    TextView username;
 
     @Override
@@ -97,6 +101,7 @@ public class Dashboard extends AppCompatActivity
         Persistently which mean data you stored in the SharedPreferences are still
         exist even if you stop the application or turn off the device*/
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        editor = preferences.edit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -131,6 +136,15 @@ public class Dashboard extends AppCompatActivity
         btnNext = (Button)findViewById(R.id.buttonNext);
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
+        btnStop = (Button) findViewById(R.id.btnStop);
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getOfflineData(Config.GET_OFFLINE_DATA);
+                init();
+            }
+        });
 
         /*If user first time login (included user who log out the device previously),
         * then it will prompt user to download*/
@@ -141,7 +155,9 @@ public class Dashboard extends AppCompatActivity
         }
 
         btnNext.setOnClickListener(this);
+    }
 
+    private void init(){
         if(isNetworkStatusAvailable(this)) {
             Toast.makeText(getApplicationContext(), "internet available", Toast.LENGTH_SHORT).show();
             getData();
@@ -150,6 +166,7 @@ public class Dashboard extends AppCompatActivity
             // ask sqlite to geneate spinner data by passing the staff id
             getSpinnerData();
         }
+        swipeContainer.setRefreshing(false);
     }
 
     public void getSpinnerData(){
@@ -338,6 +355,8 @@ public class Dashboard extends AppCompatActivity
         //Traversing through all the items in the json array
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navView.getMenu();
+        courseid.clear();
+        subjectData.clear();
         for(int i=0;i<j.length();i++){
             try {
                 //Getting json object
@@ -359,17 +378,6 @@ public class Dashboard extends AppCompatActivity
         card.setVisibility(View.VISIBLE);
     }
 
-    private void refreshNavigationView(){
-        for (int i = 0, count = navigationView.getChildCount(); i < count; i++) {
-        final View child = navigationView.getChildAt(i);
-        if (child != null && child instanceof ListView) {
-        final ListView menuView = (ListView) child;
-        final HeaderViewListAdapter adapter = (HeaderViewListAdapter) menuView.getAdapter();
-        final BaseAdapter wrapped = (BaseAdapter) adapter.getWrappedAdapter();
-        wrapped.notifyDataSetChanged();}
-        }
-    }
-
     private void processDetails(JSONArray j,int position){
         String invigilator = "";
         //Traversing through all the items in the json array
@@ -378,6 +386,15 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = j.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
+                Log.d("person: ", invigilator + "Sesion:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
+                if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
+                        && json.getString("invigilator_position").equals(Config.CHIEF)){
+                    btnStop.setVisibility(View.VISIBLE);
+                    editor.putString(POSITION, json.getString("invigilator_position"));
+                    editor.commit();
+                    editor.apply();
+                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -398,6 +415,17 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = result2.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
+//                txtProfileName.setText(preferences.getString("staff_name","Unknown"));
+                Log.d("person: ", invigilator + "Sesion:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
+                if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
+                        && json.getString("invigilator_position").equals(Config.CHIEF)){
+                    btnStop.setVisibility(View.VISIBLE);
+                    editor.putString(POSITION, json.getString("invigilator_position"));
+                    editor.putString(Config.COURSE_ID, getSubjectCode(position));
+                    editor.commit();
+                    editor.apply();
+                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -480,8 +508,11 @@ public class Dashboard extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-        if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+        btnStop.setVisibility(View.GONE);
+        editor.putString(POSITION, "null");
+        editor.commit();
+        editor.apply();
+        if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
             String subjectDetails = mydb.getSubjectDetails(getSubjectCode(position));
             try {
                 JSONArray jsonArray2 = new JSONArray(subjectDetails);
@@ -495,10 +526,14 @@ public class Dashboard extends AppCompatActivity
         }
         passData = getSubjectCode(position);
         subjectInfo = getSubjectCode(position)+" "+getSubjectName(position);
+        if(passData != null)
+        is_time_available();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+        Toast.makeText(this, parent.getSelectedItem() + " aa", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -507,13 +542,51 @@ public class Dashboard extends AppCompatActivity
     {
         Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
 
-        if (v == findViewById(R.id.buttonNext)){
+
+        if (v == findViewById(R.id.buttonNext) && is_time_available()){
             Intent intent = new Intent(this, TakeAttendance.class);
             intent.putExtra("passDataValue",passData);
             intent.putExtra("passSubjectInfo",subjectInfo);
             intent.putExtra("studentnumber",student_number);
             startActivity(intent);
+        } else if(v == findViewById(R.id.btnStop)){
+            ComfirmMessage("Are you sure you want to finalise the list?", "This session will only open during 30 minutes before and close after 30 minutes of the examination");
+        } else {
+            showMessage("Session Close", "This session will only open during 30 minutes before and close after 30 minutes of the examination");
         }
+    }
+
+    public void showMessage(String title, String message) {
+        AlertDialog.Builder Adialog = new AlertDialog.Builder(this);
+        Adialog.setTitle(title);
+        Adialog.setMessage(message).setCancelable(false)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = Adialog.create();
+        Adialog.show();
+    }
+
+    public void ComfirmMessage(String title, String message) {
+        AlertDialog.Builder Adialog = new AlertDialog.Builder(this);
+        Adialog.setTitle(title);
+        Adialog.setMessage(message).setCancelable(false)
+                .setPositiveButton("Finalise", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mydb.StopCourse(passData);
+                    }
+                })
+        .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+            }
+        });
+        Adialog.show();
     }
 
     //Logout function
@@ -627,9 +700,20 @@ public class Dashboard extends AppCompatActivity
         return true;
     }
 
+    private boolean is_time_available(){
+        String available = mydb.CheckCourseTime(passData);
+        if(available.equals(Config.UNAVAILABLE)){
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
     @Override
     public void onResume(){
         super.onResume();
+        init();
     }
 
     public static boolean isNetworkStatusAvailable(Context context) {

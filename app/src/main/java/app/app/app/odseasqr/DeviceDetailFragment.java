@@ -98,7 +98,41 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     /* search in the database to get unsynced data (where status = 0), status = 0, mean that the data
     * has been modified by invigilator, by default, the status is 1 */
     private void getUnsyncData() {
-        Cursor cursor = mydb.getUnsyscData();
+        Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
+        Log.d(SyncActivity.TAG, DatabaseUtils.dumpCursorToString(cursor));
+        if(cursor == null)
+            Toast.makeText(getActivity(), "All data up to date, No Sync Require", Toast.LENGTH_SHORT).show();
+        else if (cursor.moveToFirst()) {
+            do {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    /*After retrieved from the database, result taken will be stored as JSONObject*/
+                    jsonObject.put("enroll_handler_id", cursor.getString(0));
+                    jsonObject.put("student_id", cursor.getString(1));
+                    jsonObject.put("course_id", cursor.getString(2));
+                    jsonObject.put("ischecked", cursor.getString(3));
+                    jsonObject.put("checkin_time", cursor.getString(4));
+                    jsonObject.put("checkout_time", cursor.getString(5));
+                    jsonObject.put("checkin_staffID", cursor.getInt(6));
+                    jsonObject.put("checkout_staffID", cursor.getInt(7));
+                    jsonObject.put("checkin_style_id", cursor.getString(8));
+                    jsonObject.put("checkout_style_id", cursor.getString(9));
+                    jsonObject.put("status", cursor.getString(10));
+                    jsonObject.put("created_date", cursor.getString(11));
+                    jsonObject.put("updated_date", cursor.getString(12));
+
+                    courseData.add(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        }
+        Toast.makeText(getActivity(), courseData.size()+"", Toast.LENGTH_SHORT).show();
+        sendToChief(courseData.toString());
+    }
+
+    private void getSyncedResult() {
+        Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
         Log.d(SyncActivity.TAG, DatabaseUtils.dumpCursorToString(cursor));
         if(cursor == null)
             Toast.makeText(getActivity(), "All data up to date, No Sync Require", Toast.LENGTH_SHORT).show();
@@ -141,6 +175,17 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     }
 
     private void sendToChief(String result){
+        Log.d(SyncActivity.TAG, "Enter send to chief");
+        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
+        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, result);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                info.groupOwnerAddress.getHostAddress());
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+        getActivity().startService(serviceIntent);
+    }
+
+    private void syncClient(String result){
         Log.d(SyncActivity.TAG, "Enter send to chief");
         Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);

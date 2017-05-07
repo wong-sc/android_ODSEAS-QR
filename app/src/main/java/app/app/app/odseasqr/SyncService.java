@@ -1,8 +1,11 @@
 package app.app.app.odseasqr;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -27,6 +30,7 @@ public class SyncService extends IntentService {
     public static final String LOG_TAG = "RSSPullService";
     OfflineDatabase mydb;
     RequestQueue requestQueue;
+    SharedPreferences preferences;
 
     public SyncService() {
         super(LOG_TAG);
@@ -38,11 +42,12 @@ public class SyncService extends IntentService {
         String workingIntent = intent != null ? intent.getStringExtra(Config.WIFI_STATUS) : null;
         ArrayList<JSONObject> courseData = new ArrayList<>();
         mydb = new OfflineDatabase(getApplicationContext());
+        preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 //        if(workingIntent.equals("Wifi enabled") || workingIntent.equals("Mobile data enabled")) {
-            Cursor cursor = mydb.getUnsyscData();
+            Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
 
             if (cursor.moveToFirst()) {
-//                Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
+                Log.d("Result50 sync--", DatabaseUtils.dumpCursorToString(cursor));
                 do {
                     JSONObject jsonObject = new JSONObject();
                     try {

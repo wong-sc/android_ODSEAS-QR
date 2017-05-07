@@ -7,10 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -23,7 +29,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import app.app.app.odseasqr.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +40,7 @@ import java.util.Map;
 public class ViewNameList extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     Spinner spinner;
+    ImageButton infoButton;
     String course_id, course_full_name;
     Intent intent;
     RequestQueue requestQueue;
@@ -42,6 +48,9 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
     OfflineDatabase mydb;
     Boolean connection = true;
     TableLayout table;
+    private PopupWindow popupWindow;
+    private LayoutInflater layoutInflater;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,37 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         preferences = ViewNameList.this.getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         mydb = new OfflineDatabase(this);
         spinner = (Spinner) findViewById(R.id.sort);
+
+        infoButton = (ImageButton) findViewById(R.id.infoButton);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                ViewGroup container = (ViewGroup) layoutInflater.inflate(R.layout.status_image,null);
+
+                popupWindow = new PopupWindow(
+                        container,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,true);
+
+                // show the popup at bottom of the screen and set some margin at bottom
+//                popupWindow.showAtLocation(linearLayout, Gravity.CENTER,0,0);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.setFocusable(true);
+                popupWindow.showAsDropDown(view);
+
+                container.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        popupWindow.dismiss();
+                        return true;
+                    }
+                });
+            }
+        });
+
         intent = getIntent();
         course_id = intent.getStringExtra("course_id");
         course_full_name = intent.getStringExtra("course_full_name");
@@ -74,7 +114,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         switch (i){
             case 0:
                 Toast.makeText(ViewNameList.this, "Item position: 0 --" + selectedItem, Toast.LENGTH_SHORT).show();
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAllData(course_id);
                     processNameList(getnamelist);
                 }
@@ -82,7 +122,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 1:
                 Toast.makeText(ViewNameList.this, "Item position: 1 --" + selectedItem, Toast.LENGTH_SHORT).show();
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAttendeesData(course_id);
                     processNameList(getnamelist);
                 }
@@ -90,7 +130,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 2:
                 Toast.makeText(ViewNameList.this, "Item position: 2 --" + selectedItem, Toast.LENGTH_SHORT).show();
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")) {
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
                     getnamelist = mydb.getAbsenteesData(course_id);
                     processNameList(getnamelist);
                 }
@@ -98,19 +138,20 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 3:
                 Toast.makeText(ViewNameList.this, "Item position: 3 --" + selectedItem, Toast.LENGTH_SHORT).show();
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-                    getnamelist = mydb.getSubmittedData(course_id);
-                    processNameList(getnamelist);
-                }
-                getNameList(Config.GET_SUBMITTED_DATA);
-                break;
-            case 4:
-                Toast.makeText(ViewNameList.this, "Item position: 4 --" + selectedItem, Toast.LENGTH_SHORT).show();
-                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getInExaminationData(course_id);
                     processNameList(getnamelist);
                 }
                 getNameList(Config.GET_INEXAMINATION_DATA);
+
+                break;
+            case 4:
+                Toast.makeText(ViewNameList.this, "Item position: 4 --" + selectedItem, Toast.LENGTH_SHORT).show();
+                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+                    getnamelist = mydb.getSubmittedData(course_id);
+                    processNameList(getnamelist);
+                }
+                getNameList(Config.GET_SUBMITTED_DATA);
                 break;
             default:
                 break;
@@ -132,12 +173,12 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                     getnamelist = mydb.getAbsenteesData(course_id);
                     processNameList(getnamelist);
                 break;
+            case Config.GET_INEXAMINATION_DATA:
+                getnamelist = mydb.getInExaminationData(course_id);
+                processNameList(getnamelist);
+                break;
             case Config.GET_SUBMITTED_DATA:
                     getnamelist = mydb.getSubmittedData(course_id);
-                    processNameList(getnamelist);
-                break;
-            case Config.GET_INEXAMINATION_DATA:
-                    getnamelist = mydb.getInExaminationData(course_id);
                     processNameList(getnamelist);
                 break;
             default:
@@ -192,9 +233,9 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 TableRow row = new TableRow(this);
                 row.setPadding(5, 5, 5, 5);
 
-                TableRow.LayoutParams bilParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.1f);
-                TableRow.LayoutParams matricParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.25f);
-                TableRow.LayoutParams studentNameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.35f);
+                TableRow.LayoutParams bilParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 0.1f);
+                TableRow.LayoutParams matricParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.20f);
+                TableRow.LayoutParams studentNameParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.33f);
                 TableRow.LayoutParams statusParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.18f);
 
                 TextView bil = new TextView(this);
@@ -215,7 +256,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 ImageView status = new ImageView(this);
                 switch (mydb.getStatus(jsonObject.getString("student_id"), course_id)){
                     case "0":
-                        status.setImageResource(R.drawable.ic_cancel_black_24px);
+                        status.setImageResource(R.drawable.ic_cancel_red_24px);
                         break;
                     case "1":
                         status.setImageResource(R.drawable.ic_done_black_24px);
@@ -223,15 +264,15 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                     case "2":
                         status.setImageResource(R.drawable.ic_done_all_black_24px);
                         break;
-                    default:
+                    case "3":
                         status.setImageResource(R.drawable.ic_sync_problem_black_24dp);
+                        break;
+                    case "4":
+                        status.setImageResource(R.drawable.ic_sync_problem_blue_24dp);
+                        break;
+                    default:
+                        status.setImageResource(R.drawable.ic_cancel_red_24px);
                 }
-//                if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet") || !connection) {
-//                    if(jsonObject.getString("status").equals("1"))
-//                        status.setImageResource(R.drawable.ic_check_circle_black_24dp);
-//                    else
-//                        status.setImageResource(R.drawable.ic_sync_problem_black_24dp);
-//                } else status.setImageResource(R.drawable.ic_check_circle_black_24dp);
 
                 status.setLayoutParams(statusParams);
                 row.addView(status);
