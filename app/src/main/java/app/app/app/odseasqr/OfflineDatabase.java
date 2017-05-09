@@ -520,9 +520,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 Log.d(SyncActivity.TAG, jsonArray.length() + "");
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                if(!jsonObject.getString(COURSE_ID).equals(sharedPreferences.getString(Config.COURSE_ID, "null"))){
-                    return "fail";
-                }
+//                if(!jsonObject.getString(COURSE_ID).equals(sharedPreferences.getString(Config.COURSE_ID, "null"))){
+//                    return "fail";
+//                }
 
                 ContentValues values = new ContentValues();
                 values.put(CHECKIN_TIME, jsonObject.getString(CHECKIN_TIME));
@@ -534,7 +534,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CHECKOUT_STYLE_ID, jsonObject.getInt(CHECKOUT_STAFFID));
                 values.put(ISCHECKED, jsonObject.getString(ISCHECKED));
 
-                int status = db.update(TABLE_ENROLL_HANDLER, values, STUDENT_ID + "= ? AND "+ COURSE_ID + " = ?",
+                int status = db.update(
+                        TABLE_ENROLL_HANDLER, values,
+                        STUDENT_ID + "= ? AND "+ COURSE_ID + " = ? AND (" + STATUS + " != 2 AND " + STATUS + " != 4)" ,
                         new String[]{jsonObject.getString("student_id"), jsonObject.getString("course_id")});
                 Log.d("status", status+"");
             }
@@ -1150,7 +1152,27 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 status = true;
             else status = false;
         }
+        assert cursor != null;
+        cursor.close();
+        db.close();
+        return status;
+    }
 
+    public String getCourseStatus(String course_id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String status;
+
+        String CHECK_STATUS =
+                String.format("SELECT %s FROM %s WHERE %s = %s", STATUS, TABLE_COURSE, COURSE_ID, course_id);
+
+        Cursor cursor = db.rawQuery(CHECK_STATUS, null);
+
+        if(cursor.moveToFirst()){
+            status = cursor.getString(0);
+        } else status = "fail";
+
+        cursor.close();
+        db.close();
         return status;
     }
 

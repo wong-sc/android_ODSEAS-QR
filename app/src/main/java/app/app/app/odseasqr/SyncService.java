@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -81,7 +80,7 @@ public class SyncService extends IntentService {
                 syncDatabase(courseData.toString());
             } else {
                 Log.d("Result == ", "NO");
-                Toast.makeText(getApplicationContext(), "All data synced with server", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "All data synced with server", Toast.LENGTH_SHORT).show();
             }
 
             cursor.close();

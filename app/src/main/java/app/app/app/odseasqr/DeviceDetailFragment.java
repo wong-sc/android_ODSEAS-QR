@@ -17,6 +17,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +42,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Timer;
 
 public class DeviceDetailFragment extends Fragment implements WifiP2pManager.ConnectionInfoListener {
     protected static final int CHOOSE_FILE_RESULT_CODE = 20;
@@ -75,16 +78,20 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
             @Override
             public void onClick(View v) {
-                WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = device.deviceAddress;
-                config.wps.setup = WpsInfo.PBC;
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
+                if (preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress = device.deviceAddress;
+                    config.wps.setup = WpsInfo.PBC;
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                    progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel",
+                            "Connecting to :" + device.deviceAddress, true, true
+                    );
+                    ((DeviceListsFragment.DeviceActionListener) getActivity()).connect(config);
+                } else {
+                    showMessage("Action Restricted", "Only Chief Invigilator can select a device to connect");
                 }
-                progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel",
-                        "Connecting to :" + device.deviceAddress, true, true
-                );
-                ((DeviceListsFragment.DeviceActionListener) getActivity()).connect(config);
             }
         });
 
@@ -315,6 +322,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
             Socket client = null;
             DataInputStream inputstream = null;
             DataOutputStream outputStream = null;
+            Handler h = new Handler(Looper.getMainLooper());
 
 //            if (info.groupFormed && info.isGroupOwner) {
 
@@ -328,45 +336,87 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     Log.d("clientIP3: ", ""+client.getPort());
                     Log.d("clientIP", clientIP + "");
                     inputstream = new DataInputStream(client.getInputStream());
-                    String str = inputstream.readUTF();
+//                    String str = inputstream.readUTF();
+//                    Log.d("item", str);
 
+                    int lengths = inputstream.readInt();
+                    byte[] input = new byte[lengths];
+                    inputstream.readFully(input);
+                    String str=new String(input,"UTF-8");
+                    Log.d(SyncActivity.TAG, "Message from server: " + str);
+                    final String[] key_code = str.split("@", 2);
+                    Log.d(SyncActivity.TAG, "Key Code: " + key_code[0]);
 
-                    String status = mydb.insertDataFrom_(str);
-                    if(status.equals("fail")){
-                        showMessage("Wrong Course", "Please select the same course with CHIEF Invigilator");
+                    if(preferences.getString(Config.COURSE_ID, "null").equals(key_code[0])) {
+                        if (mydb.check_course_status(key_code[0])){
+                            String status = mydb.insertDataFrom_(key_code[1]);
+                                Log.d("item", status);
+                                if (status.equals("fail")) {
+
+                                    h.post(new Runnable() {
+                                        public void run() {
+                                            showMessage("Wrong Course", "Please select the same course with CHIEF Invigilator");
+                                        }
+                                    });
+
+                                    } else if (str.length() != 0) {
+
+                                        sync();
+                                        h.post(new Runnable() {
+                                            public void run() {
+                                                loading.setMessage("Sending " + courseData.size() + " record...");
+                                                loading.show();
+                                            }
+                                        });
+                                        try {
+                                            Thread.sleep(8000);
+
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    getSyncedResult();
+                                    outputStream = new DataOutputStream(client.getOutputStream());
+                                    String key_result = key_code[0] + "@" + courseData.toString();
+                                    byte[] data = key_result.getBytes("UTF-8");
+                                    outputStream.writeInt(data.length);
+                                    outputStream.write(data);
+                                    h.post(new Runnable() {
+                                        public void run() {
+                                            loading.dismiss();
+                                        }
+                                     });
+
+                                    } else {
+
+                                        h.post(new Runnable() {
+                                            public void run() {
+                                                showMessage("Message Empty", "No data from client");
+                                            }
+                                        });
+
+                                    }
+                                } else {
+                                    h.post(new Runnable() {
+                                        public void run() {
+                                            showMessage("Cannot Sync", "This course: " + key_code[0] + "has been closed by CHIEF INVIGILATOR");
+                                        }
+                                    });
+                                 }
                     } else {
-                        getSyncedResult();
-                        outputStream = new DataOutputStream(client.getOutputStream());
-                        byte[] data = courseData.toString().getBytes("UTF-8");
-                        outputStream.writeInt(data.length);
-                        outputStream.write(data);
+
+                        h.post(new Runnable() {
+                            public void run() {
+                                showMessage("Course Mismatch: "+ key_code[0], "Sync with wrong CHEIF INVIGILATOR" + preferences.getString(Config.COURSE_ID, "null"));
+                            }
+                        });
                     }
-//                    if(!preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED))
-//                        sync();
-
-
-
                     serverSocket.close();
                     return str;
                 } catch (IOException e) {
                     Log.e(SyncActivity.TAG, e.getMessage());
                     return null;
                 }
-
-//            }  else {
-//                try {
-//
-//                    serverSocket = new ServerSocket(8988);
-//
-//                    Socket ss= serverSocket.accept();
-//                    OutputStream os= ss.getOutputStream();
-//
-//                    return os.toString();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    return  null;
-//                }
-//            }
         }
 
         @Override
@@ -391,7 +441,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 //                Toast.makeText(context.getApplicationContext(), "Successfully accept data", Toast.LENGTH_SHORT).show();
 
             }
-//            else getSyncedResult();
 
         }
         @Override
@@ -470,104 +519,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                         dialog.cancel();
                     }
                 });
-        AlertDialog alert = Adialog.create();
         Adialog.show();
     }
-
-    public class PingServerAsyncTask extends AsyncTask<Void, Void, String> {
-
-
-        public PingServerAsyncTask(Context context, WifiP2pInfo m) {
-
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-
-
-            String host = info.groupOwnerAddress.getHostAddress();
-            Socket socket = new Socket();
-            int port = 8988;
-            int SOCKET_TIMEOUT = 5000;
-            try {
-                Log.d(SyncActivity.TAG, "Opening client socket - ");
-                socket.bind(null);
-
-                socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
-//                Toast.makeText(context, "server:"+host + "me:"+socket.getLocalAddress(), Toast.LENGTH_LONG).show();
-                Log.d(SyncActivity.TAG, "Client socket - " + socket.isConnected());
-
-            } catch (Exception e) {
-                Log.e(SyncActivity.TAG, e.getMessage());
-
-            } finally {
-                if (socket != null) {
-                    if (socket.isConnected()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Give up
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
-//        public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
-//            /**
-//             * @param context
-//             */
-//
-//            DataInputStream inputstream = null;
-//
-//            public FileServerAsyncTask(Context context) {
-////intialize
-//            }
-//
-//            @Override
-//            protected String doInBackground(Void... params) {
-//                try {
-//                    ServerSocket serverSocket = new ServerSocket(8988);
-//                    Log.d(SyncActivity.TAG, "Server: Socket opened");
-//                    Socket client = serverSocket.accept();
-//                    Log.d(SyncActivity.TAG, "Server: connection done");
-////                    final File f = new File(Environment.getExternalStorageDirectory() + "/"
-////                            + context.getPackageName() + "/wifip2pshared/" + System.currentTimeMillis()
-////                            + ".jpg");
-////
-////                    File dirs = new File(f.getParent());
-////                    if (!dirs.exists())
-////                        dirs.mkdirs();
-////                    f.createNewFile();
-////                    Log.d(SyncActivity.TAG, "server: copying files " + f.toString());
-////                    InputStream inputstream = client.getInputStream();
-////                    copyFile(inputstream, new FileOutputStream(f));
-//
-//                    inputstream = new DataInputStream(client.getInputStream());
-//                    String str = inputstream.readUTF();
-//
-//                    serverSocket.close();
-//                    return str;
-//                } catch (IOException e) {
-//                    Log.e(SyncActivity.TAG, e.getMessage());
-//                    return null;
-//                }
-//            }
-//
-//            /*
-//             * (non-Javadoc)
-//             * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-//             */
-//            @Override
-//            protected void onPostExecute(String result) {
-//                //Do stuff with data..
-//                Log.d("result---", result + "result");
-//            }
-//
-//    }
 
     public static boolean copyFile(InputStream inputStream, OutputStream out) {
         byte buf[] = new byte[1024];

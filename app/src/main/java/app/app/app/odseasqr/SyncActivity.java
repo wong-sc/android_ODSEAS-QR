@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -26,8 +27,8 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
-    ProgressDialog progressDialog;
     Button search;
+    SharedPreferences preferences;
 
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
@@ -61,6 +62,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+        preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
         search = (Button) findViewById(R.id.search);
         search.setOnClickListener(this);
@@ -201,28 +203,28 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
     @Override
     public void connect(WifiP2pConfig config) {
 
-        config.groupOwnerIntent = 15;
+            config.groupOwnerIntent = 15;
 
-        Snackbar snackbar = Snackbar
-                .make(coordinatorLayout, "Opening Socket Server", Snackbar.LENGTH_LONG);
-        snackbar.show();
+            Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, "Opening Socket Server", Snackbar.LENGTH_LONG);
+            snackbar.show();
 
-        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
-            @Override
-            public void onSuccess() {
-                search.setVisibility(View.GONE);
-                Snackbar snackbar = Snackbar
-                        .make(coordinatorLayout, "Connected Successful", Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
+                @Override
+                public void onSuccess() {
+                    search.setVisibility(View.GONE);
+                    Snackbar snackbar = Snackbar
+                            .make(coordinatorLayout, "Connected Successful", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
 
-            @Override
-            public void onFailure(int reason) {
-                Toast.makeText(SyncActivity.this, "Connect failed. Retry.",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(int reason) {
+                    Toast.makeText(SyncActivity.this, "Connect failed. Retry.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
  }
 
  @Override

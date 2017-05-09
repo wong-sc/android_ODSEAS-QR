@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.DataInputStream;
@@ -24,6 +25,7 @@ public class FileTransferService extends IntentService {
     public static final String COURSE_CODE = "course_id";
     SyncBroadCast syncBroadCast;
     IntentFilter intentFilter;
+    SharedPreferences preferences;
 
     public FileTransferService(String name) {
         super(name);
@@ -42,6 +44,8 @@ public class FileTransferService extends IntentService {
         intentFilter = new IntentFilter("com.odseasqr.android.SYNC");
         registerReceiver(syncBroadCast, intentFilter);
         String result = intent.getExtras().getString(EXTRAS_FILE_PATH);
+        String course_code = intent.getExtras().getString(COURSE_CODE);
+        String result_key = course_code + "@"  + result;
         String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
         int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
         Socket socket;
@@ -56,9 +60,9 @@ public class FileTransferService extends IntentService {
                 Log.d(SyncActivity.TAG, "Addr: " + host);
                 socket = new Socket();
 
-                Log.d(SyncActivity.TAG, result);
+                Log.d(SyncActivity.TAG, result_key);
 
-                if (result != null) {
+                if (result_key != null) {
 
                     try {
                         Log.d(SyncActivity.TAG, "Opening client socket - ");
@@ -66,7 +70,7 @@ public class FileTransferService extends IntentService {
                         socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
                         Log.d(SyncActivity.TAG, "Client socket - " + socket.isConnected());
                         stream = new DataOutputStream(socket.getOutputStream());
-                        byte[] info = result.getBytes("UTF-8");
+                        byte[] info = result_key.getBytes("UTF-8");
                         stream.writeInt(info.length);
                         stream.write(info);
 
@@ -78,13 +82,14 @@ public class FileTransferService extends IntentService {
                         String str=new String(data,"UTF-8");
                         Log.d(SyncActivity.TAG, "Message from server: " + str);
 
-                        String code = str.substring(0,7);
-                        Log.d("course_id", code);
+                        String[] code = str.split("@", 2);
+                        Log.d("course_id", code[0]);
+                        Log.d("result", code[1]);
 
                         if(str.length() != 0){
                             Intent intents = new Intent("com.odseasqr.android.SYNC");
                             intents.putExtra("status", "Sync");
-                            intents.putExtra("result", str);
+                            intents.putExtra("result", code[1]);
                             sendBroadcast(intents);
                         }
 
