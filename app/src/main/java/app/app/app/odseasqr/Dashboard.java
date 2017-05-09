@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -73,6 +74,7 @@ public class Dashboard extends AppCompatActivity
     HashMap<Integer, String> params = new HashMap<Integer, String>();
     HashMap<Integer, String> params_name = new HashMap<Integer, String>();
     public static final String POSITION = "position";
+    int[] itemIDs;
 
     private Spinner spinner;
 
@@ -83,6 +85,7 @@ public class Dashboard extends AppCompatActivity
     ProgressDialog loading;
     NavigationView navigationView;
     private SwipeRefreshLayout swipeContainer;
+    Menu menu;
 
     Button btnNext, btnStop;
 //    TextView username;
@@ -108,10 +111,6 @@ public class Dashboard extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-//        staff_id = preferences.getString("staff_id","Unknown");
-//        TextView username = (TextView) findViewById(R.id.username);
-//        username.setText(staff_id);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -142,6 +141,10 @@ public class Dashboard extends AppCompatActivity
             @Override
             public void onRefresh() {
                 getOfflineData(Config.GET_OFFLINE_DATA);
+                if(itemIDs.length != 0)
+                    for (int itemID : itemIDs) {
+                        menu.removeItem(itemID);
+                    }
                 init();
             }
         });
@@ -155,6 +158,7 @@ public class Dashboard extends AppCompatActivity
         }
 
         btnNext.setOnClickListener(this);
+        btnStop.setOnClickListener(this);
     }
 
     private void init(){
@@ -354,9 +358,13 @@ public class Dashboard extends AppCompatActivity
     private void getSubjectData(JSONArray j){
         //Traversing through all the items in the json array
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navView.getMenu();
+        menu = navView.getMenu();
+//        SubMenu subMenu = menu.addSubMenu(R.id.group_course, 100, 500, "View Attendance");
         courseid.clear();
         subjectData.clear();
+        params_name.clear();
+        params.clear();
+        itemIDs = new int[j.length()];
         for(int i=0;i<j.length();i++){
             try {
                 //Getting json object
@@ -364,6 +372,7 @@ public class Dashboard extends AppCompatActivity
                 //Adding the name of the student to array list
                 subjectData.add(json.getString("course_id") + " " + json.getString("course_name"));
                 int itemID = Integer.valueOf(json.getString("course_id").substring(3));
+                itemIDs[i] = itemID;
                 menu.add(R.id.group_2, itemID, 500,json.getString("course_id") + " " + json.getString("course_name"));
                 params.put(itemID, json.getString("course_id"));
                 params_name.put(itemID, json.getString("course_id") + " " + json.getString("course_name"));
@@ -387,6 +396,7 @@ public class Dashboard extends AppCompatActivity
                 JSONObject json = j.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
                 Log.d("person: ", invigilator + "Sesion:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
+
                 if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
                         && json.getString("invigilator_position").equals(Config.CHIEF)){
                     btnStop.setVisibility(View.VISIBLE);
@@ -395,6 +405,7 @@ public class Dashboard extends AppCompatActivity
                     editor.apply();
                     Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -405,6 +416,9 @@ public class Dashboard extends AppCompatActivity
         tvVenue.setText(getVenue(position));
         tvDate.setText(getExamDate(position));
         tvTime.setText(getExamTime(position));
+        editor.putString(Config.COURSE_ID, getSubjectCode(position));
+        editor.commit();
+        editor.apply();
     }
 
     private void processOfflineDetails(int position){
@@ -421,9 +435,6 @@ public class Dashboard extends AppCompatActivity
                         && json.getString("invigilator_position").equals(Config.CHIEF)){
                     btnStop.setVisibility(View.VISIBLE);
                     editor.putString(POSITION, json.getString("invigilator_position"));
-                    editor.putString(Config.COURSE_ID, getSubjectCode(position));
-                    editor.commit();
-                    editor.apply();
                     Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
@@ -436,6 +447,9 @@ public class Dashboard extends AppCompatActivity
         tvVenue.setText(getVenue(position));
         tvDate.setText(getExamDate(position));
         tvTime.setText(getExamTime(position));
+        editor.putString(Config.COURSE_ID, getSubjectCode(position));
+        editor.commit();
+        editor.apply();
     }
 
     private String getSubjectCode (int position){
@@ -542,17 +556,26 @@ public class Dashboard extends AppCompatActivity
     {
         Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
 
+        if(v == findViewById(R.id.btnStop)){
+            if(mydb.check_course_status(passData))
+                ComfirmMessage("Are you sure you want to finalise the list?", "Once it is finalised, there will be no amendment can be done");
+            else
+                showMessage("Subject Finalised", "Subject finalised by CHIEF Invigilator, no amendment can be done in this moment");
+            return;
+        }
 
-        if (v == findViewById(R.id.buttonNext) && is_time_available()){
-            Intent intent = new Intent(this, TakeAttendance.class);
-            intent.putExtra("passDataValue",passData);
-            intent.putExtra("passSubjectInfo",subjectInfo);
-            intent.putExtra("studentnumber",student_number);
-            startActivity(intent);
-        } else if(v == findViewById(R.id.btnStop)){
-            ComfirmMessage("Are you sure you want to finalise the list?", "This session will only open during 30 minutes before and close after 30 minutes of the examination");
+        if(mydb.check_course_status(passData)) {
+            if (v == findViewById(R.id.buttonNext) && is_time_available()) {
+                Intent intent = new Intent(this, TakeAttendance.class);
+                intent.putExtra("passDataValue", passData);
+                intent.putExtra("passSubjectInfo", subjectInfo);
+                intent.putExtra("studentnumber", student_number);
+                startActivity(intent);
+            } else {
+                showMessage("Session Close", "This session will only open during 30 minutes before and close after 30 minutes of the examination");
+            }
         } else {
-            showMessage("Session Close", "This session will only open during 30 minutes before and close after 30 minutes of the examination");
+            showMessage("Session Close", "This session has been closed by CHIEF Invigilator");
         }
     }
 
@@ -577,7 +600,9 @@ public class Dashboard extends AppCompatActivity
                 .setPositiveButton("Finalise", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mydb.StopCourse(passData);
+                        stopSubject();
+                        if(!isNetworkStatusAvailable(Dashboard.this))
+                            mydb.StopCourse(passData);
                     }
                 })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
@@ -587,6 +612,42 @@ public class Dashboard extends AppCompatActivity
             }
         });
         Adialog.show();
+    }
+
+    public void stopSubject(){
+
+        String stop_course = Config.BASE_URL + Config.STOP_COURSE;
+        //Creating a string request
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, stop_course,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("testing", response + " haha");
+
+                        if(response.equals("success"))
+                            mydb.StopCourse(passData);
+                        else
+                            showMessage("Fail to stop course", "Error has encountered from server");
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showMessage("Fail to stop course", error.toString());
+                    }
+                }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("course_id",passData);
+                return params;
+            }
+        };
+        //Creating a request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+
     }
 
     //Logout function
@@ -713,6 +774,11 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
+        if(itemIDs != null)
+        if(itemIDs.length != 0)
+            for (int itemID : itemIDs) {
+                menu.removeItem(itemID);
+            }
         init();
     }
 

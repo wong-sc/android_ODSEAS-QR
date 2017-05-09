@@ -3,6 +3,7 @@ package app.app.app.odseasqr;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -31,6 +32,8 @@ public class SyncService extends IntentService {
     OfflineDatabase mydb;
     RequestQueue requestQueue;
     SharedPreferences preferences;
+    SyncBroadCast syncBroadCast;
+    IntentFilter intentFilter;
 
     public SyncService() {
         super(LOG_TAG);
@@ -40,11 +43,15 @@ public class SyncService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
 
         String workingIntent = intent != null ? intent.getStringExtra(Config.WIFI_STATUS) : null;
+        syncBroadCast = new SyncBroadCast();
+        intentFilter = new IntentFilter("com.odseasqr.android.SYNC");
+        registerReceiver(syncBroadCast, intentFilter);
         ArrayList<JSONObject> courseData = new ArrayList<>();
         mydb = new OfflineDatabase(getApplicationContext());
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 //        if(workingIntent.equals("Wifi enabled") || workingIntent.equals("Mobile data enabled")) {
             Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
+        Log.d("course_id", preferences.getString(Config.COURSE_ID, "null"));
 
             if (cursor.moveToFirst()) {
                 Log.d("Result50 sync--", DatabaseUtils.dumpCursorToString(cursor));
@@ -96,8 +103,18 @@ public class SyncService extends IntentService {
                             JSONArray jsonArray = new JSONArray(result);
                             for (int i = 0; i < jsonArray.length(); i++){
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                if(jsonObject.getString("status").equals("success"))
+                                if(jsonObject.getString("status").equals("success")) {
                                     mydb.markedSyncRecord(jsonObject);
+                                    if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
+                                        Intent intent = new Intent("com.odseasqr.android.SYNC");
+                                        intent.putExtra("status", "Start");
+                                        sendBroadcast(intent);
+                                    } else {
+                                        Intent intent = new Intent("com.odseasqr.android.SYNC");
+                                        intent.putExtra("status", "Finished");
+                                        sendBroadcast(intent);
+                                    }
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -109,6 +126,15 @@ public class SyncService extends IntentService {
                     public void onErrorResponse(final VolleyError volleyError) {
                         Log.e("Volley-studentError", volleyError.getLocalizedMessage() + " / "
                                                 + volleyError.getMessage() + " / " + volleyError.toString());
+                        if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
+                            Intent intent = new Intent("com.odseasqr.android.SYNC");
+                            intent.putExtra("status", "Start");
+                            sendBroadcast(intent);
+                        } else {
+                            Intent intent = new Intent("com.odseasqr.android.SYNC");
+                            intent.putExtra("status", "Finished");
+                            sendBroadcast(intent);
+                        }
                     }
                 }
             ){
@@ -121,4 +147,10 @@ public class SyncService extends IntentService {
         };
                 requestQueue.add(jsonObjectRequest);
             }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(syncBroadCast);
+        super.onDestroy();
+    }
 }

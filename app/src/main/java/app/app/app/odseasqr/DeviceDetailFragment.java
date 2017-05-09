@@ -1,8 +1,10 @@
 package app.app.app.odseasqr;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,6 +16,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,11 +30,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 
 public class DeviceDetailFragment extends Fragment implements WifiP2pManager.ConnectionInfoListener {
@@ -43,16 +50,26 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     OfflineDatabase mydb;
     ArrayList<JSONObject> courseData = new ArrayList<>();
     SharedPreferences preferences;
+    ProgressDialog loading;
+    ServerSocket serverSocket;
+    Socket mSocket;
+    String clientIP;
+    int clientPort;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        odseasqr od_seas = (odseasqr) getActivity().getApplicationContext();
+        od_seas.deviceDetailFragment = this;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mydb = new OfflineDatabase(getActivity());
+        loading = new ProgressDialog(getActivity());
+        loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loading.setCancelable(true);
         mContentView = inflater.inflate(R.layout.device_detail, null);
         mContentView.findViewById(R.id.btn_connect).setOnClickListener(new View.OnClickListener() {
 
@@ -86,6 +103,9 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     @Override
                     public void onClick(View v) {
                         Log.d(SyncActivity.TAG, "Enter onclick");
+                        loading.setMessage("Validating course information...");
+                        loading.show();
+//                        syncClient();
                         getUnsyncData();
                     }
                 });
@@ -93,6 +113,11 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
 
         return mContentView;
+    }
+
+    public void successValidated(){
+        loading.setMessage("Getting Unsynced Data...");
+        getUnsyncData();
     }
 
     /* search in the database to get unsynced data (where status = 0), status = 0, mean that the data
@@ -131,11 +156,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         sendToChief(courseData.toString());
     }
 
-    private void getSyncedResult() {
-        Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
+    public void getSyncedResult() {
+        Cursor cursor = mydb.getAttendance(preferences.getString(Config.COURSE_ID, "null"));
+        courseData.clear();
         Log.d(SyncActivity.TAG, DatabaseUtils.dumpCursorToString(cursor));
-        if(cursor == null)
+        if(cursor == null) {
             Toast.makeText(getActivity(), "All data up to date, No Sync Require", Toast.LENGTH_SHORT).show();
+            loading.dismiss();
+        }
         else if (cursor.moveToFirst()) {
             do {
                 JSONObject jsonObject = new JSONObject();
@@ -161,58 +189,47 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 }
             } while (cursor.moveToNext());
         }
-        Toast.makeText(getActivity(), courseData.size()+"", Toast.LENGTH_SHORT).show();
-        sendToChief(courseData.toString());
+//        Toast.makeText(getActivity(), courseData.size()+"", Toast.LENGTH_SHORT).show();
+//        new ServerAsyncTask(getActivity()).execute();
+//        syncClient();
+    }
+
+    public void syncClient(){
+        Log.d(SyncActivity.TAG, "Enter send to chief " + info.groupOwnerAddress.getHostAddress());
+        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
+        serviceIntent.setAction(FileTransferService.ACTION_SYNC_FILE);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, preferences.getString(Config.COURSE_ID, "null"));
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                info.groupOwnerAddress.getHostAddress());
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+        getActivity().startService(serviceIntent);
+    }
+
+    private void sendToChief(String result){
+        loading.setMessage("Sending to chief...");
+        Log.d(SyncActivity.TAG, "Enter send to chief " + info.groupOwnerAddress.getHostAddress());
+        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
+        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, result);
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                info.groupOwnerAddress.getHostAddress());
+        serviceIntent.putExtra(FileTransferService.COURSE_CODE, preferences.getString(Config.COURSE_ID, "null"));
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+        getActivity().startService(serviceIntent);
     }
 
     public void sync(){
 
-        if(preferences.getString(Config.WIFI_STATUS, "").equals("Wifi enabled") ||
-                preferences.getString(Config.WIFI_STATUS, "").equals("Mobile data enabled")){
-            Intent startsync = new Intent(getActivity(), SyncService.class);
-            getActivity().startService(startsync);
+        if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
+                Intent startsync = new Intent(getActivity(), SyncService.class);
+                getActivity().startService(startsync);
         }
+
     }
 
-    private void sendToChief(String result){
-        Log.d(SyncActivity.TAG, "Enter send to chief");
-        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
-        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, result);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-        getActivity().startService(serviceIntent);
+    public void Finisehd(){
+        Toast.makeText(getActivity(), "Finished", Toast.LENGTH_SHORT).show();
     }
-
-    private void syncClient(String result){
-        Log.d(SyncActivity.TAG, "Enter send to chief");
-        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
-        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, result);
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-        getActivity().startService(serviceIntent);
-    }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//        // User has picked an image. Transfer it to group owner i.e peer using
-//        // FileTransferService.
-//        Uri uri = data.getData();
-//        TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
-//        statusText.setText("Sending: " + uri);
-//        Log.d(SyncActivity.TAG, "Intent----------- " + uri);
-//        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
-//        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-//        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
-//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-//                info.groupOwnerAddress.getHostAddress());
-//        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-//        getActivity().startService(serviceIntent);
-//    }
 
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
@@ -223,25 +240,16 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         this.info = info;
         this.getView().setVisibility(View.VISIBLE);
 
-        // The owner IP is now known.
-//        TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
-//        String owner = getResources().getString(R.string.group_owner_text) + ((info.isGroupOwner) ? "Yes" : "No");
-//        view.setText(owner);
+        Log.d(SyncActivity.TAG, info.toString());
 
-        // InetAddress from WifiP2pInfo struct.
-//        view = (TextView) mContentView.findViewById(R.id.device_info);
-//        String group_owner_ip = "Group Owner IP - " + info.groupOwnerAddress.getHostAddress();
-//        view.setText(group_owner_ip);
-
-        // After the group negotiation, we assign the group owner as the file
-        // server. The file server is single threaded, single connection server
-        // socket.
         if (info.groupFormed && info.isGroupOwner) {
             new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text))
                     .execute();
+//            new validateCourse(getActivity()).execute();
         } else if (info.groupFormed) {
             // The other device acts as the client. In this case, we enable the
             // get file button.
+//            clientIP = info.groupOwnerAddress.getHostAddress();
             mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
             ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources()
                     .getString(R.string.client_text));
@@ -249,6 +257,13 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
         ((DeviceListsFragment.DeviceActionListener) getActivity()).receiveconnection();
+    }
+
+    public void start(){
+        Toast.makeText(getActivity(), "Start", Toast.LENGTH_LONG).show();
+        if(info.isGroupOwner){
+            getSyncedResult();
+        }
     }
 
     /**
@@ -259,10 +274,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     public void showDetails(WifiP2pDevice device) {
         this.device = device;
         this.getView().setVisibility(View.VISIBLE);
-//        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
-//        view.setText(device.deviceAddress);
-//        view = (TextView) mContentView.findViewById(R.id.device_info);
-//        view.setText(device.toString());
+        Log.d(SyncActivity.TAG, "device: " + device.toString());
     }
 
     /**
@@ -270,16 +282,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
      */
     public void resetViews() {
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.VISIBLE);
-//        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
-//        view.setText("");
-//        view = (TextView) mContentView.findViewById(R.id.device_info);
-//        view.setText("");
-//        view = (TextView) mContentView.findViewById(R.id.group_owner);
-//        view.setText("");
-//        view = (TextView) mContentView.findViewById(R.id.status_text);
-//        view.setText("");
         mContentView.findViewById(R.id.btn_start_client).setVisibility(View.GONE);
         this.getView().setVisibility(View.GONE);
+    }
+
+    public void renewDatabase(String result){
+        String status = mydb.SyncEnrollHandler(result);
+        Toast.makeText(getActivity(), "Success" + status, Toast.LENGTH_SHORT).show();
+        loading.dismiss();
     }
 
     /**
@@ -304,31 +314,84 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
             ServerSocket serverSocket = null;
             Socket client = null;
             DataInputStream inputstream = null;
+            DataOutputStream outputStream = null;
 
-            try {
-                serverSocket = new ServerSocket(8988);
-                client = serverSocket.accept();
-                inputstream = new DataInputStream(client.getInputStream());
-                String str = inputstream.readUTF();
-                serverSocket.close();
-                return str;
-            } catch (IOException e) {
-                Log.e(SyncActivity.TAG, e.getMessage());
-                return null;
-            }
+//            if (info.groupFormed && info.isGroupOwner) {
+
+                try {
+                    serverSocket = new ServerSocket(8988);
+                    client = serverSocket.accept();
+//                    clientIP = (((InetSocketAddress) client.getRemoteSocketAddress()).getAddress()).toString().replace("/","");
+                    clientIP = client.getInetAddress().toString().replace("/","");
+                    clientPort = client.getPort();
+                    Log.d("clientIP2: ", client.getRemoteSocketAddress().toString());
+                    Log.d("clientIP3: ", ""+client.getPort());
+                    Log.d("clientIP", clientIP + "");
+                    inputstream = new DataInputStream(client.getInputStream());
+                    String str = inputstream.readUTF();
+
+
+                    String status = mydb.insertDataFrom_(str);
+                    if(status.equals("fail")){
+                        showMessage("Wrong Course", "Please select the same course with CHIEF Invigilator");
+                    } else {
+                        getSyncedResult();
+                        outputStream = new DataOutputStream(client.getOutputStream());
+                        byte[] data = courseData.toString().getBytes("UTF-8");
+                        outputStream.writeInt(data.length);
+                        outputStream.write(data);
+                    }
+//                    if(!preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED))
+//                        sync();
+
+
+
+                    serverSocket.close();
+                    return str;
+                } catch (IOException e) {
+                    Log.e(SyncActivity.TAG, e.getMessage());
+                    return null;
+                }
+
+//            }  else {
+//                try {
+//
+//                    serverSocket = new ServerSocket(8988);
+//
+//                    Socket ss= serverSocket.accept();
+//                    OutputStream os= ss.getOutputStream();
+//
+//                    return os.toString();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    return  null;
+//                }
+//            }
         }
+
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
+
                 Log.d(SyncActivity.TAG, "Result: "+ result);
-                String status = mydb.insertDataFrom_(result);
-                if(status.equals("success update")){
-                    Toast.makeText(context.getApplicationContext(), "Successfully update data", Toast.LENGTH_SHORT).show();
-                    sync();
-                } else {
-                    Toast.makeText(context.getApplicationContext(), "Error occur", Toast.LENGTH_SHORT).show();
-                }
+                loading.dismiss();
+//                String status = mydb.insertDataFrom_(result);
+//                loading.dismiss();
+//
+//                if(status.equals("success update") && preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)){
+//                    Toast.makeText(context.getApplicationContext(), "Successfully update data", Toast.LENGTH_SHORT).show();
+//                    sync();
+//                }
+//
+//                if(!preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
+//                    Finisehd();
+//                    loading.dismiss();
+//                }
+//
+//                Toast.makeText(context.getApplicationContext(), "Successfully accept data", Toast.LENGTH_SHORT).show();
+
             }
+//            else getSyncedResult();
 
         }
         @Override
@@ -336,6 +399,175 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
             statusText.setText("Opening a server socket");
         }
     }
+
+    public class validateCourse extends AsyncTask<Void, Void, String> {
+
+        public validateCourse(Context context) {
+
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            ServerSocket serverSocket = null;
+            Socket client = null;
+            DataInputStream inputstream = null;
+            DataOutputStream outputStream = null;
+            String status = null;
+
+//            if (info.groupFormed && info.isGroupOwner) {
+
+            try {
+                serverSocket = new ServerSocket(8988);
+                client = serverSocket.accept();
+//                    clientIP = (((InetSocketAddress) client.getRemoteSocketAddress()).getAddress()).toString().replace("/","");
+                clientIP = client.getInetAddress().toString().replace("/","");
+                clientPort = client.getPort();
+                Log.d("clientIP2: ", client.getRemoteSocketAddress().toString());
+                Log.d("clientIP3: ", ""+client.getPort());
+                Log.d("clientIP", clientIP + "");
+                inputstream = new DataInputStream(client.getInputStream());
+                String str = inputstream.readUTF();
+                Log.d(SyncActivity.TAG, "h"+str+"h");
+
+                if(str.equals(preferences.getString(Config.COURSE_ID, ""))){
+                    status = "true";
+                    outputStream = new DataOutputStream(client.getOutputStream());
+                    byte[] data = status.getBytes("UTF-8");
+                    outputStream.writeInt(data.length);
+                    outputStream.write(data);
+                } else
+                    status = "false";
+
+                serverSocket.close();
+                return status;
+            } catch (IOException e) {
+                Log.e(SyncActivity.TAG, e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                if(result.equals("false")){
+                    loading.dismiss();
+                    showMessage("Wrong Course", "Please select the same course with CHIEF Invigilator");
+                } else {
+                    loading.setMessage("Getting Unsync data...");
+                    new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text));
+                }
+            }
+        }
+    }
+
+    public void showMessage(String title, String message) {
+        AlertDialog.Builder Adialog = new AlertDialog.Builder(getActivity());
+        Adialog.setTitle(title);
+        Adialog.setMessage(message).setCancelable(false)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = Adialog.create();
+        Adialog.show();
+    }
+
+    public class PingServerAsyncTask extends AsyncTask<Void, Void, String> {
+
+
+        public PingServerAsyncTask(Context context, WifiP2pInfo m) {
+
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+
+            String host = info.groupOwnerAddress.getHostAddress();
+            Socket socket = new Socket();
+            int port = 8988;
+            int SOCKET_TIMEOUT = 5000;
+            try {
+                Log.d(SyncActivity.TAG, "Opening client socket - ");
+                socket.bind(null);
+
+                socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
+//                Toast.makeText(context, "server:"+host + "me:"+socket.getLocalAddress(), Toast.LENGTH_LONG).show();
+                Log.d(SyncActivity.TAG, "Client socket - " + socket.isConnected());
+
+            } catch (Exception e) {
+                Log.e(SyncActivity.TAG, e.getMessage());
+
+            } finally {
+                if (socket != null) {
+                    if (socket.isConnected()) {
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            // Give up
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+//        public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+//            /**
+//             * @param context
+//             */
+//
+//            DataInputStream inputstream = null;
+//
+//            public FileServerAsyncTask(Context context) {
+////intialize
+//            }
+//
+//            @Override
+//            protected String doInBackground(Void... params) {
+//                try {
+//                    ServerSocket serverSocket = new ServerSocket(8988);
+//                    Log.d(SyncActivity.TAG, "Server: Socket opened");
+//                    Socket client = serverSocket.accept();
+//                    Log.d(SyncActivity.TAG, "Server: connection done");
+////                    final File f = new File(Environment.getExternalStorageDirectory() + "/"
+////                            + context.getPackageName() + "/wifip2pshared/" + System.currentTimeMillis()
+////                            + ".jpg");
+////
+////                    File dirs = new File(f.getParent());
+////                    if (!dirs.exists())
+////                        dirs.mkdirs();
+////                    f.createNewFile();
+////                    Log.d(SyncActivity.TAG, "server: copying files " + f.toString());
+////                    InputStream inputstream = client.getInputStream();
+////                    copyFile(inputstream, new FileOutputStream(f));
+//
+//                    inputstream = new DataInputStream(client.getInputStream());
+//                    String str = inputstream.readUTF();
+//
+//                    serverSocket.close();
+//                    return str;
+//                } catch (IOException e) {
+//                    Log.e(SyncActivity.TAG, e.getMessage());
+//                    return null;
+//                }
+//            }
+//
+//            /*
+//             * (non-Javadoc)
+//             * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+//             */
+//            @Override
+//            protected void onPostExecute(String result) {
+//                //Do stuff with data..
+//                Log.d("result---", result + "result");
+//            }
+//
+//    }
 
     public static boolean copyFile(InputStream inputStream, OutputStream out) {
         byte buf[] = new byte[1024];

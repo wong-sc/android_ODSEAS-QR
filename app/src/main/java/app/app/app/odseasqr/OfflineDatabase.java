@@ -2,6 +2,7 @@ package app.app.app.odseasqr;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
@@ -93,6 +94,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     private static final String STYLE_NAME = "style_name";
 
     Context context;
+    SharedPreferences sharedPreferences;
 
     public OfflineDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -331,6 +333,43 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
+    public String SyncEnrollHandler(String data){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_ENROLL_HANDLER, null,null);
+        db.beginTransaction();
+
+        try {
+            JSONArray jsonArray = new JSONArray(data);
+
+            for(int i = 0 ; i < jsonArray.length() ; i++) {
+                JSONObject result = jsonArray.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(ENROLL_HANDLER_ID, result.getString("enroll_handler_id"));
+                values.put(STUDENT_ID, result.getString("student_id"));
+                values.put(COURSE_ID, result.getString("course_id"));
+                values.put(ISCHECKED, result.getString("ischecked"));
+                values.put(STATUS, result.getString("status"));
+                values.put(CHECKIN_TIME, result.getString("checkin_time"));
+                values.put(CHECKOUT_TIME, result.getString("checkout_time"));
+                values.put(CHECKIN_STYLE_ID, result.getString("checkin_style_id"));
+                values.put(CHECKOUT_STYLE_ID, result.getString("checkout_style_id"));
+                values.put(CREATED_DATE, result.getString("created_date"));
+                values.put(UPDATED_DATE, result.getString("updated_date"));
+                // insert row
+                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
+                Log.d("enroll_handler id = ", tag_id + " ");
+            }
+            db.setTransactionSuccessful();
+        } catch (JSONException error){
+            Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
+        }
+        db.close();
+        return "success";
+    }
+
     public void insertStaff(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -473,12 +512,18 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
     public String insertDataFrom_ (String result){
         SQLiteDatabase db = this.getReadableDatabase();
+        sharedPreferences = context.getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         db.beginTransaction();
         try {
             JSONArray jsonArray = new JSONArray(result);
             for(int i = 0 ; i < jsonArray.length() ; i++){
                 Log.d(SyncActivity.TAG, jsonArray.length() + "");
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                if(!jsonObject.getString(COURSE_ID).equals(sharedPreferences.getString(Config.COURSE_ID, "null"))){
+                    return "fail";
+                }
+
                 ContentValues values = new ContentValues();
                 values.put(CHECKIN_TIME, jsonObject.getString(CHECKIN_TIME));
                 values.put(CHECKOUT_TIME, jsonObject.getString(CHECKOUT_TIME));
@@ -1093,9 +1138,18 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         /*query to select the checkin time of specific student*/
-        String CHECK_UNSYNC =
+        String CHECK_STATUS =
                 String.format("SELECT %s FROM %s WHERE %s = '%s'",
                         STATUS,TABLE_COURSE, COURSE_ID, course_id);
+
+        Cursor cursor = db.rawQuery(CHECK_STATUS, null);
+
+        if((cursor != null) && (cursor.getCount() > 0)){
+            cursor.moveToNext();
+            if(cursor.getString(0).equals("0"))
+                status = true;
+            else status = false;
+        }
 
         return status;
     }
@@ -1105,12 +1159,26 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         /*query to select the checkin time of specific student*/
         String CHECK_UNSYNC =
-                String.format("SELECT * FROM %s WHERE %s = %s OR %s = %s AND %s = '%s'",
+                String.format("SELECT * FROM %s WHERE (%s = %s OR %s = %s) AND %s = '%s'",
                         TABLE_ENROLL_HANDLER,
                         STATUS, 3, STATUS, 4, COURSE_ID, course_id);
 
         /*cursor to search in the database*/
         return db.rawQuery(CHECK_UNSYNC, null);
+    }
+
+    public Cursor getAttendance(String course_id){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        /*query to select the checkin time of specific student*/
+        String GET_ATTENDANCE =
+                String.format("SELECT * FROM %s",
+                        TABLE_ENROLL_HANDLER);
+
+        /*cursor to search in the database*/
+        return db.rawQuery(GET_ATTENDANCE, null);
+
     }
 
     public ArrayList<String> check_attendance(SQLiteDatabase db, String student_id, String course_id){

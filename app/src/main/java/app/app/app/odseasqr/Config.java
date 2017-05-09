@@ -21,6 +21,7 @@ public class Config {
     public static final String GET_INEXAMINATION_DATA = "ODSEAS-QR/student/getInExaminationData.php";
     public static final String GET_OFFLINE_DATA = "ODSEAS-QR/student/getOfflineData.php";
     public static final String SYNC = "ODSEAS-QR/gcm_test/v1/sync";
+    public static final String STOP_COURSE = "ODSEAS-QR/staff/CloseSubject.php";
 
     public static final String WIFI_STATUS = "Wifi_Status";
     public static final String CHIEF = "CHIEF";

@@ -20,7 +20,9 @@
             android:orderInCategory="500"
             android:title="View Attendance" />
     <group android:id="@+id/group_course"/>
+
     </group>
+    <!--</group>-->
 
     <group
         android:id="@+id/group_3"
