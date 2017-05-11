@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group
-        android:id="@+id/group_1"
-        android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_home"
-            android:orderInCategory="100"
-            android:title="Home" />
-    </group>
+    <!--<group-->
+        <!--android:id="@+id/group_1"-->
+        <!--android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/nav_home"-->
+            <!--android:icon="@drawable/ic_menu_home"-->
+            <!--android:orderInCategory="100"-->
+            <!--android:title="Home" />-->
+    <!--</group>-->
 
     <group
         android:id="@+id/group_2"
@@ -31,7 +31,7 @@
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_logout"
             android:orderInCategory="1000"
-            android:title="Log Out" />
+            android:title="Logout" />
     </group>
 
 </menu>

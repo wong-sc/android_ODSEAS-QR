@@ -34,7 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:paddingLeft="5dp"
-                    android:text="Course Name:"
+                    android:text="Course Selected:"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textSize="20sp" />
 

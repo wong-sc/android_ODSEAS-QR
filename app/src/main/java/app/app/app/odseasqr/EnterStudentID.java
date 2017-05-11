@@ -37,7 +37,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
     public static final String ARG_PAGE = "ARF_PAGE";
     public String dataStringStudentID;
-    public String dataStringSubjectCode;
+    public String dataStringSubjectCode, subjectName;
     public String staffID, position;
     SharedPreferences preferences;
     OfflineDatabase mydb;
@@ -71,8 +71,14 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
         buttonComfirm = (Button)v.findViewById(R.id.buttonConfirm);
         buttonComfirm.setOnClickListener(this);
         buttonComfirm.setClickable(false);
+
+        TextView subjectname = (TextView) v.findViewById(R.id.textViewSubjectName);
+
         Intent i = getActivity().getIntent();
         dataStringSubjectCode = i.getStringExtra("passDataValue");
+        subjectName = i.getStringExtra("passSubjectInfo");
+        subjectname.setText(subjectName);
+
         mydb = new OfflineDatabase(getContext());
         requestQueue = Volley.newRequestQueue(getActivity());
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
@@ -103,7 +109,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 processStudentSubject(studentSubject);
             }
         } else {
-            showMessage("Expired course", "You have exceed 30minute after exam.. GG");
+            showMessage("Course Expired", "You have exceed 30 minutes after exam.");
         }
     }
 
@@ -218,7 +224,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
             }
             if (!foundStudent) {
                 Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
-                showMessage("Alert", "Student does not register for this subject.");
+                showMessage("Alert", "Student does not register for this course.");
                 buttonComfirm.setClickable(false);
             }
         } catch (JSONException e) {

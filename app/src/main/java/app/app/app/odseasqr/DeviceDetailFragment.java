@@ -364,7 +364,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                                         sync();
                                         h.post(new Runnable() {
                                             public void run() {
-                                                loading.setMessage("Sending " + courseData.size() + " record...");
+                                                loading.setMessage("Receiving record...");
                                                 loading.show();
                                             }
                                         });
@@ -407,7 +407,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                         h.post(new Runnable() {
                             public void run() {
-                                showMessage("Course Mismatch: "+ key_code[0], "Sync with wrong CHEIF INVIGILATOR" + preferences.getString(Config.COURSE_ID, "null"));
+                                showMessage("Course Mismatch: "+ key_code[0], "Sync with wrong CHIEF INVIGILATOR" + preferences.getString(Config.COURSE_ID, "null"));
                             }
                         });
                     }

@@ -33,9 +33,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="app.app.app.odseasqr.Register"
-            android:label="Register" />
+        <!--<activity-->
+            <!--android:name="app.app.app.odseasqr.Register"-->
+            <!--android:label="Register" />-->
         <activity
             android:name="app.app.app.odseasqr.TakeAttendance"
             android:label="Take Attendance" >

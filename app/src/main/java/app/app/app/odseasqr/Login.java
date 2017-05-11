@@ -38,7 +38,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextStaffID;
     private EditText editTextPassword;
     private Button buttonLogin;
-    private TextView registerLink;
+//    private TextView registerLink;
 
     private String staff_id;
     private String staff_password;
@@ -54,11 +54,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
-        registerLink = (TextView)findViewById(R.id.tvRegisterLink);
-        registerLink.setPaintFlags( registerLink.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+//        registerLink = (TextView)findViewById(R.id.tvRegisterLink);
+//        registerLink.setPaintFlags( registerLink.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
 
         buttonLogin.setOnClickListener(this);
-        registerLink.setOnClickListener(this);
+//        registerLink.setOnClickListener(this);
     }
 
     @Override
@@ -158,8 +158,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             userLogin();
             //startActivity(new Intent(this, Login.class));
         }
-        if(v == registerLink){
-            startActivity(new Intent(this, Register.class));
-        }
+//        if(v == registerLink){
+//            startActivity(new Intent(this, Register.class));
+//        }
     }
 }

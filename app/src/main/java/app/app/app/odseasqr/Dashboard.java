@@ -27,7 +27,9 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.HeaderViewListAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,6 +77,7 @@ public class Dashboard extends AppCompatActivity
     HashMap<Integer, String> params_name = new HashMap<Integer, String>();
     public static final String POSITION = "position";
     int[] itemIDs;
+    LinearLayout content_layout;
 
     private Spinner spinner;
 
@@ -86,6 +89,7 @@ public class Dashboard extends AppCompatActivity
     NavigationView navigationView;
     private SwipeRefreshLayout swipeContainer;
     Menu menu;
+    ProgressBar load;
 
     Button btnNext, btnStop;
 //    TextView username;
@@ -131,20 +135,24 @@ public class Dashboard extends AppCompatActivity
         tvDate = (TextView) findViewById(R.id.tvDate);
         tvTime = (TextView) findViewById(R.id.tvTime);
         card = (CardView) findViewById(R.id.card_view);
-        card.setVisibility(View.GONE);
+//        card.setVisibility(View.GONE);
         btnNext = (Button)findViewById(R.id.buttonNext);
         tvCourse = (TextView) findViewById(R.id.tvCourse);
         tvInvigilatorName = (TextView) findViewById(R.id.tvInvigilatorName);
         btnStop = (Button) findViewById(R.id.btnStop);
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        content_layout = (LinearLayout) findViewById(R.id.content);
+        content_layout.setVisibility(View.GONE);
+        load = (ProgressBar) findViewById(R.id.loading);
+
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getOfflineData(Config.GET_OFFLINE_DATA);
                 if(itemIDs.length != 0)
                     for (int itemID : itemIDs) {
                         menu.removeItem(itemID);
                     }
+                getOfflineData(Config.GET_OFFLINE_DATA);
                 init();
             }
         });
@@ -190,7 +198,7 @@ public class Dashboard extends AppCompatActivity
     public void promtDownloadData(String staff_id){
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("To runable during offline mode, it is encourage to download the content first into this application.");
+        alertDialogBuilder.setMessage("To runable during offline mode, it is encourage to download the content first into this application. Please enable your internet connection");
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
@@ -208,6 +216,8 @@ public class Dashboard extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
+                int pid = android.os.Process.myPid();
+                android.os.Process.killProcess(pid);
             }
         });
         alertDialogBuilder.show();
@@ -251,6 +261,7 @@ public class Dashboard extends AppCompatActivity
                             loading.dismiss();
                             editor.putBoolean("firstTimeLogin", false);
                             editor.commit();
+                            init();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -364,6 +375,11 @@ public class Dashboard extends AppCompatActivity
         subjectData.clear();
         params_name.clear();
         params.clear();
+        if(itemIDs != null)
+            if(itemIDs.length != 0)
+                for (int itemID : itemIDs) {
+                    menu.removeItem(itemID);
+                }
         itemIDs = new int[j.length()];
         for(int i=0;i<j.length();i++){
             try {
@@ -384,7 +400,7 @@ public class Dashboard extends AppCompatActivity
 
         //Setting adapter to show the items in the spinner
         spinner.setAdapter(new ArrayAdapter<String>(Dashboard.this, android.R.layout.simple_spinner_dropdown_item, subjectData));
-        card.setVisibility(View.VISIBLE);
+//        card.setVisibility(View.VISIBLE);
     }
 
     private void processDetails(JSONArray j,int position){
@@ -419,6 +435,8 @@ public class Dashboard extends AppCompatActivity
         editor.putString(Config.COURSE_ID, getSubjectCode(position));
         editor.commit();
         editor.apply();
+        content_layout.setVisibility(View.VISIBLE);
+        load.setVisibility(View.GONE);
     }
 
     private void processOfflineDetails(int position){
@@ -450,6 +468,8 @@ public class Dashboard extends AppCompatActivity
         editor.putString(Config.COURSE_ID, getSubjectCode(position));
         editor.commit();
         editor.apply();
+        content_layout.setVisibility(View.VISIBLE);
+        load.setVisibility(View.GONE);
     }
 
     private String getSubjectCode (int position){
@@ -523,6 +543,8 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         btnStop.setVisibility(View.GONE);
+        content_layout.setVisibility(View.GONE);
+        load.setVisibility(View.VISIBLE);
         editor.putString(POSITION, "null");
         editor.commit();
         editor.apply();
@@ -601,8 +623,7 @@ public class Dashboard extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         stopSubject();
-                        if(!isNetworkStatusAvailable(Dashboard.this))
-                            mydb.StopCourse(passData);
+                        mydb.StopCourse(passData);
                     }
                 })
         .setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
@@ -748,8 +769,6 @@ public class Dashboard extends AppCompatActivity
             String full_course = params_name.get(id);
             intent.putExtra("course_full_name", full_course);
             startActivity(intent);
-        } else if (id == R.id.nav_home) {
-            // Handle the home action
         } else if (id == R.id.nav_viewattendance) {
 
         } else if (id == R.id.nav_logout) {

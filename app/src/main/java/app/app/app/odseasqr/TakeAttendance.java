@@ -84,9 +84,4 @@ public class TakeAttendance extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
     }
-
-    public boolean onCreateOptionalMenu (Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bottombar,menu);
-        return true;
-    }
 }
