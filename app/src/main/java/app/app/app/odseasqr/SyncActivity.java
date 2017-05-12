@@ -3,6 +3,7 @@ package app.app.app.odseasqr;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
@@ -53,6 +54,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id
                 .coordinate);
+        Intent i = getIntent();
 
         // add necessary intent values to be matched.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -63,6 +65,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        String course_name = i.getStringExtra("course_name");
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setTitle(course_name);
 
         search = (Button) findViewById(R.id.search);
         search.setOnClickListener(this);
@@ -95,7 +100,7 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
             manager.initialize(this, getMainLooper(), this);
         } else {
             Toast.makeText(this,
-                    "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.",
+                    "Severe! Channel is probably lost permanently. Try Disable/Re-Enable P2P.",
                     Toast.LENGTH_LONG).show();
         }
 
@@ -120,10 +125,9 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
         switch (view.getId()){
             case R.id.search:
                 if (!isWifiP2pEnabled) {
-                    Toast.makeText(SyncActivity.this, "Enable P2P from action bar button above or system settings",
-                            Toast.LENGTH_SHORT).show();
                     WifiManager wManager = (WifiManager)this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                     wManager.setWifiEnabled(true);
+                    return;
                 }
 
                 final DeviceListsFragment fragment = (DeviceListsFragment) getFragmentManager()

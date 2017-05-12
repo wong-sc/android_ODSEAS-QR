@@ -39,6 +39,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     String course_id, position;
     SharedPreferences preferences;
     OfflineDatabase mydb;
+    public String dataStringSubjectCode = "";
 
     public static DisplayResult newInstance(int page) {
         Bundle args = new Bundle();
@@ -69,7 +70,7 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
         mydb = new OfflineDatabase(getContext());
         position = preferences.getString(Dashboard.POSITION, "null");
         Intent i = getActivity().getIntent();
-        final String dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
+        dataStringSubjectCode = i.getStringExtra("passSubjectInfo");
         String dataStringStudentNumber = i.getStringExtra("studentnumber");
 
         course_id = i.getStringExtra("passDataValue");
@@ -218,7 +219,9 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.sync:
-                startActivity(new Intent(getActivity(), SyncActivity.class));
+                Intent intent = new Intent(getActivity(), SyncActivity.class);
+                intent.putExtra("course_name", dataStringSubjectCode);
+                startActivity(intent);
         }
     }
 

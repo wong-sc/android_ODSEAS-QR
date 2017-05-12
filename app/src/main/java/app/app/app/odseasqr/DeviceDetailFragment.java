@@ -407,7 +407,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                         h.post(new Runnable() {
                             public void run() {
-                                showMessage("Course Mismatch: "+ key_code[0], "Sync with wrong CHIEF INVIGILATOR" + preferences.getString(Config.COURSE_ID, "null"));
+                                showMessage("Course Mismatch: "+ key_code[0], "Sync with wrong CHIEF: " + preferences.getString(Config.COURSE_ID, "null"));
                             }
                         });
                     }
@@ -425,23 +425,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                 Log.d(SyncActivity.TAG, "Result: "+ result);
                 loading.dismiss();
-//                String status = mydb.insertDataFrom_(result);
-//                loading.dismiss();
-//
-//                if(status.equals("success update") && preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)){
-//                    Toast.makeText(context.getApplicationContext(), "Successfully update data", Toast.LENGTH_SHORT).show();
-//                    sync();
-//                }
-//
-//                if(!preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
-//                    Finisehd();
-//                    loading.dismiss();
-//                }
-//
-//                Toast.makeText(context.getApplicationContext(), "Successfully accept data", Toast.LENGTH_SHORT).show();
-
             }
-
         }
         @Override
         protected void onPreExecute() {
