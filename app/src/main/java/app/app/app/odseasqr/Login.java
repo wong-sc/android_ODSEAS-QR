@@ -158,8 +158,5 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             userLogin();
             //startActivity(new Intent(this, Login.class));
         }
-//        if(v == registerLink){
-//            startActivity(new Intent(this, Register.class));
-//        }
     }
 }

@@ -49,7 +49,7 @@ public class TakeAttendance extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new EnterStudentID(), "Enter PIN");
+        adapter.addFragment(new EnterStudentID(), "Insert PIN");
         adapter.addFragment(new Scan(), "Scan QR");
         adapter.addFragment(new DisplayResult(), "Attendance");
         viewPager.setAdapter(adapter);

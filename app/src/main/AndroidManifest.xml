@@ -22,9 +22,6 @@
         android:name=".odseasqr"
         android:label="@string/app_name">
 
-        <!-- <activity -->
-        <!-- android:name=".SelectSubject" -->
-        <!-- android:label="Select Subject" /> -->
         <activity
             android:name="app.app.app.odseasqr.Login"
             android:label="@string/app_name">
@@ -33,9 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity-->
-            <!--android:name="app.app.app.odseasqr.Register"-->
-            <!--android:label="Register" />-->
+
         <activity
             android:name="app.app.app.odseasqr.TakeAttendance"
             android:label="Take Attendance" >

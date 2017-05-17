@@ -1307,7 +1307,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             db.close();
             return Config.UNAVAILABLE;
         }
-
     }
 
     private String validate_end_time(String format) {

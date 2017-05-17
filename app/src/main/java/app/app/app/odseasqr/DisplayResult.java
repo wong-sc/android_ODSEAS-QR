@@ -103,7 +103,6 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
             processAttendedData(attendeddata);
             processBookletData(bookletData);
         }
-
     }
 
     //Logout function

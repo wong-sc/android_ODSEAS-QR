@@ -116,29 +116,22 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 for(int i = 1 ; i < splited.length ; i++){
                     if(subjectCode.equals(splited[i])) {
                         matchedSubject = splited[i];
-                        Toast.makeText(getActivity(),"Successfully scanned "+splited[0],Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity(),"Successfully scanned "+splited[0],Toast.LENGTH_LONG).show();
                         matched = true;
                         break;
                     }
                 }
                 if(!matched)
-                    Toast.makeText(getActivity(),splited[0] + " does not belong to this examination",Toast.LENGTH_LONG).show();
+                    showMessage("Alert", splited[0] + " does not belong to this examination");
+//                    Toast.makeText(getActivity(),splited[0] + " does not belong to this examination",Toast.LENGTH_LONG).show();
                 else{
-
-//                    if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
-//                        String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
-//                        Log.d("Result scan -", studentSubject);
-//                        processStudentIschecked(studentSubject);
-//                    } else
                     if(position.equals(Config.CHIEF))
                         checkAlreadyScan();
                     else{
                         String studentSubject = mydb.checkAlreadyScan(matchedSubject, splited[0]);
                         processStudentIschecked(studentSubject);
                     }
-
-                    }
-//                }
+                }
             }
         } else {
             // This is important, otherwise the result will not be passed to the fragment
@@ -156,7 +149,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                         dialog.cancel();
                     }
                 });
-
         AlertDialog alert = Adialog.create();
         alert.setTitle(title);
         Adialog.show();
@@ -179,18 +171,13 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                     showMessage("Alert", splited[0] + " has already scanned!");
 
                 } else {
-//                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-//                        String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 1);
-//                        /*CHECK WHETHER THE STUDENT HAS CHECKIN / CHECKOUT */
-//                        processGetData(status);
-//                    } else
                     if(position.equals(Config.CHIEF))
                         getData();
                     else {
                         String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 0);
                         processGetData(status);
                     }
-                    Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
                 }
             }
             if (jsonArray.length() == 0) {
@@ -203,9 +190,9 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
     public void processGetData(String response){
         if (response.equals("success checkin")) {
-            showMessage("Alert", "Student has checked in for this course");
+            showMessage("Alert", splited[0] + " has checked in for this course");
         } else if (response.equals("success checkout")){
-            showMessage("Alert", "Student has checked out for this course");
+            showMessage("Alert", splited[0] + " has checked out for this course");
         }
     }
 
@@ -273,9 +260,8 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                                 }
                                 else{
                                     getData();
-                                    Toast.makeText(getContext(),"Successfully added "+splited[0],Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(getContext(),"Successfully added "+splited[0],Toast.LENGTH_LONG).show();
                                 }
-
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

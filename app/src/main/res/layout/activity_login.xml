@@ -70,15 +70,5 @@
         android:layout_below="@+id/editTextPassword"
         android:layout_alignParentLeft="true" />
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Register Here"-->
-        <!--android:id="@+id/tvRegisterLink"-->
-        <!--android:textStyle="bold"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_below="@+id/buttonLogin"-->
-        <!--android:layout_centerHorizontal="true" />-->
-
 </RelativeLayout>
 </ScrollView>

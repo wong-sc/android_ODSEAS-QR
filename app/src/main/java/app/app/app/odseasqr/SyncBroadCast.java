@@ -14,7 +14,7 @@ public class SyncBroadCast extends BroadcastReceiver{
         switch (intent.getStringExtra("status")){
 
             case "Finished":
-                deviceDetailFragment.Finisehd();
+                deviceDetailFragment.Finished();
                 break;
 
             case "Start":

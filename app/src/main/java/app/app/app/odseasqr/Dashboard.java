@@ -162,7 +162,7 @@ public class Dashboard extends AppCompatActivity
         if(preferences.getBoolean("firstTimeLogin", false))
             promtDownloadData(staff_id);
         else{
-            Toast.makeText(Dashboard.this, "You already have downloaded content", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Dashboard.this, "Download content successfully", Toast.LENGTH_SHORT).show();
         }
 
         btnNext.setOnClickListener(this);
@@ -171,11 +171,11 @@ public class Dashboard extends AppCompatActivity
 
     private void init(){
         if(isNetworkStatusAvailable(this)) {
-            Toast.makeText(getApplicationContext(), "internet available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Internet Available", Toast.LENGTH_SHORT).show();
             getData();
         } else {
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-            // ask sqlite to geneate spinner data by passing the staff id
+            // ask sqlite to generate spinner data by passing the staff id
             getSpinnerData();
         }
         swipeContainer.setRefreshing(false);
@@ -203,7 +203,7 @@ public class Dashboard extends AppCompatActivity
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
                 getOfflineData(Config.GET_OFFLINE_DATA);
                 loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 loading.setTitle("Downloading Content..........");
@@ -215,7 +215,7 @@ public class Dashboard extends AppCompatActivity
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
                 int pid = android.os.Process.myPid();
                 android.os.Process.killProcess(pid);
             }
@@ -237,7 +237,7 @@ public class Dashboard extends AppCompatActivity
 //                        data.clear();
                         try {
                             JSONObject jsonObject1 = new JSONObject(jsonObject);
-                            Toast.makeText(Dashboard.this, "Result length" + jsonObject1.length(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(Dashboard.this, "Result length" + jsonObject1.length(), Toast.LENGTH_SHORT).show();
                             String course = jsonObject1.getString("course");
                             String course_handler = jsonObject1.getString("course_handler");
                             String enroll_handler = jsonObject1.getString("enroll_handler");
@@ -304,7 +304,7 @@ public class Dashboard extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
                         getSpinnerData();
                     }
                 }){
@@ -411,7 +411,7 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = j.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
-                Log.d("person: ", invigilator + "Sesion:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
+                Log.d("person: ", invigilator + "Session:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
 
                 if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
                         && json.getString("invigilator_position").equals(Config.CHIEF)){
@@ -419,9 +419,8 @@ public class Dashboard extends AppCompatActivity
                     editor.putString(POSITION, json.getString("invigilator_position"));
                     editor.commit();
                     editor.apply();
-                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -448,12 +447,12 @@ public class Dashboard extends AppCompatActivity
                 JSONObject json = result2.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
 //                txtProfileName.setText(preferences.getString("staff_name","Unknown"));
-                Log.d("person: ", invigilator + "Sesion:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
+                Log.d("person: ", invigilator + "Session:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
                 if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
                         && json.getString("invigilator_position").equals(Config.CHIEF)){
                     btnStop.setVisibility(View.VISIBLE);
                     editor.putString(POSITION, json.getString("invigilator_position"));
-                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -568,15 +567,12 @@ public class Dashboard extends AppCompatActivity
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
-        Toast.makeText(this, parent.getSelectedItem() + " aa", Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
     public void onClick(View v)
     {
-        Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
 
         if(v == findViewById(R.id.btnStop)){
             if(mydb.check_course_status(passData))

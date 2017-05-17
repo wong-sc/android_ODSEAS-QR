@@ -211,7 +211,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 String subject_code = object.getString("course_id");
                 Log.d("hye course code", subject_code);
                 if (dataStringSubjectCode.equals(subject_code)) {
-                    Toast.makeText(getActivity(),"Subject found",Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getActivity(),"Subject found",Toast.LENGTH_LONG).show();
                     foundStudent = true;
                     buttonComfirm.setClickable(true);
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
@@ -223,8 +223,8 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 }
             }
             if (!foundStudent) {
-                Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
-                showMessage("Alert", "Student does not register for this course.");
+//                Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
+                showMessage("Alert", dataStringStudentID + " does not belong to this examination");
                 buttonComfirm.setClickable(false);
             }
         } catch (JSONException e) {
@@ -264,7 +264,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                         processGetData(status);
                     }
 
-                    Toast.makeText(getContext(), "Successfully added " + dataStringStudentID, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), "Successfully added " + dataStringStudentID, Toast.LENGTH_LONG).show();
                     studentid.setText("");
                     studentname.setText("Student Name: ");
                 }
@@ -302,7 +302,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     public void onResponse(String jsonObject) {
 
                         Log.d("Result --- ", jsonObject);
-                        Toast.makeText(getActivity(),"Return  result"+ jsonObject,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity(),"Return  result"+ jsonObject,Toast.LENGTH_LONG).show();
                         processStudentName(jsonObject);
                     }
                 },
@@ -329,12 +329,12 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
     public void processGetData(String response){
         if (response.equals("success checkin")) {
 
-            showMessage("Alert", "Student has checked in for this course");
+            showMessage("Alert", dataStringStudentID + " has checked in for this course");
             buttonComfirm.setClickable(false);
 
         } else if (response.equals("success checkout")){
 
-            showMessage("Alert", "Student has checked out for this course");
+            showMessage("Alert", dataStringStudentID + " Student has checked out for this course");
             buttonComfirm.setClickable(false);
 
         }
