@@ -334,7 +334,7 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
 
         } else if (response.equals("success checkout")){
 
-            showMessage("Alert", dataStringStudentID + " Student has checked out for this course");
+            showMessage("Alert", dataStringStudentID + " has checked out for this course");
             buttonComfirm.setClickable(false);
 
         }
