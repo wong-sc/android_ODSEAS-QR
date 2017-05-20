@@ -64,7 +64,7 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_scan,container,false);
-        TextView subjectname = (TextView) v.findViewById(R.id.textViewSubjectName);
+        final TextView subjectname = (TextView) v.findViewById(R.id.textViewSubjectName);
 
         Intent i = getActivity().getIntent();
         subjectCode = i.getStringExtra("passDataValue");
@@ -82,7 +82,11 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
             @Override
             public void onClick(View v) {
-                IntentIntegrator.forSupportFragment(Scan.this).initiateScan();
+//                IntentIntegrator.forSupportFragment(Scan.this).initiateScan();
+                Intent intent = new Intent(getContext(), ZxingQRActivity.class);
+                intent.putExtra("subject_code", subjectCode);
+                intent.putExtra("subject_name", subjectName);
+                startActivity(intent);
             }
         });
         return v;
@@ -116,14 +120,12 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                 for(int i = 1 ; i < splited.length ; i++){
                     if(subjectCode.equals(splited[i])) {
                         matchedSubject = splited[i];
-//                        Toast.makeText(getActivity(),"Successfully scanned "+splited[0],Toast.LENGTH_LONG).show();
                         matched = true;
                         break;
                     }
                 }
                 if(!matched)
                     showMessage("Alert", splited[0] + " does not belong to this examination");
-//                    Toast.makeText(getActivity(),splited[0] + " does not belong to this examination",Toast.LENGTH_LONG).show();
                 else{
                     if(position.equals(Config.CHIEF))
                         checkAlreadyScan();

@@ -1,5 +1,7 @@
 package app.app.app.odseasqr;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -15,6 +17,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -25,6 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.kosalgeek.genasync12.MainActivity;
 
 import app.app.app.odseasqr.R;
 
@@ -58,6 +63,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     Socket mSocket;
     String clientIP;
     int clientPort;
+    public Context context;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -225,11 +231,12 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         getActivity().startService(serviceIntent);
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     public void sync(){
 
         if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
-                Intent startsync = new Intent(getActivity(), SyncService.class);
-                getActivity().startService(startsync);
+                Intent startsync = new Intent(context.getApplicationContext(), SyncService.class);
+                context.startService(startsync);
         }
     }
 
@@ -354,13 +361,22 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                                     } else if (str.length() != 0) {
 
-                                        sync();
-                                        h.post(new Runnable() {
-                                            public void run() {
+                                    h.post(new Runnable() {
+                                        public void run() {
+                                           sync();
+                                        }
+                                    });
+
+                                    h.post(new Runnable() {
+                                        public void run() {
+                                            if(!isCancelled()) {
                                                 loading.setMessage("Receiving record...");
-                                                loading.show();
+                                                if (!loading.isShowing())
+                                                    loading.show();
                                             }
-                                        });
+                                        }
+                                    });
+
                                         try {
                                             Thread.sleep(8000);
 
@@ -437,5 +453,11 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     }
                 });
         Adialog.show();
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        this.context = context;
     }
 }

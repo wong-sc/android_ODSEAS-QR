@@ -3,7 +3,7 @@ package app.app.app.odseasqr;
 public class Config {
 
     /*every static variable will be stored here to ease the modification*/
-    public static final String BASE_URL = "http://192.168.137.1/";
+    public static final String BASE_URL = "http://192.168.137.226/";
     public static final String GET_SUBJECT_DATA = "ODSEAS-QR/student/getSubjectData.php";
     public static final String GET_DETAILS_DATA = "ODSEAS-QR/student/getDetailsData.php";
     public static final String GET_ATTENDED_DATA = "ODSEAS-QR/student/getAttendedData.php";

@@ -297,6 +297,7 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_ENROLL_HANDLER, null,null);
         db.beginTransaction();
+        Log.d("enroll", data);
 
         try {
             JSONArray jsonArray = new JSONArray(data);
@@ -1257,8 +1258,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery(GET_STATUS, null);
 
-        if (cursor != null){
+        if (cursor != null && cursor.getCount() != 0){
             cursor.moveToFirst();
+            Log.d("Result cursor--", DatabaseUtils.dumpCursorToString(cursor));
             String status = cursor.getString(0);
             cursor.close();
             db.close();
