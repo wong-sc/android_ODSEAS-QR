@@ -255,7 +255,8 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
             @Override
             public void onSuccess() {
 
-                fragment.getView().setVisibility(View.GONE);
+                if(fragment.getView() != null)
+                    fragment.getView().setVisibility(View.GONE);
                 search.setVisibility(View.VISIBLE);
 
                 Snackbar snackbar = Snackbar

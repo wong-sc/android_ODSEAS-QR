@@ -377,6 +377,41 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         return "success";
     }
 
+    public String localSync(String data){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_ENROLL_HANDLER, null,null);
+        db.beginTransaction();
+
+        try {
+            JSONArray jsonArray = new JSONArray(data);
+            for(int i = 0 ; i < jsonArray.length() ; i++) {
+                JSONObject result = jsonArray.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(ENROLL_HANDLER_ID, result.getString("enroll_handler_id"));
+                values.put(STUDENT_ID, result.getString("student_id"));
+                values.put(COURSE_ID, result.getString("course_id"));
+                values.put(ISCHECKED, result.getString("ischecked"));
+                values.put(STATUS, result.getString("status"));
+                values.put(CHECKIN_TIME, result.getString("checkin_time"));
+                values.put(CHECKOUT_TIME, result.getString("checkout_time"));
+                values.put(CHECKIN_STYLE_ID, result.getString("checkin_style_id"));
+                values.put(CHECKOUT_STYLE_ID, result.getString("checkout_style_id"));
+                values.put(CREATED_DATE, result.getString("created_date"));
+                values.put(UPDATED_DATE, result.getString("updated_date"));
+                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
+                Log.d("enroll_handler id = ", tag_id + " ");
+            }
+
+            db.setTransactionSuccessful();
+        } catch (JSONException error){
+            Log.d("error", error.toString());
+        } finally {
+            db.endTransaction();
+        }
+        db.close();
+        return "success";
+    }
+
     public void insertStaff(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -526,11 +561,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             for(int i = 0 ; i < jsonArray.length() ; i++){
                 Log.d(SyncActivity.TAG, jsonArray.length() + "");
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-//                if(!jsonObject.getString(COURSE_ID).equals(sharedPreferences.getString(Config.COURSE_ID, "null"))){
-//                    return "fail";
-//                }
-
                 ContentValues values = new ContentValues();
                 values.put(CHECKIN_TIME, jsonObject.getString(CHECKIN_TIME));
                 values.put(CHECKOUT_TIME, jsonObject.getString(CHECKOUT_TIME));
@@ -803,10 +833,10 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         int count = 0;
 
         String SELECT_COURSE_DETAILS =
-                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s != 'null'",
+                String.format("SELECT * FROM %s WHERE %s = '%s' AND %s = 1",
                         TABLE_ENROLL_HANDLER,
                         COURSE_ID, course_id,
-                        CHECKOUT_TIME);
+                        ISCHECKED);
 
         Log.d("query", SELECT_COURSE_DETAILS);
 

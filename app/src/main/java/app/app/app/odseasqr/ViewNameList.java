@@ -276,6 +276,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 status.setLayoutParams(statusParams);
                 row.addView(status);
                 table.addView(row);
+                table.refreshDrawableState();
             }
         } catch (JSONException e) {
             e.printStackTrace();

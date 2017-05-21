@@ -231,12 +231,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         getActivity().startService(serviceIntent);
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    public void sync(){
-
+    public void sync(Context context){
         if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
-                Intent startsync = new Intent(getActivity(), SyncService.class);
-                getActivity().startService(startsync);
+                Intent startsync = new Intent(context, SyncService.class);
+                context.startService(startsync);
         }
     }
 
@@ -271,7 +269,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     }
 
     public void start(){
-        Toast.makeText(getActivity(), "Start", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getActivity(), "Start", Toast.LENGTH_LONG).show();
         if(info.isGroupOwner){
             getSyncedResult();
         }
@@ -298,7 +296,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     }
 
     public void renewDatabase(String result){
-        String status = mydb.SyncEnrollHandler(result);
+        String status = mydb.localSync(result);
         Toast.makeText(getActivity(), "Success" + status, Toast.LENGTH_SHORT).show();
         loading.dismiss();
     }
@@ -312,11 +310,13 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         private Context context;
         private TextView statusText;
         OfflineDatabase mydb;
+        ProgressDialog loading2;
 
         public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;
             mydb = new OfflineDatabase(context);
+            loading2 = new ProgressDialog(context);
         }
 
         @Override
@@ -348,6 +348,13 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     Log.d(SyncActivity.TAG, "Key Code: " + key_code[0]);
                     Log.d(SyncActivity.TAG, "Key Code: " + key_code[1]);
 
+                    h.post(new Runnable() {
+                        public void run() {
+                            loading2.setMessage("Receiving record...");
+                            loading2.show();
+                        }
+                    });
+
                     if(preferences.getString(Config.COURSE_ID, "null").equals(key_code[0])) {
                         if (mydb.check_course_status(key_code[0])){
                             String status = mydb.insertDataFrom_(key_code[1]);
@@ -364,23 +371,20 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                                     h.post(new Runnable() {
                                         public void run() {
-                                           sync();
+//                                            loading2.setMessage("Receiving record...");
+//                                            loading2.show();
+                                            sync(context);
                                         }
                                     });
 
-                                    h.post(new Runnable() {
-                                        public void run() {
-                                            if(!isCancelled()) {
-                                                loading.setMessage("Receiving record...");
-                                                if (!loading.isShowing())
-                                                    loading.show();
-                                            }
-                                        }
-                                    });
+//                                    h.post(new Runnable() {
+//                                        public void run() {
+//
+//                                        }
+//                                    });
 
-                                        try {
-                                            Thread.sleep(8000);
-
+                                    try {
+                                        Thread.sleep(8000);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -432,9 +436,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-
                 Log.d(SyncActivity.TAG, "Result: "+ result);
-                loading.dismiss();
+                loading2.dismiss();
+                if(loading.isShowing())
+                    loading.dismiss();
             }
         }
         @Override
