@@ -51,21 +51,21 @@ public class ZxingQRActivity extends AppCompatActivity implements ZXingScannerVi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e("onCreate", "onCreate");
-
-        mScannerView = new ZXingScannerView(this);
+        mScannerView = new ZXingScannerView(ZxingQRActivity.this);
+        setContentView(mScannerView);
+        Log.e("onCreate", "onCreate1");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setContentView(mScannerView);
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion >= android.os.Build.VERSION_CODES.M) {
             if (checkPermission()) {
                 Toast.makeText(getApplicationContext(), "Permission already granted", Toast.LENGTH_LONG).show();
-
             } else {
                 requestPermission();
             }
         }
+        Log.e("onCreate", "onCreate2");
 
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
         staffID = preferences.getString("staff_id", "null");
@@ -325,7 +325,8 @@ public class ZxingQRActivity extends AppCompatActivity implements ZXingScannerVi
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mScannerView.resumeCameraPreview(ZxingQRActivity.this);
+                dialog.dismiss();
+//                mScannerView.resumeCameraPreview(ZxingQRActivity.this);
             }
         });
 

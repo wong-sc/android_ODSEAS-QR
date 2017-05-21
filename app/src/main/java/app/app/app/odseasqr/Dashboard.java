@@ -251,7 +251,10 @@ public class Dashboard extends AppCompatActivity
 
                             mydb.insertCourseData(course);
                             mydb.insertCourseHandler(course_handler);
-                            mydb.insertEnrollHandler(enroll_handler);
+                            if(preferences.getBoolean("firstTimeLogin", false))
+                                mydb.insertEnrollHandler(enroll_handler);
+                            else
+                                mydb.SyncEnrollHandler(enroll_handler);
                             mydb.insertStudent(student);
                             mydb.insertVenue(venue);
                             mydb.insertVenueHandler(venue_handler);

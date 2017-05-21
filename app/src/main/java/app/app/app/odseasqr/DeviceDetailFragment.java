@@ -235,8 +235,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     public void sync(){
 
         if(preferences.getString(Dashboard.POSITION, "null").equals(Config.CHIEF)) {
-                Intent startsync = new Intent(context.getApplicationContext(), SyncService.class);
-                context.startService(startsync);
+                Intent startsync = new Intent(getActivity(), SyncService.class);
+                getActivity().startService(startsync);
         }
     }
 
@@ -346,6 +346,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     Log.d(SyncActivity.TAG, "Message from server: " + str);
                     final String[] key_code = str.split("@", 2);
                     Log.d(SyncActivity.TAG, "Key Code: " + key_code[0]);
+                    Log.d(SyncActivity.TAG, "Key Code: " + key_code[1]);
 
                     if(preferences.getString(Config.COURSE_ID, "null").equals(key_code[0])) {
                         if (mydb.check_course_status(key_code[0])){

@@ -82,11 +82,11 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
 
             @Override
             public void onClick(View v) {
-//                IntentIntegrator.forSupportFragment(Scan.this).initiateScan();
-                Intent intent = new Intent(getContext(), ZxingQRActivity.class);
-                intent.putExtra("subject_code", subjectCode);
-                intent.putExtra("subject_name", subjectName);
-                startActivity(intent);
+                IntentIntegrator.forSupportFragment(Scan.this).initiateScan();
+//                Intent intent = new Intent(getContext(), ZxingQRActivity.class);
+//                intent.putExtra("subject_code", subjectCode);
+//                intent.putExtra("subject_name", subjectName);
+//                startActivity(intent);
             }
         });
         return v;

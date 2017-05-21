@@ -337,7 +337,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
     public String SyncEnrollHandler(String data){
 
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_ENROLL_HANDLER, null,null);
         db.beginTransaction();
 
         try {
@@ -346,11 +345,15 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             for(int i = 0 ; i < jsonArray.length() ; i++) {
                 JSONObject result = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(ENROLL_HANDLER_ID, result.getString("enroll_handler_id"));
                 values.put(STUDENT_ID, result.getString("student_id"));
                 values.put(COURSE_ID, result.getString("course_id"));
                 values.put(ISCHECKED, result.getString("ischecked"));
-                values.put(STATUS, result.getString("status"));
+
+                if(result.getString("ischecked").equals("1"))
+                    values.put(STATUS, 2);
+                else if(!result.getString("checkin_time").equals("null") && result.getString("checkout_time").equals("null"))
+                    values.put(STATUS, 1);
+
                 values.put(CHECKIN_TIME, result.getString("checkin_time"));
                 values.put(CHECKOUT_TIME, result.getString("checkout_time"));
                 values.put(CHECKIN_STYLE_ID, result.getString("checkin_style_id"));
@@ -358,8 +361,11 @@ public class OfflineDatabase extends SQLiteOpenHelper {
                 values.put(CREATED_DATE, result.getString("created_date"));
                 values.put(UPDATED_DATE, result.getString("updated_date"));
                 // insert row
-                long tag_id = db.insert(TABLE_ENROLL_HANDLER, null, values);
-                Log.d("enroll_handler id = ", tag_id + " ");
+                int tag_id = db.update(
+                        TABLE_ENROLL_HANDLER, values,
+                        STUDENT_ID + "= ? AND "+ COURSE_ID + " = ? AND (" + STATUS + " != 3 AND " + STATUS + " != 4)" ,
+                        new String[]{result.getString("student_id"), result.getString("course_id")});
+                Log.d("update id = ", tag_id + " ");
             }
             db.setTransactionSuccessful();
         } catch (JSONException error){
