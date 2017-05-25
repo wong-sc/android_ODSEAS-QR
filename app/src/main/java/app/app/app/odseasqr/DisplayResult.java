@@ -93,6 +93,10 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
     }
 
     private void init(){
+<<<<<<< HEAD
+=======
+        
+>>>>>>> remove unused code
             String attendeddata = mydb.getAttendedData(course_id);
             String bookletData = mydb.getAnswerBooklet(course_id);
             processAttendedData(attendeddata);

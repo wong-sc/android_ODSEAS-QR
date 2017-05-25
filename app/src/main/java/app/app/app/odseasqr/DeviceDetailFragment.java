@@ -2,12 +2,18 @@ package app.app.app.odseasqr;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import android.app.Activity;
 =======
 >>>>>>> remove unused code
 =======
 import android.app.Activity;
 >>>>>>> fix bug
+=======
+import android.app.Activity;
+=======
+>>>>>>> remove unused code
+>>>>>>> remove unused code
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -108,10 +114,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                     @Override
                     public void onClick(View v) {
-                            Log.d(SyncActivity.TAG, "Enter onclick");
-                            loading.setMessage("Validating course information...");
-                            loading.show();
-                            getUnsyncData();
+                        Log.d(SyncActivity.TAG, "Enter onclick");
+                        loading.setMessage("Validating course information...");
+                        loading.show();
+                        getUnsyncData();
                     }
                 });
 
