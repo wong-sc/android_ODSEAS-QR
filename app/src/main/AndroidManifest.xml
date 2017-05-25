@@ -58,8 +58,6 @@
                 android:value="app.app.app.odseasqr.Dashboard" />
         </activity>
 
-        <activity android:name=".ZxingQRActivity" android:label="QR Scanning"/>
-
         <receiver
             android:name="app.app.app.odseasqr.NetworkStatus"
             android:label="NetworkChangeReceiver">
@@ -83,7 +81,7 @@
         <!-- Used for transferring files  after a successful connection -->
         <service android:enabled="true" android:name="app.app.app.odseasqr.FileTransferService" />
 
-        <activity android:name="app.app.app.odseasqr.SyncActivity" android:label="Local Sync"></activity>
+        <activity android:name="app.app.app.odseasqr.SyncActivity" android:label="Local Sync"/>
     </application>
 
 </manifest>

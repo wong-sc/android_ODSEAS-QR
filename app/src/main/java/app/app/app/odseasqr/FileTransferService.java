@@ -11,7 +11,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class FileTransferService extends IntentService {
@@ -180,58 +179,3 @@ public class FileTransferService extends IntentService {
         super.onDestroy();
     }
 }
-
-/*else if(intent.getAction().equals(ACTION_SYNC_FILE)){
-            String host = "";
-            Log.d(SyncActivity.TAG, "Entering");
-            try {
-
-                ServerSocket serverSocket = new ServerSocket(intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT));
-                Socket client = serverSocket.accept();
-                host = client.getInetAddress().toString();
-                Log.d(SyncActivity.TAG, "host: " + host);
-                serverSocket.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d(SyncActivity.TAG, "Error: " + host);
-            }
-
-            String result = intent.getExtras().getString(EXTRAS_FILE_PATH);
-//            String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
-            Socket socket = new Socket();
-            int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
-            DataOutputStream stream = null;
-            Log.d(SyncActivity.TAG, result);
-
-            if (result != null) {
-                Log.d(SyncActivity.TAG, "result: " + result);
-                try {
-                    Log.d(SyncActivity.TAG, "Opening client socket - ");
-                    socket.bind(null);
-                    socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
-                    Log.d(SyncActivity.TAG, "Client socket - " + socket.isConnected());
-                    stream = new DataOutputStream(socket.getOutputStream());
-                    stream.writeUTF(result);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (stream != null) {
-                        try {
-                            stream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (socket != null) {
-                        if (socket.isConnected()) {
-                            try {
-                                socket.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-        } else Log.d(SyncActivity.TAG, "Error: No enter at all " + intent.getAction());*/

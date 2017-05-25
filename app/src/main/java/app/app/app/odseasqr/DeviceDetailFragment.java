@@ -1,7 +1,5 @@
 package app.app.app.odseasqr;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -17,9 +15,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -28,29 +24,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.kosalgeek.genasync12.MainActivity;
-
-import app.app.app.odseasqr.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
-import java.util.Timer;
 
 public class DeviceDetailFragment extends Fragment implements WifiP2pManager.ConnectionInfoListener {
-    protected static final int CHOOSE_FILE_RESULT_CODE = 20;
     private View mContentView = null;
     private WifiP2pDevice device;
     private WifiP2pInfo info;
@@ -59,8 +42,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     ArrayList<JSONObject> courseData = new ArrayList<>();
     SharedPreferences preferences;
     ProgressDialog loading;
-    ServerSocket serverSocket;
-    Socket mSocket;
     String clientIP;
     int clientPort;
     public Context context;
@@ -118,7 +99,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                         Log.d(SyncActivity.TAG, "Enter onclick");
                         loading.setMessage("Validating course information...");
                         loading.show();
-//                        syncClient();
                         getUnsyncData();
                     }
                 });
@@ -202,9 +182,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 }
             } while (cursor.moveToNext());
         }
-//        Toast.makeText(getActivity(), courseData.size()+"", Toast.LENGTH_SHORT).show();
-//        new ServerAsyncTask(getActivity()).execute();
-//        syncClient();
     }
 
     public void syncClient(){
@@ -257,8 +234,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
             new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text))
                     .execute();
         } else if (info.groupFormed) {
-            // The other device acts as the client. In this case, we enable the
-            // get file button.
             mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
             ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources()
                     .getString(R.string.client_text));
@@ -269,7 +244,6 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     }
 
     public void start(){
-//        Toast.makeText(getActivity(), "Start", Toast.LENGTH_LONG).show();
         if(info.isGroupOwner){
             getSyncedResult();
         }
@@ -371,17 +345,9 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                                     h.post(new Runnable() {
                                         public void run() {
-//                                            loading2.setMessage("Receiving record...");
-//                                            loading2.show();
                                             sync(context);
                                         }
                                     });
-
-//                                    h.post(new Runnable() {
-//                                        public void run() {
-//
-//                                        }
-//                                    });
 
                                     try {
                                         Thread.sleep(8000);

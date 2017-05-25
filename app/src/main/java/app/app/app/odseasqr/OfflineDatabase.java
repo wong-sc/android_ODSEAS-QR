@@ -537,21 +537,6 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
-    /*[{
-    "created_date":"2017-03-31 13:37:48",
-    "checkout_time":"2017-04-12 00:45:43",
-    "checkin_time":"2017-03-31 13:42:11",
-    "updated_date":"2017-03-31 13:37:48",
-    "checkout_staffID":"1",
-    "status":"0",
-    "checkout_style_id":"2",
-    "enroll_handler_id":"1",
-    "student_id":"44648",
-    "checkin_style_id":"1",
-    "ischecked":"1",
-    "course_id":"TMN2053"
-    }]*/
-
     public String insertDataFrom_ (String result){
         SQLiteDatabase db = this.getReadableDatabase();
         sharedPreferences = context.getSharedPreferences("myloginapp", Context.MODE_PRIVATE);

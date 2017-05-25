@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,11 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.HeaderViewListAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,7 +37,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import app.app.app.odseasqr.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -185,7 +180,6 @@ public class Dashboard extends AppCompatActivity
         Log.d("tagdata", staff_id);
         String spinnerData = mydb.getSpinnerData(staff_id);
         try {
-            //convert String to JSONArray == [{course_id: 'TMN2053', course_name: 'COURSE NAME 2'}]
             JSONArray jsonArray = new JSONArray(spinnerData);
             result = jsonArray;
             getSubjectData(jsonArray);
@@ -203,7 +197,6 @@ public class Dashboard extends AppCompatActivity
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                Toast.makeText(Dashboard.this, "You have selected YES", Toast.LENGTH_SHORT).show();
                 getOfflineData(Config.GET_OFFLINE_DATA);
                 loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 loading.setTitle("Downloading Content..........");
@@ -215,7 +208,6 @@ public class Dashboard extends AppCompatActivity
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-//                Toast.makeText(Dashboard.this, "You have selected NO", Toast.LENGTH_SHORT).show();
                 int pid = android.os.Process.myPid();
                 android.os.Process.killProcess(pid);
             }
@@ -234,10 +226,8 @@ public class Dashboard extends AppCompatActivity
                     public void onResponse(String jsonObject) {
 
                         Log.d("result-----", jsonObject);
-//                        data.clear();
                         try {
                             JSONObject jsonObject1 = new JSONObject(jsonObject);
-//                            Toast.makeText(Dashboard.this, "Result length" + jsonObject1.length(), Toast.LENGTH_SHORT).show();
                             String course = jsonObject1.getString("course");
                             String course_handler = jsonObject1.getString("course_handler");
                             String enroll_handler = jsonObject1.getString("enroll_handler");
@@ -422,7 +412,6 @@ public class Dashboard extends AppCompatActivity
                     editor.putString(POSITION, json.getString("invigilator_position"));
                     editor.commit();
                     editor.apply();
-//                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -449,13 +438,11 @@ public class Dashboard extends AppCompatActivity
                 //Getting json object
                 JSONObject json = result2.getJSONObject(i);
                 invigilator = invigilator + json.getString("staff_name") +"  ("+json.getString("invigilator_position") + ") " + "\n";
-//                txtProfileName.setText(preferences.getString("staff_name","Unknown"));
                 Log.d("person: ", invigilator + "Session:" + preferences.getString("staff_name", "Unknown") + " " + json.getString("invigilator_position"));
                 if(preferences.getString("staff_name", "Unknown").equals(json.getString("staff_name"))
                         && json.getString("invigilator_position").equals(Config.CHIEF)){
                     btnStop.setVisibility(View.VISIBLE);
                     editor.putString(POSITION, json.getString("invigilator_position"));
-//                    Toast.makeText(this, "True", Toast.LENGTH_SHORT).show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -575,8 +562,6 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onClick(View v)
     {
-//        Toast.makeText(Dashboard.this,"take attendance",Toast.LENGTH_SHORT).show();
-
         if(v == findViewById(R.id.btnStop)){
             if(mydb.check_course_status(passData))
                 ComfirmMessage("Are you sure you want to finalise the list?", "Once it is finalised, there will be no amendment can be done");
