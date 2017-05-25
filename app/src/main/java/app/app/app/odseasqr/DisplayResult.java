@@ -105,45 +105,6 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
         }
     }
 
-    //Logout function
-    private void logout(){
-        //Creating an alert dialog to confirm logout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setMessage("Are you sure you want to logout?");
-        alertDialogBuilder.setPositiveButton("Yes",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-
-                        //Getting out sharedpreferences
-//                        SharedPreferences preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
-//                        //Getting editor
-                        SharedPreferences.Editor editor = preferences.edit();
-
-                        //Puting the value false for subjectCode
-                        editor.putBoolean(course_id, false);
-
-                        //Putting blank value to email
-                        editor.putString("email", "");
-
-                        //Saving the sharedpreferences
-                        editor.commit();
-                    }
-                });
-
-        alertDialogBuilder.setNegativeButton("No",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-
-                    }
-                });
-
-        //Showing the alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
     public void getAttendedData() {
         requestQueue = Volley.newRequestQueue(getActivity());
         String getAttendedData = Config.BASE_URL + Config.GET_ATTENDED_DATA;

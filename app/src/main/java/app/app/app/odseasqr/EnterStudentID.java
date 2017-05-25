@@ -211,7 +211,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 String subject_code = object.getString("course_id");
                 Log.d("hye course code", subject_code);
                 if (dataStringSubjectCode.equals(subject_code)) {
-//                    Toast.makeText(getActivity(),"Subject found",Toast.LENGTH_LONG).show();
                     foundStudent = true;
                     buttonComfirm.setClickable(true);
                     if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
@@ -223,7 +222,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                 }
             }
             if (!foundStudent) {
-//                Toast.makeText(getActivity(),"student does not exists",Toast.LENGTH_LONG).show();
                 showMessage("Alert", dataStringStudentID + " does not belong to this examination");
                 buttonComfirm.setClickable(false);
             }
@@ -253,10 +251,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     buttonComfirm.setClickable(false);
                 } else {
 
-//                    if(preferences.getString(Config.WIFI_STATUS, "").equals("Not connected to Internet")){
-//                        String status = mydb.updateAttendanceRecord(dataStringStudentID, dataStringSubjectCode, staffID, "2", 3);
-//                        processGetData(status);
-//                    } else
                     if(position.equals(Config.CHIEF))
                         getData();
                     else {
@@ -264,7 +258,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                         processGetData(status);
                     }
 
-//                    Toast.makeText(getContext(), "Successfully added " + dataStringStudentID, Toast.LENGTH_LONG).show();
                     studentid.setText("");
                     studentname.setText("Student Name: ");
                 }
@@ -302,7 +295,6 @@ public class EnterStudentID extends Fragment implements View.OnClickListener{
                     public void onResponse(String jsonObject) {
 
                         Log.d("Result --- ", jsonObject);
-//                        Toast.makeText(getActivity(),"Return  result"+ jsonObject,Toast.LENGTH_LONG).show();
                         processStudentName(jsonObject);
                     }
                 },

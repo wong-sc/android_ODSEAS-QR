@@ -48,9 +48,7 @@ public class SyncService extends IntentService {
         ArrayList<JSONObject> courseData = new ArrayList<>();
         mydb = new OfflineDatabase(getApplicationContext());
         preferences = getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
-//        if(workingIntent.equals("Wifi enabled") || workingIntent.equals("Mobile data enabled")) {
-            Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
-        Log.d("course_id", preferences.getString(Config.COURSE_ID, "null"));
+        Cursor cursor = mydb.getUnsyscData(preferences.getString(Config.COURSE_ID, "null"));
 
             if (cursor.moveToFirst()) {
                 Log.d("Result50 sync--", DatabaseUtils.dumpCursorToString(cursor));
@@ -80,7 +78,6 @@ public class SyncService extends IntentService {
                 syncDatabase(courseData.toString());
             } else {
                 Log.d("Result == ", "NO");
-//                Toast.makeText(getApplicationContext(), "All data synced with server", Toast.LENGTH_SHORT).show();
             }
 
             cursor.close();

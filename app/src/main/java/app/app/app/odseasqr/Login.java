@@ -1,6 +1,5 @@
 package app.app.app.odseasqr;
 
-import android.graphics.Paint;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,9 +9,7 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -20,11 +17,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import app.app.app.odseasqr.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +32,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextStaffID;
     private EditText editTextPassword;
     private Button buttonLogin;
-//    private TextView registerLink;
 
     private String staff_id;
     private String staff_password;
@@ -54,11 +47,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
 
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
-//        registerLink = (TextView)findViewById(R.id.tvRegisterLink);
-//        registerLink.setPaintFlags( registerLink.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
 
         buttonLogin.setOnClickListener(this);
-//        registerLink.setOnClickListener(this);
     }
 
     @Override

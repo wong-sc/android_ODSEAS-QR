@@ -77,8 +77,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,true);
 
-                // show the popup at bottom of the screen and set some margin at bottom
-//                popupWindow.showAtLocation(linearLayout, Gravity.CENTER,0,0);
                 popupWindow.setOutsideTouchable(true);
                 popupWindow.setFocusable(true);
                 popupWindow.showAsDropDown(view);
@@ -98,7 +96,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         course_full_name = intent.getStringExtra("course_full_name");
         TextView course_name = (TextView) findViewById(R.id.coursename);
         course_name.setText(course_full_name);
-//        Toast.makeText(ViewNameList.this, course_id, Toast.LENGTH_SHORT).show();
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.sorting,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -108,12 +105,10 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> item, View view, int i, long l) {
-        String selectedItem = item.getItemAtPosition(i).toString();
         String getnamelist;
 
         switch (i){
             case 0:
-//                Toast.makeText(ViewNameList.this, "Item position: 0 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAllData(course_id);
                     processNameList(getnamelist);
@@ -121,7 +116,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ALL_DATA);
                 break;
             case 1:
-//                Toast.makeText(ViewNameList.this, "Item position: 1 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAttendeesData(course_id);
                     processNameList(getnamelist);
@@ -129,7 +123,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ATTENDEES_DATA);
                 break;
             case 2:
-//                Toast.makeText(ViewNameList.this, "Item position: 2 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
                     getnamelist = mydb.getAbsenteesData(course_id);
                     processNameList(getnamelist);
@@ -137,7 +130,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 getNameList(Config.GET_ABSENTEES_DATA);
                 break;
             case 3:
-//                Toast.makeText(ViewNameList.this, "Item position: 3 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getInExaminationData(course_id);
                     processNameList(getnamelist);
@@ -146,7 +138,6 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
                 break;
             case 4:
-//                Toast.makeText(ViewNameList.this, "Item position: 4 --" + selectedItem, Toast.LENGTH_SHORT).show();
                 if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getSubmittedData(course_id);
                     processNameList(getnamelist);
@@ -220,8 +211,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
     public void processNameList(String result){
         Log.d("result-----", result);
         try {
-            JSONArray jsonArray = new JSONArray(result); // convert string to JSON Array
-//            Toast.makeText(ViewNameList.this, "Result length" + jsonArray.length(), Toast.LENGTH_SHORT).show();
+            JSONArray jsonArray = new JSONArray(result);
             int count = table.getChildCount();
             Log.d("count", count + "");
             if (count > 1) {
