@@ -141,8 +141,8 @@ public class SyncActivity extends AppCompatActivity implements DeviceListsFragme
                     @Override
                     public void onSuccess() {
 
-                        Toast.makeText(SyncActivity.this, "Discovery Initiated",
-                                Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(SyncActivity.this, "Discovery Initiated",
+//                                Toast.LENGTH_SHORT).show();
 
                     }
 

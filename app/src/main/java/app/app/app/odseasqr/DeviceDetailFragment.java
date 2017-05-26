@@ -271,7 +271,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
     public void renewDatabase(String result){
         String status = mydb.localSync(result);
-        Toast.makeText(getActivity(), "Success" + status, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
         loading.dismiss();
     }
 
