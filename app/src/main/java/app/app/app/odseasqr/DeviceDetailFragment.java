@@ -1,5 +1,6 @@
 package app.app.app.odseasqr;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -44,7 +45,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     ProgressDialog loading;
     String clientIP;
     int clientPort;
-    public Context context;
+    public FileServerAsyncTask fileServerAsyncTask;
+    public Context currentContext;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -57,11 +59,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mydb = new OfflineDatabase(getActivity());
-        loading = new ProgressDialog(getActivity());
+        currentContext = getActivity();
+        loading = new ProgressDialog(currentContext);
         loading.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         loading.setCancelable(true);
-        mContentView = inflater.inflate(R.layout.device_detail, null);
-        mContentView.findViewById(R.id.btn_connect).setOnClickListener(new View.OnClickListener() {
+//        mContentView = inflater.inflate(R.layout.device_detail, null);
+        mContentView = inflater.inflate(R.layout.device_detail, container, false);
+        mContentView.findViewById(R.id.btn_connect).setOnClickListener(
+                new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -96,14 +101,15 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                     @Override
                     public void onClick(View v) {
-                        Log.d(SyncActivity.TAG, "Enter onclick");
-                        loading.setMessage("Validating course information...");
-                        loading.show();
-                        getUnsyncData();
+                            Log.d(SyncActivity.TAG, "Enter onclick");
+                            loading.setMessage("Validating course information...");
+                            loading.show();
+                            getUnsyncData();
                     }
                 });
 
         preferences = getActivity().getSharedPreferences("myloginapp", Context.MODE_PRIVATE);
+        fileServerAsyncTask = new FileServerAsyncTask(currentContext, mContentView.findViewById(R.id.status_text));
 
         return mContentView;
     }
@@ -231,8 +237,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         Log.d(SyncActivity.TAG, info.toString());
 
         if (info.groupFormed && info.isGroupOwner) {
-            new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text))
-                    .execute();
+            if(!fileServerAsyncTask.getStatus().equals(AsyncTask.Status.RUNNING))
+                fileServerAsyncTask.execute();
         } else if (info.groupFormed) {
             mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
             ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources()
@@ -279,18 +285,21 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
      * A simple server socket that accepts connection and writes some data on
      * the stream.
      */
-    public class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
+    public class FileServerAsyncTask extends AsyncTask<Void, String, String> {
 
         private Context context;
         private TextView statusText;
         OfflineDatabase mydb;
-        ProgressDialog loading2;
+        ProgressDialog statusdialog;
 
         public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;
             mydb = new OfflineDatabase(context);
-            loading2 = new ProgressDialog(context);
+            this.statusdialog = new ProgressDialog(getActivity());
+            this.statusdialog.setCancelable(true);
+            this.statusdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            Log.d("fatal", "enter");
         }
 
         @Override
@@ -312,6 +321,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     Log.d("clientIP3: ", ""+client.getPort());
                     Log.d("clientIP", clientIP + "");
                     inputstream = new DataInputStream(client.getInputStream());
+                    this.publishProgress("Receiving record");
 
                     int lengths = inputstream.readInt();
                     byte[] input = new byte[lengths];
@@ -322,12 +332,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                     Log.d(SyncActivity.TAG, "Key Code: " + key_code[0]);
                     Log.d(SyncActivity.TAG, "Key Code: " + key_code[1]);
 
-                    h.post(new Runnable() {
-                        public void run() {
-                            loading2.setMessage("Receiving record...");
-                            loading2.show();
-                        }
-                    });
+//                    h.post(new Runnable() {
+//                        public void run() {
+////                            if(!isCancelled()){
+//                                loading.setMessage("Receiving record...");
+//                                loading.show();
+////                            }
+//                        }
+//                    });
 
                     if(preferences.getString(Config.COURSE_ID, "null").equals(key_code[0])) {
                         if (mydb.check_course_status(key_code[0])){
@@ -361,11 +373,12 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                                     byte[] data = key_result.getBytes("UTF-8");
                                     outputStream.writeInt(data.length);
                                     outputStream.write(data);
-                                    h.post(new Runnable() {
-                                        public void run() {
-                                            loading.dismiss();
-                                        }
-                                     });
+
+//                                    h.post(new Runnable() {
+//                                        public void run() {
+//                                            loading.dismiss();
+//                                        }
+//                                     });
 
                                     } else {
 
@@ -400,22 +413,34 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         }
 
         @Override
+        protected void onProgressUpdate(String... progress)
+        {
+            this.statusdialog.setMessage(progress[0]);
+            if(getActivity() != null)
+                if(!getActivity().isFinishing())
+                    this.statusdialog.show();
+        }
+
+        @Override
         protected void onPostExecute(String result) {
-            if (result != null) {
-                Log.d(SyncActivity.TAG, "Result: "+ result);
-                loading2.dismiss();
-                if(loading.isShowing())
-                    loading.dismiss();
-            }
+
+            this.statusdialog.dismiss();
+            if(loading.isShowing())
+                loading.dismiss();
+
+            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+
         }
         @Override
         protected void onPreExecute() {
-            statusText.setText("Opening a server socket");
+//            statusText.setText("Opening a server socket");
+//            loading.setMessage("Receiving Record...");
+//            loading.show();
         }
     }
 
     public void showMessage(String title, String message) {
-        AlertDialog.Builder Adialog = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder Adialog = new AlertDialog.Builder(currentContext);
         Adialog.setTitle(title);
         Adialog.setMessage(message).setCancelable(false)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
@@ -428,8 +453,17 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     }
 
     @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-        this.context = context;
+    public void onDestroy(){
+        super.onDestroy();
+        if(fileServerAsyncTask.getStatus().equals(AsyncTask.Status.RUNNING))
+            fileServerAsyncTask.cancel(true);
     }
+
+
+//    @Override
+//    public void onResume(){
+//        super.onResume();
+//        currentContext = this.getActivity();
+//    }
+
 }

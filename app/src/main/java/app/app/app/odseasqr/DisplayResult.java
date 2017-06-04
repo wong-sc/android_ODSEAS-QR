@@ -94,15 +94,15 @@ public class DisplayResult extends Fragment implements View.OnClickListener{
 
     private void init(){
 
-        if(position.equals(Config.CHIEF)) {
-                getAttendedData();
-                getAnswerBooklet();
-        } else {
+//        if(position.equals(Config.CHIEF)) {
+//                getAttendedData();
+//                getAnswerBooklet();
+//        } else {
             String attendeddata = mydb.getAttendedData(course_id);
             String bookletData = mydb.getAnswerBooklet(course_id);
             processAttendedData(attendeddata);
             processBookletData(bookletData);
-        }
+//        }
     }
 
     public void getAttendedData() {
