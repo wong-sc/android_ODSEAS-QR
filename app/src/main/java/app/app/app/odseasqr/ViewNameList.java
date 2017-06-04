@@ -41,7 +41,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
     Spinner spinner;
     ImageButton infoButton;
-    String course_id, course_full_name;
+    String course_id, course_full_name, position;
     Intent intent;
     RequestQueue requestQueue;
     SharedPreferences preferences;
@@ -101,7 +101,18 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
         table = (TableLayout) findViewById(R.id.namelist);
+        position = preferences.getString(Dashboard.POSITION, null);
     }
+
+//    if(position.equals(Config.CHIEF)) {
+//        getAttendedData();
+//        getAnswerBooklet();
+//    } else {
+//        String attendeddata = mydb.getAttendedData(course_id);
+//        String bookletData = mydb.getAnswerBooklet(course_id);
+//        processAttendedData(attendeddata);
+//        processBookletData(bookletData);
+//    }
 
     @Override
     public void onItemSelected(AdapterView<?> item, View view, int i, long l) {
@@ -109,40 +120,45 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
 
         switch (i){
             case 0:
-                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAllData(course_id);
                     processNameList(getnamelist);
-                }
-                getNameList(Config.GET_ALL_DATA);
+//                }
+//                if(position.equals(Config.CHIEF))
+//                    getNameList(Config.GET_ALL_DATA);
                 break;
             case 1:
-                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getAttendeesData(course_id);
                     processNameList(getnamelist);
-                }
-                getNameList(Config.GET_ATTENDEES_DATA);
+//                }
+//                if(position.equals(Config.CHIEF))
+//                    getNameList(Config.GET_ATTENDEES_DATA);
                 break;
             case 2:
-                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)) {
                     getnamelist = mydb.getAbsenteesData(course_id);
                     processNameList(getnamelist);
-                }
-                getNameList(Config.GET_ABSENTEES_DATA);
+//                }
+//                if(position.equals(Config.CHIEF))
+//                    getNameList(Config.GET_ABSENTEES_DATA);
                 break;
             case 3:
-                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getInExaminationData(course_id);
                     processNameList(getnamelist);
-                }
-                getNameList(Config.GET_INEXAMINATION_DATA);
+//                }
+//                if(position.equals(Config.CHIEF))
+//                    getNameList(Config.GET_INEXAMINATION_DATA);
 
                 break;
             case 4:
-                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
+//                if(preferences.getString(Config.WIFI_STATUS, "").equals(Config.NOT_CONNECTED)){
                     getnamelist = mydb.getSubmittedData(course_id);
                     processNameList(getnamelist);
-                }
-                getNameList(Config.GET_SUBMITTED_DATA);
+//                }
+//                if(position.equals(Config.CHIEF))
+//                    getNameList(Config.GET_SUBMITTED_DATA);
                 break;
             default:
                 break;
@@ -186,6 +202,7 @@ public class ViewNameList extends AppCompatActivity implements AdapterView.OnIte
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String jsonObject) {
+                        Log.d("result", jsonObject);
                         processNameList(jsonObject);
                     }
                 },
