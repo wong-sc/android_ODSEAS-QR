@@ -175,7 +175,6 @@ public class Scan extends Fragment implements ZXingScannerView.ResultHandler{
                         String status = mydb.updateAttendanceRecord(splited[0], subjectCode, staffID, "1", 0);
                         processGetData(status);
                     }
-//                    Toast.makeText(getContext(), "Successfully added " + splited[0], Toast.LENGTH_LONG).show();
                 }
             }
             if (jsonArray.length() == 0) {

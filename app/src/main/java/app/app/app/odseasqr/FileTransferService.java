@@ -74,7 +74,6 @@ public class FileTransferService extends IntentService {
                         stream.write(info);
 
                         inputStream = new DataInputStream(socket.getInputStream());
-    //                    int lengths =
                         int lengths = inputStream.readInt();
                         byte[] data=new byte[lengths];
                         inputStream.readFully(data);
@@ -147,7 +146,6 @@ public class FileTransferService extends IntentService {
                             sendBroadcast(intents);
                         }
 
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
@@ -169,7 +167,6 @@ public class FileTransferService extends IntentService {
                         }
                     }
                 }
-
             }
         }
 

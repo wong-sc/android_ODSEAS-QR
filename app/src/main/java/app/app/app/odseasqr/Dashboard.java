@@ -297,7 +297,6 @@ public class Dashboard extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-//                        Toast.makeText(Dashboard.this, "Error: "+ error.toString(), Toast.LENGTH_SHORT).show();
                         getSpinnerData();
                     }
                 }){
@@ -363,7 +362,6 @@ public class Dashboard extends AppCompatActivity
         //Traversing through all the items in the json array
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         menu = navView.getMenu();
-//        SubMenu subMenu = menu.addSubMenu(R.id.group_course, 100, 500, "View Attendance");
         courseid.clear();
         subjectData.clear();
         params_name.clear();
@@ -393,7 +391,6 @@ public class Dashboard extends AppCompatActivity
 
         //Setting adapter to show the items in the spinner
         spinner.setAdapter(new ArrayAdapter<String>(Dashboard.this, android.R.layout.simple_spinner_dropdown_item, subjectData));
-//        card.setVisibility(View.VISIBLE);
     }
 
     private void processDetails(JSONArray j,int position){
@@ -595,7 +592,6 @@ public class Dashboard extends AppCompatActivity
                         dialog.cancel();
                     }
                 });
-        AlertDialog alert = Adialog.create();
         Adialog.show();
     }
 
