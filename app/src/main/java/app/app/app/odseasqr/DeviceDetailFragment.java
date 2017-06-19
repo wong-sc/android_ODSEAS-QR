@@ -1,19 +1,6 @@
 package app.app.app.odseasqr;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 import android.app.Activity;
-=======
->>>>>>> remove unused code
-=======
-import android.app.Activity;
->>>>>>> fix bug
-=======
-import android.app.Activity;
-=======
->>>>>>> remove unused code
->>>>>>> remove unused code
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
